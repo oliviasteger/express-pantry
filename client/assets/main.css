@@ -1,6 +1,36 @@
 /* Add some global styles here! */
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif&display=swap');
+html, body {
+  font-family: 'PT Serif', serif;
+  
+/*    
+  background: var(--base-bg);
+  height: 100vh; */
+
+}
 
 :root {
+  --red: #f59ba5ff;
+  --base-bg:  #eff3feff;
+  --light-pink: #ffdefdff;
+  --medium-pink: #ed9ff6ff;
+  --header-color: #3066be;
+  --green: #0a6824;
+  --red:#a22c29;
+  --light-red:#eb6e6e;
+  --light-green:#81c28f;
+  --light-grey:#ebebeb;
+  --dark-grey:#666666; 
+  
+  --dark-blue: #091d68ff;
+  --light-yellow: #fef0bcff;
+  --near-black: #02052cff;
+  --muted-blue:#5a69d0ff;
+  --muted-lavender:#6264a1ff;
+  --magenta:#863263ff;
+  --dark-plum:#3b1f48ff;
+  --medium: 75px;
+  --large: 150px;
   --red: rgb(208, 67, 12);
   --base-bg: #f1f3f5;
 }
