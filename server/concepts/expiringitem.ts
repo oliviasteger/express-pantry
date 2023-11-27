@@ -3,20 +3,20 @@ import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError, NotFoundError } from "./errors";
 
-type Status = "Unreleased" | "Claimable" | "Ordered" | "Used" | "Expired";
+export type ExpiringItemStatus = "Unreleased" | "Claimable" | "Ordered" | "Used" | "Expired";
 
 export interface ExpiringItemDoc extends BaseDoc {
   administrator: ObjectId;
   barcode: string;
   dropDate: Date;
   expirationDate: Date;
-  status: Status;
+  status: ExpiringItemStatus;
 }
 
 export default class ExpiringItemConcept {
   public readonly expiringitems = new DocCollection<ExpiringItemDoc>("expiringitems");
 
-  async create(administrator: ObjectId, barcode: string, dropDate: Date, expirationDate: Date, status: Status) {
+  async create(administrator: ObjectId, barcode: string, dropDate: Date, expirationDate: Date, status: ExpiringItemStatus) {
     this.areDatesValid(dropDate, expirationDate);
     const _id = await this.expiringitems.createOne({ administrator, barcode, dropDate, expirationDate, status });
     return { msg: "Expiring item successfully created!", post: await this.expiringitems.readOne({ _id }) };
@@ -50,9 +50,28 @@ export default class ExpiringItemConcept {
     return { msg: "Expiring item deleted successfully!" };
   }
 
+  async isAdministrator(user: ObjectId, _id: ObjectId) {
+    const expiringitem = await this.expiringitems.readOne({ _id });
+    if (!expiringitem) {
+      throw new NotFoundError(`Expiring item ${_id} does not exist!`);
+    }
+    if (expiringitem.administrator.toString() !== user.toString()) {
+      throw new ItemAdministratorNotMatchError(user, _id);
+    }
+  }
+
   private areDatesValid(dropDate: Date, expirationDate: Date) {
     if (expirationDate.getTime() < dropDate.getTime()) {
       throw new NotAllowedError(`Cannot have an item that expires before being released!`);
     }
+  }
+}
+
+export class ItemAdministratorNotMatchError extends NotAllowedError {
+  constructor(
+    public readonly administrator: ObjectId,
+    public readonly _id: ObjectId,
+  ) {
+    super("{0} is not the administrator of expiring item {1}!", administrator, _id);
   }
 }

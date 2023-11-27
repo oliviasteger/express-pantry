@@ -2,9 +2,10 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Friend, Post, User, WebSession } from "./app";
+import { ExpiringItem, Friend, Post, User, WebSession } from "./app";
+import { ExpiringItemDoc, ExpiringItemStatus } from "./concepts/expiringitem";
 import { PostDoc, PostOptions } from "./concepts/post";
-import { UserDoc } from "./concepts/user";
+import { UserDoc, UserType } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import Responses from "./responses";
 
@@ -26,9 +27,9 @@ class Routes {
   }
 
   @Router.post("/users")
-  async createUser(session: WebSessionDoc, username: string, password: string) {
+  async createUser(session: WebSessionDoc, username: string, password: string, type: UserType) {
     WebSession.isLoggedOut(session);
-    return await User.create(username, password);
+    return await User.create(username, password, type);
   }
 
   @Router.patch("/users")
@@ -55,6 +56,66 @@ class Routes {
   async logOut(session: WebSessionDoc) {
     WebSession.end(session);
     return { msg: "Logged out!" };
+  }
+
+  @Router.get("/users/:username/items")
+  async getOrderableBarcodesAndQuantities(username: string) {
+    // View all orderable items for a given pantry
+    const administrator = await User.getUserByUsername(username);
+    await User.isAdministrator(administrator._id);
+
+    const items = await ExpiringItem.getExpiringItems({ administrator: administrator, status: "Claimable" });
+    const barcodesToQuantities: { [key: string]: number } = {};
+
+    for (const item in items) {
+      if (item in barcodesToQuantities) {
+        barcodesToQuantities[item] += 1;
+      } else {
+        barcodesToQuantities[item] = 1;
+      }
+    }
+
+    return barcodesToQuantities;
+  }
+
+  @Router.get("/items")
+  async getItems(session: WebSessionDoc) {
+    // View all items in pantry inventory
+    const user = WebSession.getUser(session);
+    await User.isAdministrator(user);
+
+    return await ExpiringItem.getExpiringItems({ administrator: user });
+  }
+
+  @Router.post("/items")
+  async createItem(session: WebSessionDoc, barcode: string, dropDate: string, expirationDate: string, status: ExpiringItemStatus) {
+    // Create a pantry item
+    const user = WebSession.getUser(session);
+    await User.isAdministrator(user);
+
+    return await ExpiringItem.create(user, barcode, new Date(dropDate), new Date(expirationDate), status);
+  }
+
+  @Router.patch("/items/:id")
+  async updateItem(session: WebSessionDoc, id: ObjectId, update: Partial<ExpiringItemDoc>) {
+    // Update a pantry item
+    const user = WebSession.getUser(session);
+    await User.isAdministrator(user);
+    await ExpiringItem.isAdministrator(user, id);
+    return await ExpiringItem.update(id, update);
+
+    // TODO: update any corresponding orders
+  }
+
+  @Router.delete("/items/:id")
+  async deleteItem(session: WebSessionDoc, id: ObjectId) {
+    // Delete a pantry item
+    const user = WebSession.getUser(session);
+    await User.isAdministrator(user);
+    await ExpiringItem.isAdministrator(user, id);
+    return await ExpiringItem.delete(id);
+
+    // TODO: update any corresponding orders
   }
 
   @Router.get("/posts")

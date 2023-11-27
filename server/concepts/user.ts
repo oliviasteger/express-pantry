@@ -2,17 +2,20 @@ import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { BadValuesError, NotAllowedError, NotFoundError } from "./errors";
 
+export type UserType = "Administrator" | "Client";
+
 export interface UserDoc extends BaseDoc {
   username: string;
   password: string;
+  type: UserType;
 }
 
 export default class UserConcept {
   public readonly users = new DocCollection<UserDoc>("users");
 
-  async create(username: string, password: string) {
+  async create(username: string, password: string, type: UserType) {
     await this.canCreate(username, password);
-    const _id = await this.users.createOne({ username, password });
+    const _id = await this.users.createOne({ username, password, type });
     return { msg: "User created successfully!", user: await this.users.readOne({ _id }) };
   }
 
@@ -78,6 +81,15 @@ export default class UserConcept {
     const maybeUser = await this.users.readOne({ _id });
     if (maybeUser === null) {
       throw new NotFoundError(`User not found!`);
+    }
+  }
+
+  async isAdministrator(_id: ObjectId) {
+    const maybeUser = await this.users.readOne({ _id });
+    if (maybeUser === null) {
+      throw new NotFoundError(`User not found!`);
+    } else if (maybeUser.type === "Client") {
+      throw new NotAllowedError(`User is not an administrator!`);
     }
   }
 
