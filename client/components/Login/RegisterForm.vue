@@ -5,6 +5,7 @@ import { ref } from "vue";
 
 const username = ref("");
 const password = ref("");
+const UserType = ref("");
 const { createUser, loginUser, updateSession } = useUserStore();
 
 async function register() {
@@ -27,6 +28,20 @@ async function register() {
         <label for="aligned-password">Password</label>
         <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
       </div>
+      <div class="pure-control-group">
+        <h3 for="UserType">Account Type</h3>
+        <div class="radio-container">
+          <div>
+            <input type="radio" value="Food Pantry Admin" v-model="UserType" id="Food Pantry Admin" />
+            <label for="foodPantryAdmin">Food Pantry Admin</label>
+          </div>
+          <div>
+            <input type="radio" value="Client" v-model="UserType" id="Client" />
+            <label for="client">Client</label>
+          </div>
+        </div>
+      </div>
+      <br />
       <div class="pure-controls">
         <button type="submit" class="pure-button pure-button-primary">Register</button>
       </div>
