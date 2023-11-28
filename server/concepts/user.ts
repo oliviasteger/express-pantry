@@ -4,6 +4,11 @@ import { BadValuesError, NotAllowedError, NotFoundError } from "./errors";
 
 export type UserType = "Administrator" | "Client";
 
+export interface UserInfo {
+  isSnapEligible?: boolean;
+  location?: string;
+}
+
 export interface UserDocUnparsed extends BaseDoc {
   username: string;
   password: string;
@@ -14,7 +19,7 @@ export interface UserDoc extends BaseDoc {
   username: string;
   password: string;
   type: UserType;
-  information: Record<string, string>;
+  information: UserInfo;
 }
 
 export default class UserConcept {
