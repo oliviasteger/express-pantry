@@ -1,0 +1,1 @@
+<!-- ASK abt if search bar and filter should be seperate components or not -->
