@@ -4,18 +4,25 @@ import { BadValuesError, NotAllowedError, NotFoundError } from "./errors";
 
 export type UserType = "Administrator" | "Client";
 
+export interface UserDocUnparsed extends BaseDoc {
+  username: string;
+  password: string;
+  type: UserType;
+  information: string;
+}
 export interface UserDoc extends BaseDoc {
   username: string;
   password: string;
   type: UserType;
+  information: Record<string, string>;
 }
 
 export default class UserConcept {
   public readonly users = new DocCollection<UserDoc>("users");
 
-  async create(username: string, password: string, type: UserType) {
+  async create(username: string, password: string, type: UserType, information?: Record<string, string>) {
     await this.canCreate(username, password);
-    const _id = await this.users.createOne({ username, password, type });
+    const _id = await this.users.createOne({ username, password, type, information });
     return { msg: "User created successfully!", user: await this.users.readOne({ _id }) };
   }
 

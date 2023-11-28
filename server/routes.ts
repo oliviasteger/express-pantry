@@ -2,10 +2,9 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { ExpiringItem, Friend, Post, User, WebSession } from "./app";
+import { ExpiringItem, Friend, User, WebSession } from "./app";
 import { ExpiringItemDoc, ExpiringItemStatus } from "./concepts/expiringitem";
-import { PostDoc, PostOptions } from "./concepts/post";
-import { UserDoc, UserType } from "./concepts/user";
+import { UserDoc, UserDocUnparsed, UserType } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import Responses from "./responses";
 
@@ -27,15 +26,21 @@ class Routes {
   }
 
   @Router.post("/users")
-  async createUser(session: WebSessionDoc, username: string, password: string, type: UserType) {
+  async createUser(session: WebSessionDoc, username: string, password: string, type: UserType, information?: string) {
     WebSession.isLoggedOut(session);
-    return await User.create(username, password, type);
+    let parsedInfo;
+    if (information) parsedInfo = JSON.parse(information);
+    return await User.create(username, password, type, parsedInfo);
   }
 
   @Router.patch("/users")
-  async updateUser(session: WebSessionDoc, update: Partial<UserDoc>) {
+  async updateUser(session: WebSessionDoc, update: Partial<UserDocUnparsed>) {
     const user = WebSession.getUser(session);
-    return await User.update(user, update);
+    let updateParsed: Partial<UserDoc> = {};
+    let information: string | undefined = "";
+    ({ information, ...updateParsed } = update);
+    if (information) updateParsed.information = JSON.parse(information);
+    return await User.update(user, updateParsed);
   }
 
   @Router.delete("/users")
@@ -118,38 +123,38 @@ class Routes {
     // TODO: update any corresponding orders
   }
 
-  @Router.get("/posts")
-  async getPosts(author?: string) {
-    let posts;
-    if (author) {
-      const id = (await User.getUserByUsername(author))._id;
-      posts = await Post.getByAuthor(id);
-    } else {
-      posts = await Post.getPosts({});
-    }
-    return Responses.posts(posts);
-  }
+  // @Router.get("/posts")
+  // async getPosts(author?: string) {
+  //   let posts;
+  //   if (author) {
+  //     const id = (await User.getUserByUsername(author))._id;
+  //     posts = await Post.getByAuthor(id);
+  //   } else {
+  //     posts = await Post.getPosts({});
+  //   }
+  //   return Responses.posts(posts);
+  // }
 
-  @Router.post("/posts")
-  async createPost(session: WebSessionDoc, content: string, options?: PostOptions) {
-    const user = WebSession.getUser(session);
-    const created = await Post.create(user, content, options);
-    return { msg: created.msg, post: await Responses.post(created.post) };
-  }
+  // @Router.post("/posts")
+  // async createPost(session: WebSessionDoc, content: string, options?: PostOptions) {
+  //   const user = WebSession.getUser(session);
+  //   const created = await Post.create(user, content, options);
+  //   return { msg: created.msg, post: await Responses.post(created.post) };
+  // }
 
-  @Router.patch("/posts/:_id")
-  async updatePost(session: WebSessionDoc, _id: ObjectId, update: Partial<PostDoc>) {
-    const user = WebSession.getUser(session);
-    await Post.isAuthor(user, _id);
-    return await Post.update(_id, update);
-  }
+  // @Router.patch("/posts/:_id")
+  // async updatePost(session: WebSessionDoc, _id: ObjectId, update: Partial<PostDoc>) {
+  //   const user = WebSession.getUser(session);
+  //   await Post.isAuthor(user, _id);
+  //   return await Post.update(_id, update);
+  // }
 
-  @Router.delete("/posts/:_id")
-  async deletePost(session: WebSessionDoc, _id: ObjectId) {
-    const user = WebSession.getUser(session);
-    await Post.isAuthor(user, _id);
-    return Post.delete(_id);
-  }
+  // @Router.delete("/posts/:_id")
+  // async deletePost(session: WebSessionDoc, _id: ObjectId) {
+  //   const user = WebSession.getUser(session);
+  //   await Post.isAuthor(user, _id);
+  //   return Post.delete(_id);
+  // }
 
   @Router.get("/friends")
   async getFriends(session: WebSessionDoc) {
