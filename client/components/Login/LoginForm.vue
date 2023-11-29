@@ -27,15 +27,27 @@ async function login() {
         <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
       </div>
       <div class="pure-controls">
-        <button type="submit" class="pure-button pure-button-primary">Submit</button>
+        <button type="submit" class="button default">Submit</button>
+      </div>
+      <div class = "row">
+        <h6> Don't have an account</h6>
       </div>
     </fieldset>
   </form>
 </template>
 
 <style scoped>
-h3 {
+h3,h6 {
   display: flex;
   justify-content: center;
+}
+.row {
+  margin: 0 auto;
+  max-width: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 1em;
 }
 </style>
