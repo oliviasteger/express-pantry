@@ -10,11 +10,11 @@ const pickupWindowLength = ref("");
 const ordersPerWindow = ref("");
 const rules = ref("");
 const cities = ref([]);
+const hoursOptions = Array.from({ length: 24 }, (_, index) => String(index + 1));
 
 async function getCities() {
   const response = await fetch("https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-cities-demographics/records?group_by=city&limit=3000");
   const data = await response.json();
-  console.log("HERE", data);
 
   cities.value = data.results.map((record) => record.city); // Extracting city names
 
@@ -50,6 +50,42 @@ onMounted(async () => {
           <option value="" disabled>Select City</option>
           <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
         </select>
+      </div>
+
+      <div class="pure-control-group">
+        <label for="aligned-openHour">Name of Food Pantry</label>
+        <input v-model.trim="name" type="text" id="aligned-name" placeholder="name" required />
+      </div>
+
+      <div class="pure-control-group">
+        <label for="aligned-openHour">Hour That Food Pantry Opens</label>
+        <select v-model="openHour" id="aligned-openHour" required>
+          <option value="" disabled>Select Hour</option>
+          <option v-for="hour in hoursOptions" :key="hour" :value="hour">{{ hour }}</option>
+        </select>
+      </div>
+
+      <div class="pure-control-group">
+        <label for="aligned-closeHour">Hour That Food Pantry Closes</label>
+        <select v-model="closeHour" id="aligned-closeHour" required>
+          <option value="" disabled>Select Hour</option>
+          <option v-for="hour in hoursOptions" :key="hour" :value="hour">{{ hour }}</option>
+        </select>
+      </div>
+
+      <div class="pure-control-group">
+        <label for="aligned-pickupWindowLength">Pickup Window Length</label>
+        <input v-model.trim="pickupWindowLength" type="text" id="aligned-pickupWindowLength" placeholder="pickup Length" required />
+      </div>
+
+      <div class="pure-control-group">
+        <label for="aligned-ordersPerWindow">Number of Orders Per Pickup Window</label>
+        <input v-model.trim="ordersPerWindow" type="text" id="aligned-ordersPerWindow" placeholder="orders Per Window" required />
+      </div>
+
+      <div class="pure-control-group">
+        <label for="aligned-rules">Annual Income Max (optional)</label>
+        <input v-model.trim="rules" type="text" id="aligned-rules" placeholder="rules" />
       </div>
 
       <br />
