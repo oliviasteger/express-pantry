@@ -11,6 +11,8 @@ const ordersPerWindow = ref("");
 const rules = ref("");
 const cities = ref([]);
 const hoursOptions = Array.from({ length: 24 }, (_, index) => String(index + 1));
+const username = ref("");
+const password = ref("");
 
 async function getCities() {
   const response = await fetch("https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-cities-demographics/records?group_by=city&limit=3000");
@@ -33,6 +35,14 @@ const registerPantry = async () => {
       rules: rules.value,
     },
   });
+
+  await fetchy("/api/users", "POST", {
+    body: {
+      username: username.value,
+      password: password.value,
+      UserType: "admin",
+    },
+  });
 };
 
 onMounted(async () => {
@@ -41,6 +51,14 @@ onMounted(async () => {
 </script>
 
 <template>
+  <div class="pure-control-group">
+    <label for="aligned-name">Username</label>
+    <input v-model.trim="username" type="text" id="aligned-name" placeholder="Username" required />
+  </div>
+  <div class="pure-control-group">
+    <label for="aligned-password">Password</label>
+    <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
+  </div>
   <form class="pure-form pure-form-aligned" @submit.prevent="registerPantry">
     <h3>Register Pantry</h3>
     <fieldset>
@@ -66,6 +84,8 @@ onMounted(async () => {
       </div>
 
       <div class="pure-control-group">
+        <v-date-picker v-model="openHour" @input="dateMenu = false" :min="currentDate" :show-current="true"></v-date-picker>
+
         <label for="aligned-closeHour">Hour That Food Pantry Closes</label>
         <select v-model="closeHour" id="aligned-closeHour" required>
           <option value="" disabled>Select Hour</option>
