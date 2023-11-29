@@ -2,8 +2,9 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { ExpiringItem, Friend, User, WebSession } from "./app";
+import { ExpiringItem, Friend, Profile, User, WebSession } from "./app";
 import { ExpiringItemDoc, ExpiringItemStatus } from "./concepts/expiringitem";
+import { ProfileDoc } from "./concepts/profile";
 import { UserDoc, UserDocUnparsed, UserType } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import Responses from "./responses";
@@ -121,6 +122,43 @@ class Routes {
     return await ExpiringItem.delete(id);
 
     // TODO: update any corresponding orders
+  }
+
+  @Router.post("/profiles")
+  async createProfile(session: WebSessionDoc, location: string, name: string, openHour: string, closeHour: string, pickupWindowLength: string, ordersPerWindow: string, rules?: string) {
+    const user = WebSession.getUser(session);
+    return await Profile.create(user, location, name, parseInt(openHour), parseInt(closeHour), parseInt(pickupWindowLength), parseInt(ordersPerWindow), rules && JSON.parse(rules));
+  }
+
+  @Router.get("/profiles/:_id")
+  async getProfileById(_id: string) {
+    return await Profile.getProfileById(new ObjectId(_id));
+  }
+
+  @Router.get("/profiles")
+  async getProfiles(searchQuery: string) {
+    return await Profile.getProfilesByQuery(JSON.parse(searchQuery));
+  }
+
+  @Router.patch("/profiles")
+  async updateProfile(session: WebSessionDoc, _id: string, update: Partial<ProfileDoc>) {
+    const user = WebSession.getUser(session);
+    await Profile.assertAdministrator(user, new ObjectId(_id));
+    return await Profile.update(new ObjectId(_id), update);
+  }
+
+  @Router.delete("/profiles/:_id")
+  async deleteProfile(session: WebSessionDoc, _id: string) {
+    const user = WebSession.getUser(session);
+    await Profile.assertAdministrator(user, new ObjectId(_id));
+    return await Profile.delete(new ObjectId(_id));
+  }
+
+  @Router.get("/profiles/eligibility/:profileId/:userId")
+  async isEligible(profileId: string, userId: string) {
+    const user = await User.getUserById(new ObjectId(userId));
+    await Profile.assertEligible(new ObjectId(profileId), user);
+    return { msg: "User is eligible" };
   }
 
   // @Router.get("/posts")

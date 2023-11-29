@@ -53,6 +53,50 @@ const operations: operation[] = [
     method: "GET",
     fields: { username: "input" },
   },
+  {
+    name: "Create Profile",
+    endpoint: "/api/profiles",
+    method: "POST",
+    fields: { administrator: "input", location: "input", name: "input", openHour: "input", closeHour: "input", pickupWindowLength: "input", ordersPerWindow: "input", rules: "input" },
+  },
+  {
+    name: "Get Profile by id",
+    endpoint: "/api/profiles/:_id",
+    method: "GET",
+    fields: { _id: "input" },
+  },
+  {
+    name: "Get Profiles by Query",
+    endpoint: "/api/profiles",
+    method: "GET",
+    fields: { searchQuery: "input" },
+  },
+  {
+    name: "Update Profile",
+    endpoint: "/api/profiles",
+    method: "PATCH",
+    fields: {
+      _id: "input",
+      update: { administrator: "input", location: "input", name: "input", openHour: "input", closeHour: "input", pickupWindowLength: "input", ordersPerWindow: "input", rules: "input" },
+    },
+  },
+  {
+    name: "Delete Profile",
+    endpoint: "/api/profiles/:_id",
+    method: "DELETE",
+    fields: {
+      _id: "input",
+    },
+  },
+  {
+    name: "Assert eligibility",
+    endpoint: "/api/profiles/eligibility/:profileId/:userId",
+    method: "GET",
+    fields: {
+      profileId: "input",
+      userId: "input",
+    },
+  },
 ];
 
 // Do not edit below here.

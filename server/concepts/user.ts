@@ -22,6 +22,12 @@ export interface UserDoc extends BaseDoc {
   information: UserInfo;
 }
 
+export interface SanitizedUserDoc extends BaseDoc {
+  username: string;
+  type: UserType;
+  information: UserInfo;
+}
+
 export default class UserConcept {
   public readonly users = new DocCollection<UserDoc>("users");
 

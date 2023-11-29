@@ -7,7 +7,7 @@
     "dev:server": "npm run build:server && concurrently \"tsc -p server/tsconfig.json -w\" \"nodemon -r source-map-support/register dist-server/api/index.js\"",
     "build:server": "tsc -p server/tsconfig.json",
     "start:server": "npm run build:server && node -r source-map-support/register dist-server/api/index.js",
-    "test:server": "tsc && copyfiles public/*.html public/*.css public/favicon.ico dist/ && node -r source-map-support/register dist/api/index.js",
+    "test:server": "tsc && copyfiles public/*.html public/*.css dist/ && node -r source-map-support/register dist/api/index.js",
     "build": "npm run build:client && npm run build:server",
     "lint:client": "eslint client/ --ext .ts && prettier client/ --check",
     "lint:server": "eslint server/ --ext .ts && prettier server/ --check",
