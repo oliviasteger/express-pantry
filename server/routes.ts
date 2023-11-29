@@ -2,12 +2,13 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { ExpiringItem, Friend, Profile, User, WebSession } from "./app";
+import { ExpiringItem, Profile, Request, User, WebSession } from "./app";
+import { NotAllowedError } from "./concepts/errors";
 import { ExpiringItemDoc, ExpiringItemStatus } from "./concepts/expiringitem";
 import { ProfileDoc } from "./concepts/profile";
+import { RequestDoc } from "./concepts/request";
 import { UserDoc, UserDocUnparsed, UserType } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
-import Responses from "./responses";
 
 class Routes {
   @Router.get("/session")
@@ -161,6 +162,81 @@ class Routes {
     return { msg: "User is eligible" };
   }
 
+  @Router.get("/requests")
+  async getRequests(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const userType = (await User.getUserById(user)).type;
+
+    if (userType == "Client") {
+      return await Request.getRequests({ requester: user });
+    } else {
+      return await Request.getRequests({ requestee: user });
+    }
+  }
+
+  @Router.post("/requests")
+  async createRequest(session: WebSessionDoc, barcode: string, requestee: ObjectId) {
+    const user = WebSession.getUser(session);
+    const userObject = await User.getUserById(user);
+
+    if (userObject.type == "Administrator") throw new NotAllowedError(`Only pantry clients can create requests.`);
+
+    // Check that user is eligible to access the pantry
+    await Profile.assertEligible(requestee, userObject);
+
+    // Check that the item is out of stock
+    const items = await ExpiringItem.getExpiringItems({ administrator: requestee, barcode, status: "Claimable" });
+    if (items.length !== 0) throw new NotAllowedError(`Requests can only be made for items that are out of stock.`);
+
+    return await Request.create(barcode, user, requestee);
+  }
+
+  @Router.patch("/requests/:id")
+  async updateRequest(session: WebSessionDoc, _id: ObjectId, update: Partial<RequestDoc>) {
+    const user = WebSession.getUser(session);
+    const userObject = await User.getUserById(user);
+
+    // Only requesters and requestees can update requests
+    // Only requesters can update barcode, only requestees can update status
+    if (userObject.type == "Administrator") {
+      await Request.isRequestee(user, _id);
+      if (update.barcode) throw new NotAllowedError(`Only clients can update request barcodes.`);
+    } else {
+      await Request.isRequester(user, _id);
+      if (update.status) throw new NotAllowedError(`Only administrators can update request status.`);
+    }
+
+    return await Request.update(_id, update);
+  }
+
+  @Router.delete("/requests/:id")
+  async deleteRequest(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    const userObject = await User.getUserById(user);
+
+    // Only requesters can delete requests
+    if (userObject.type == "Administrator") throw new NotAllowedError(`Only pantry clients can delete requests.`);
+
+    // Can only delete a request that you created
+    await Request.isRequester(user, _id);
+
+    return await Request.delete(_id);
+  }
+
+  @Router.get("/map")
+  async getMapLocations(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const userObject = await User.getUserById(user);
+
+    // Only clients can view maps
+    if (userObject.type == "Administrator") throw new NotAllowedError(`Only pantry clients can check eligibility.`);
+
+    const pantries = await Profile.getProfilesByQuery({});
+    const eligiblePantries = pantries.filter((pantry) => Profile.isEligible(pantry._id, userObject));
+
+    return eligiblePantries;
+  }
+
   // @Router.get("/posts")
   // async getPosts(author?: string) {
   //   let posts;
@@ -194,52 +270,52 @@ class Routes {
   //   return Post.delete(_id);
   // }
 
-  @Router.get("/friends")
-  async getFriends(session: WebSessionDoc) {
-    const user = WebSession.getUser(session);
-    return await User.idsToUsernames(await Friend.getFriends(user));
-  }
+  // @Router.get("/friends")
+  // async getFriends(session: WebSessionDoc) {
+  //   const user = WebSession.getUser(session);
+  //   return await User.idsToUsernames(await Friend.getFriends(user));
+  // }
 
-  @Router.delete("/friends/:friend")
-  async removeFriend(session: WebSessionDoc, friend: string) {
-    const user = WebSession.getUser(session);
-    const friendId = (await User.getUserByUsername(friend))._id;
-    return await Friend.removeFriend(user, friendId);
-  }
+  // @Router.delete("/friends/:friend")
+  // async removeFriend(session: WebSessionDoc, friend: string) {
+  //   const user = WebSession.getUser(session);
+  //   const friendId = (await User.getUserByUsername(friend))._id;
+  //   return await Friend.removeFriend(user, friendId);
+  // }
 
-  @Router.get("/friend/requests")
-  async getRequests(session: WebSessionDoc) {
-    const user = WebSession.getUser(session);
-    return await Responses.friendRequests(await Friend.getRequests(user));
-  }
+  // @Router.get("/friend/requests")
+  // async getRequests(session: WebSessionDoc) {
+  //   const user = WebSession.getUser(session);
+  //   return await Responses.friendRequests(await Friend.getRequests(user));
+  // }
 
-  @Router.post("/friend/requests/:to")
-  async sendFriendRequest(session: WebSessionDoc, to: string) {
-    const user = WebSession.getUser(session);
-    const toId = (await User.getUserByUsername(to))._id;
-    return await Friend.sendRequest(user, toId);
-  }
+  // @Router.post("/friend/requests/:to")
+  // async sendFriendRequest(session: WebSessionDoc, to: string) {
+  //   const user = WebSession.getUser(session);
+  //   const toId = (await User.getUserByUsername(to))._id;
+  //   return await Friend.sendRequest(user, toId);
+  // }
 
-  @Router.delete("/friend/requests/:to")
-  async removeFriendRequest(session: WebSessionDoc, to: string) {
-    const user = WebSession.getUser(session);
-    const toId = (await User.getUserByUsername(to))._id;
-    return await Friend.removeRequest(user, toId);
-  }
+  // @Router.delete("/friend/requests/:to")
+  // async removeFriendRequest(session: WebSessionDoc, to: string) {
+  //   const user = WebSession.getUser(session);
+  //   const toId = (await User.getUserByUsername(to))._id;
+  //   return await Friend.removeRequest(user, toId);
+  // }
 
-  @Router.put("/friend/accept/:from")
-  async acceptFriendRequest(session: WebSessionDoc, from: string) {
-    const user = WebSession.getUser(session);
-    const fromId = (await User.getUserByUsername(from))._id;
-    return await Friend.acceptRequest(fromId, user);
-  }
+  // @Router.put("/friend/accept/:from")
+  // async acceptFriendRequest(session: WebSessionDoc, from: string) {
+  //   const user = WebSession.getUser(session);
+  //   const fromId = (await User.getUserByUsername(from))._id;
+  //   return await Friend.acceptRequest(fromId, user);
+  // }
 
-  @Router.put("/friend/reject/:from")
-  async rejectFriendRequest(session: WebSessionDoc, from: string) {
-    const user = WebSession.getUser(session);
-    const fromId = (await User.getUserByUsername(from))._id;
-    return await Friend.rejectRequest(fromId, user);
-  }
+  // @Router.put("/friend/reject/:from")
+  // async rejectFriendRequest(session: WebSessionDoc, from: string) {
+  //   const user = WebSession.getUser(session);
+  //   const fromId = (await User.getUserByUsername(from))._id;
+  //   return await Friend.rejectRequest(fromId, user);
+  // }
 }
 
 export default getExpressRouter(new Routes());
