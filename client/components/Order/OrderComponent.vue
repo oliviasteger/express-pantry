@@ -1,0 +1,1 @@
+<!-- same view for user and admin but only admin can update status-->
