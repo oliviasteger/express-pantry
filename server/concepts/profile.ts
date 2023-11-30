@@ -2,6 +2,7 @@ import assert from "assert";
 import { ObjectId } from "mongodb";
 import { User } from "../app";
 import DocCollection, { BaseDoc } from "../framework/doc";
+import { NotFoundError } from "./errors";
 import { SanitizedUserDoc } from "./user";
 
 export interface ProfileRules {
@@ -73,6 +74,27 @@ export default class ProfileConcept {
       assert(user.information.isSnapEligible !== undefined, "User's snap eligibility is not inputted");
       assert(user.information.isSnapEligible, "User is not snap eligible");
     }
+  }
+
+  async isEligible(_id: ObjectId, user: SanitizedUserDoc): Promise<boolean> {
+    const profile = await this.getProfileById(_id);
+    if (!profile) throw new NotFoundError(`Profile ${_id} does not exist!`);
+
+    const profileRules = profile.rules;
+    let eligible = true;
+
+    if (profileRules.locationProximity) {
+      if (!(user.information !== undefined && user.information !== null)) eligible = false;
+      if (!(user.information.location !== undefined)) eligible = false;
+      if (!(profile.location === user.information.location)) eligible = false;
+    }
+    if (profileRules.snapRequired) {
+      if (!(user.information !== undefined)) eligible = false;
+      if (!(user.information.isSnapEligible !== undefined)) eligible = false;
+      if (!user.information.isSnapEligible) eligible = false;
+    }
+
+    return eligible;
   }
 
   async assertAdministrator(userId: ObjectId, profileId: ObjectId) {
