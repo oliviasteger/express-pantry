@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { onBeforeMount, ref } from "vue";
+import { computed, onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 let username = ref("");
@@ -75,12 +75,19 @@ const emptyForm = () => {
 };
 const { currentUsername } = storeToRefs(useUserStore());
 const { updateUser, updateSession } = useUserStore();
-const isSubmittable = (value:any) => {
-      // You can set your own validation logic here.
-      if (value.value) return true;
-      return 'You must enter a value.';
+const rules = [
+(        value: any) => {
+          if (value) return 'value'
+
+          return 'You must enter a first name.'
+        },
+      ];
+// const isSubmittable = (value:any) => {
+//       // You can set your own validation logic here.
+//       if (value.value) return true;
+//       return 'You must enter a value.';
     
-};
+// };
 // const isUpdatePasswordDisabled = computed(() => {
 //       // You can set your own validation logic here.
 //       if (password.value) return true;
@@ -95,10 +102,10 @@ const isSubmittable = (value:any) => {
 //       // You can set your own validation logic here.
 //       return (!information.value.annualIncome);
 // });
-// const isUpdateCityDisabled = computed(() => {
-//       // You can set your own validation logic here.
-//       return (!information.value.city);
-// });
+const isUpdateCityDisabled = computed(() => {
+      // You can set your own validation logic here.
+      return (!information.value.city);
+});
 
   
 async function updateUsername() {
@@ -141,7 +148,7 @@ onBeforeMount(async () => {
       v-model="username"
       :placeholder= "currentUsername"
       :persistent-placeholder=true
-      :rules="isSubmittable(username)"
+      :rules="rules"
       label="Username"
     ></v-text-field>
 
@@ -157,7 +164,7 @@ onBeforeMount(async () => {
     <v-text-field
       v-model="password"
       label= "Password"
-      :rules="isSubmittable(password)"
+      :rules="rules"
     ></v-text-field>
 
     <v-btn
@@ -174,7 +181,7 @@ onBeforeMount(async () => {
       :placeholder= "currentAnnualIncome"
       label="Current Annual Income"
       :persistent-placeholder=true
-      :rules="isSubmittable(information.annualIncome)"
+      :rules="rules"
     ></v-text-field>
 
     <v-btn
@@ -185,14 +192,20 @@ onBeforeMount(async () => {
     ></v-btn>
   </v-form>
   <v-form validate-on="submit lazy" @submit.prevent="updateField('city')">
-    <v-text-field
+    <!-- <v-text-field
       v-model="information.city"
       :placeholder= "currentCity"
       :persistent-placeholder=true
       label="Current Annual Income"
       :rules="isSubmittable(information.city)"
-    ></v-text-field>
-
+    ></v-text-field> -->
+    <v-select
+      v-model="information.city"
+      label="Select City"
+      :placeholder= "currentCity"
+      :persistent-placeholder=true
+      :items="cities"
+    ></v-select>
     <v-btn
       type="submit"
       block
