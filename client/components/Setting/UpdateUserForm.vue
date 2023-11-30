@@ -205,6 +205,7 @@ onBeforeMount(async () => {
       :placeholder= "currentCity"
       :persistent-placeholder=true
       :items="cities"
+      return-object
     ></v-select>
     <v-btn
       type="submit"
