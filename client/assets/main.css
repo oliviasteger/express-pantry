@@ -1,8 +1,15 @@
 /* Add some global styles here! */
-@import url('https://fonts.googleapis.com/css2?family=PT+Serif&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif&family=Roboto:wght@100;300;400;500&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
 html, body {
+  font-family: 'Fredoka', sans-serif;
   font-family: 'PT Serif', serif;
-  
+  font-family: 'Roboto', sans-serif;
+/* html, body {
+  font-family: 'PT Serif', serif; */
+  height:max-content
 /*    
   background: var(--base-bg);
   height: 100vh; */
@@ -38,15 +45,20 @@ html, body {
 
 button.btn-small {
   font-size: 80%;
+  background-size: 50%;
 }
 button.default {
-  background-color:var(--red);
+  background-color:var(--lighter-header);
   border-radius: 10px;
-  
+  gap: 0.5em;
+  padding: .5em;
+  color:var(--darker-header);
 }
 h6{
+  font-weight: 300;
   color:var(--dark-grey);
 }
+
 h3{
   color:var(--off-black);
 }
@@ -59,12 +71,11 @@ button.button-success {
   background: var(--green);
 }
 button.default-disabled {
+  background-color:var(--light-grey);
+  border-radius: 10px;
+  gap: 0.5em;
+  padding: .5em;
   color:var(--dark-grey);
-  background-color:var(--base-bg);
-  border-radius: 8px;
-  border-style: solid;
-  border-width: medium;
-  border-color:var(--light-grey);
 }
 a.button {
   color: #212529;
@@ -82,3 +93,10 @@ a.button {
   align-items: center;
   gap: 1em;
 }
+@font-face {
+  font-family: 'Bugis';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Bugis'), url('./fonts/Bugis.woff') format('woff');
+  }
+

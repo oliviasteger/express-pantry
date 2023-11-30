@@ -18,7 +18,7 @@ async function getCities() {
   const response = await fetch("https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-cities-demographics/records?group_by=city&limit=3000");
   const data = await response.json();
 
-  cities.value = data.results.map((record) => record.city); // Extracting city names
+  cities.value = data.results.map((record: { city: any; }) => record.city); // Extracting city names
 
   return cities;
 }
@@ -84,7 +84,7 @@ onMounted(async () => {
       </div>
 
       <div class="pure-control-group">
-        <v-date-picker v-model="openHour" @input="dateMenu = false" :min="currentDate" :show-current="true"></v-date-picker>
+        <!-- <v-date-picker v-model="openHour" @input="dateMenu = false" :min="currentDate" :show-current="true"></v-date-picker> -->
 
         <label for="aligned-closeHour">Hour That Food Pantry Closes</label>
         <select v-model="closeHour" id="aligned-closeHour" required>
