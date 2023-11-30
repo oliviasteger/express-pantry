@@ -61,7 +61,7 @@ const operations: operation[] = [
   },
   {
     name: "Get Profile by id",
-    endpoint: "/api/profiles/:_id",
+    endpoint: "/api/profiles/id/:_id",
     method: "GET",
     fields: { _id: "input" },
   },
@@ -96,6 +96,12 @@ const operations: operation[] = [
       profileId: "input",
       userId: "input",
     },
+  },
+  {
+    name: "Get current user pantry",
+    endpoint: "/api/profiles/currentUser",
+    method: "GET",
+    fields: {},
   },
 ];
 

@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
+import assert from "assert";
 import { ExpiringItem, Friend, Profile, User, WebSession } from "./app";
 import { ExpiringItemDoc, ExpiringItemStatus } from "./concepts/expiringitem";
 import { ProfileDoc } from "./concepts/profile";
@@ -130,7 +131,15 @@ class Routes {
     return await Profile.create(user, location, name, parseInt(openHour), parseInt(closeHour), parseInt(pickupWindowLength), parseInt(ordersPerWindow), rules && JSON.parse(rules));
   }
 
-  @Router.get("/profiles/:_id")
+  @Router.get("/profiles/currentUser")
+  async getProfileByCurrentUser(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const profiles = await Profile.getProfilesByQuery({ administrator: new ObjectId(user) });
+    assert(profiles.length > 0, "Given user either has no profiles associated with them");
+    return profiles[0];
+  }
+
+  @Router.get("/profiles/id/:_id")
   async getProfileById(_id: string) {
     return await Profile.getProfileById(new ObjectId(_id));
   }
