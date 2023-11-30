@@ -1,12 +1,106 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
-import { ref } from "vue";
+import { storeToRefs } from "pinia";
+import { onBeforeMount, ref } from "vue";
+import { fetchy } from "../../utils/fetchy";
 
 let username = ref("");
 let password = ref("");
+let currentAnnualIncome = ref("");
+let currentSnapEligible = ref(false);
+let currentCity = ref("");
 
+const loaded = ref(false);
+const information = ref({
+  annualIncome: "",
+  snapEligible: false,
+  city: "",
+});
+const cities = ref([]);
+async function getCities() {
+  const response = await fetch("https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-cities-demographics/records?group_by=city&limit=3000");
+  const data = await response.json();
+
+  cities.value = data.results.map((record: { city: any; }) => record.city); // Extracting city names
+
+  return cities;
+}
+// idk if the emit matters or what to emit neccesarily 
+const emit = defineEmits(["refreshPage"]);
+const updateField = async (
+  
+    type: "annualIncome" | "snapEligible" | "city"
+    
+) => {
+  
+  const fieldParsed = ()=> {
+    
+    if (type == "annualIncome") return { annualIncome: information.value.annualIncome};
+    else if (type == "snapEligible") return { snapEligible: information.value.snapEligible};
+    else if (type == "city") return { city: information.value.city};
+    else return {};
+  };
+  if (fieldParsed){
+    await updateUser(JSON.stringify({ information: fieldParsed}));
+    await updateSession();
+
+  }else{
+    console.log("field didnt parse lol");
+  }
+  
+   
+  await getInformation();
+  emptyForm();
+};
+
+// const addField = async(name:"annualIncome" | "snapEligible" | "city", value:string|boolean) => {
+//   if (value){
+//     information.value.push({ type:name, value: value });
+//     await updateField(information.value);
+    
+//   }
+  
+// };
+
+
+
+const emptyForm = () => {
+  information.value = {
+  annualIncome: "",
+  snapEligible: false,
+  city: "",
+};
+  username.value = "";
+  password.value = "";
+};
+const { currentUsername } = storeToRefs(useUserStore());
 const { updateUser, updateSession } = useUserStore();
+const isSubmittable = (value:any) => {
+      // You can set your own validation logic here.
+      if (value.value) return true;
+      return 'You must enter a value.';
+    
+};
+// const isUpdatePasswordDisabled = computed(() => {
+//       // You can set your own validation logic here.
+//       if (password.value) return true;
+//       return 'You must enter a value.';
+// });
+// const isUpdateSnapEligibilityDisabled = computed(() => {
+//       // You can set your own validation logic here.
+//       if (snapEligi.value) return true;
+//       return 'You must enter a value.';
+// });
+// const isUpdateAnnualIncomeDisabled = computed(() => {
+//       // You can set your own validation logic here.
+//       return (!information.value.annualIncome);
+// });
+// const isUpdateCityDisabled = computed(() => {
+//       // You can set your own validation logic here.
+//       return (!information.value.city);
+// });
 
+  
 async function updateUsername() {
   await updateUser({ username: username.value });
   await updateSession();
@@ -18,11 +112,113 @@ async function updatePassword() {
   await updateSession();
   password.value = "";
 }
+async function getInformation() {
+  let query: Record<string, string> = { username:currentUsername.value };
+  let user;
+  try {
+    user = await fetchy("/api/user", "GET", {query});
+  } catch (_) {
+    return;
+  }
+  let obj = JSON.parse(user.information);
+  currentAnnualIncome.value = obj.annualIncome;
+  currentCity.value = obj.city;
+  currentSnapEligible.value = obj.snapEligible;
+  
+}
+
+onBeforeMount(async () => {
+  await getInformation();
+  await getCities(); 
+  loaded.value = true;
+});
 </script>
 
 <template>
-  <h2>Update user details</h2>
-  <form @submit.prevent="updateUsername" class="pure-form">
+  <h2>Update User Profile</h2>
+  <v-form validate-on="submit lazy" @submit.prevent="updateUsername">
+    <v-text-field
+      v-model="username"
+      :placeholder= "currentUsername"
+      :persistent-placeholder=true
+      :rules="isSubmittable(username)"
+      label="Username"
+    ></v-text-field>
+
+    <v-btn
+      type="submit"
+      block
+      class="mt-2"
+      text="Change"
+      
+    ></v-btn>
+  </v-form>
+  <v-form validate-on="submit lazy" @submit.prevent="updatePassword">
+    <v-text-field
+      v-model="password"
+      label= "Password"
+      :rules="isSubmittable(password)"
+    ></v-text-field>
+
+    <v-btn
+      type="submit"
+      block
+      class="mt-2"
+      text="Change"
+      
+    ></v-btn>
+  </v-form>
+  <v-form validate-on="submit lazy" @submit.prevent="updateField('annualIncome')">
+    <v-text-field
+      v-model="information.annualIncome"
+      :placeholder= "currentAnnualIncome"
+      label="Current Annual Income"
+      :persistent-placeholder=true
+      :rules="isSubmittable(information.annualIncome)"
+    ></v-text-field>
+
+    <v-btn
+      type="submit"
+      block
+      class="mt-2"
+      text="Change"
+    ></v-btn>
+  </v-form>
+  <v-form validate-on="submit lazy" @submit.prevent="updateField('city')">
+    <v-text-field
+      v-model="information.city"
+      :placeholder= "currentCity"
+      :persistent-placeholder=true
+      label="Current Annual Income"
+      :rules="isSubmittable(information.city)"
+    ></v-text-field>
+
+    <v-btn
+      type="submit"
+      block
+      class="mt-2"
+      text="Change"
+     
+    ></v-btn>
+  </v-form>
+  <v-form validate-on="submit lazy" @submit.prevent="updateField('snapEligible')">
+    <v-switch
+          color="primary"
+          v-model="information.snapEligible"
+          hide-details
+          :label="`Do you recieve SNAP benefits/federal food assistance? ${information.snapEligible}`"
+        ></v-switch>
+    <v-btn
+      type="submit"
+      block
+      class="mt-2"
+      text="Change"
+    ></v-btn>
+  </v-form>
+  
+  
+  
+  <!-- <form @submit.prevent="updateUsername" class="pure-form">
     <fieldset>
       <legend>Change your username</legend>
       <input type="text" placeholder="New username" v-model="username" required />
@@ -36,5 +232,5 @@ async function updatePassword() {
       <input type="password" placeholder="New password" v-model="password" required />
       <button type="submit" class="pure-button pure-button-primary">Update password</button>
     </fieldset>
-  </form>
+  </form> -->
 </template>
