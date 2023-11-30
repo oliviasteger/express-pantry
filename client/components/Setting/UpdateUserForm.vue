@@ -21,34 +21,26 @@ async function getCities() {
   const response = await fetch("https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-cities-demographics/records?group_by=city&limit=3000");
   const data = await response.json();
 
-  cities.value = data.results.map((record: { city: any; }) => record.city); // Extracting city names
+  cities.value = data.results.map((record: { city: any }) => record.city); // Extracting city names
 
   return cities;
 }
-// idk if the emit matters or what to emit neccesarily 
+// idk if the emit matters or what to emit neccesarily
 const emit = defineEmits(["refreshPage"]);
-const updateField = async (
-  
-    type: "annualIncome" | "snapEligible" | "city"
-    
-) => {
-  
-  const fieldParsed = ()=> {
-    
-    if (type == "annualIncome") return { annualIncome: information.value.annualIncome};
-    else if (type == "snapEligible") return { snapEligible: information.value.snapEligible};
-    else if (type == "city") return { city: information.value.city};
+const updateField = async (type: "annualIncome" | "snapEligible" | "city") => {
+  const fieldParsed = () => {
+    if (type == "annualIncome") return { annualIncome: information.value.annualIncome };
+    else if (type == "snapEligible") return { snapEligible: information.value.snapEligible };
+    else if (type == "city") return { city: information.value.city };
     else return {};
   };
-  if (fieldParsed){
-    await updateUser(JSON.stringify({ information: fieldParsed}));
+  if (fieldParsed) {
+    await updateUser(JSON.stringify({ information: fieldParsed }));
     await updateSession();
-
-  }else{
+  } else {
     console.log("field didnt parse lol");
   }
-  
-   
+
   await getInformation();
   emptyForm();
 };
@@ -57,36 +49,34 @@ const updateField = async (
 //   if (value){
 //     information.value.push({ type:name, value: value });
 //     await updateField(information.value);
-    
+
 //   }
-  
+
 // };
-
-
 
 const emptyForm = () => {
   information.value = {
-  annualIncome: "",
-  snapEligible: false,
-  city: "",
-};
+    annualIncome: "",
+    snapEligible: false,
+    city: "",
+  };
   username.value = "";
   password.value = "";
 };
 const { currentUsername } = storeToRefs(useUserStore());
 const { updateUser, updateSession } = useUserStore();
 const rules = [
-(        value: any) => {
-          if (value) return 'value'
+  (value: any) => {
+    if (value) return "value";
 
-          return 'You must enter a first name.'
-        },
-      ];
+    return "You must enter a first name.";
+  },
+];
 // const isSubmittable = (value:any) => {
 //       // You can set your own validation logic here.
 //       if (value.value) return true;
 //       return 'You must enter a value.';
-    
+
 // };
 // const isUpdatePasswordDisabled = computed(() => {
 //       // You can set your own validation logic here.
@@ -103,11 +93,10 @@ const rules = [
 //       return (!information.value.annualIncome);
 // });
 const isUpdateCityDisabled = computed(() => {
-      // You can set your own validation logic here.
-      return (!information.value.city);
+  // You can set your own validation logic here.
+  return !information.value.city;
 });
 
-  
 async function updateUsername() {
   await updateUser({ username: username.value });
   await updateSession();
@@ -120,10 +109,10 @@ async function updatePassword() {
   password.value = "";
 }
 async function getInformation() {
-  let query: Record<string, string> = { username:currentUsername.value };
+  let query: Record<string, string> = { username: currentUsername.value };
   let user;
   try {
-    user = await fetchy("/api/user", "GET", {query});
+    user = await fetchy("/api/user", "GET", { query });
   } catch (_) {
     return;
   }
@@ -131,12 +120,11 @@ async function getInformation() {
   currentAnnualIncome.value = obj.annualIncome;
   currentCity.value = obj.city;
   currentSnapEligible.value = obj.snapEligible;
-  
 }
 
 onBeforeMount(async () => {
   await getInformation();
-  await getCities(); 
+  await getCities();
   loaded.value = true;
 });
 </script>
@@ -144,52 +132,19 @@ onBeforeMount(async () => {
 <template>
   <h2>Update User Profile</h2>
   <v-form validate-on="submit lazy" @submit.prevent="updateUsername">
-    <v-text-field
-      v-model="username"
-      :placeholder= "currentUsername"
-      :persistent-placeholder=true
-      :rules="rules"
-      label="Username"
-    ></v-text-field>
+    <v-text-field v-model="username" :placeholder="currentUsername" :persistent-placeholder="true" :rules="rules" label="Username"></v-text-field>
 
-    <v-btn
-      type="submit"
-      block
-      class="mt-2"
-      text="Change"
-      
-    ></v-btn>
+    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
   </v-form>
   <v-form validate-on="submit lazy" @submit.prevent="updatePassword">
-    <v-text-field
-      v-model="password"
-      label= "Password"
-      :rules="rules"
-    ></v-text-field>
+    <v-text-field v-model="password" label="Password" :rules="rules"></v-text-field>
 
-    <v-btn
-      type="submit"
-      block
-      class="mt-2"
-      text="Change"
-      
-    ></v-btn>
+    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
   </v-form>
   <v-form validate-on="submit lazy" @submit.prevent="updateField('annualIncome')">
-    <v-text-field
-      v-model="information.annualIncome"
-      :placeholder= "currentAnnualIncome"
-      label="Current Annual Income"
-      :persistent-placeholder=true
-      :rules="rules"
-    ></v-text-field>
+    <v-text-field v-model="information.annualIncome" :placeholder="currentAnnualIncome" label="Current Annual Income" :persistent-placeholder="true" :rules="rules"></v-text-field>
 
-    <v-btn
-      type="submit"
-      block
-      class="mt-2"
-      text="Change"
-    ></v-btn>
+    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
   </v-form>
   <v-form validate-on="submit lazy" @submit.prevent="updateField('city')">
     <!-- <v-text-field
@@ -199,39 +154,22 @@ onBeforeMount(async () => {
       label="Current Annual Income"
       :rules="isSubmittable(information.city)"
     ></v-text-field> -->
-    <v-select
-      v-model="information.city"
-      label="Select City"
-      :placeholder= "currentCity"
-      :persistent-placeholder=true
-      :items="cities"
-      return-object
-    ></v-select>
-    <v-btn
-      type="submit"
-      block
-      class="mt-2"
-      text="Change"
-     
-    ></v-btn>
+    <div class="pure-control-group">
+      <label for="aligned-location">Choose the city You Live In: </label>
+      <select v-model="information.city" id="aligned-location" required>
+        <option value="" disabled>Select City</option>
+        <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
+      </select>
+    </div>
+    <!-- <v-select v-model="information.city" label="Select City" :placeholder="undefined" :persistent-placeholder="true" :items="cities" return-object></v-select> -->
+    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
   </v-form>
+
   <v-form validate-on="submit lazy" @submit.prevent="updateField('snapEligible')">
-    <v-switch
-          color="primary"
-          v-model="information.snapEligible"
-          hide-details
-          :label="`Do you recieve SNAP benefits/federal food assistance? ${information.snapEligible}`"
-        ></v-switch>
-    <v-btn
-      type="submit"
-      block
-      class="mt-2"
-      text="Change"
-    ></v-btn>
+    <v-switch color="primary" v-model="information.snapEligible" hide-details :label="`Do you recieve SNAP benefits/federal food assistance? ${information.snapEligible}`"></v-switch>
+    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
   </v-form>
-  
-  
-  
+
   <!-- <form @submit.prevent="updateUsername" class="pure-form">
     <fieldset>
       <legend>Change your username</legend>
