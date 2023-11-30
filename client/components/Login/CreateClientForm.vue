@@ -14,7 +14,7 @@ async function getCities() {
   const response = await fetch("https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-cities-demographics/records?group_by=city&limit=3000");
   const data = await response.json();
 
-  cities.value = data.results.map((record: { city: any; }) => record.city); // Extracting city names
+  cities.value = data.results.map((record: { city: any }) => record.city); // Extracting city names
 
   return cities;
 }
@@ -28,7 +28,7 @@ async function userRegister() {
     body: {
       username: username.value,
       password: password.value,
-      UserType: "client",
+      UserType: "Client",
       information: information.value,
     },
   });

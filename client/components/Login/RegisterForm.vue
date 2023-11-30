@@ -9,10 +9,9 @@ const emit = defineEmits(["accountCreated"]);
 const { createUser, loginUser, updateSession } = useUserStore();
 const toggle_user_type = ref(null);
 const hasSelected = ref(false);
-const selectUserType = (selectedUserType:string) => {
-  userType.value = selectedUserType; 
+const selectUserType = (selectedUserType: string) => {
+  userType.value = selectedUserType;
   hasSelected.value = true;
-
 };
 
 async function register() {
@@ -25,36 +24,21 @@ async function register() {
 <template>
   <form class="pure-form pure-form-aligned" @submit.prevent="register">
     <h3>Register User</h3>
-    <div class="d-flex flex-column " id="Flair">
-      <v-col
-        cols="12"
-        class="py-2"
-      >
-
-        <v-btn-toggle
-          v-model="toggle_user_type"
-          shaped
-          outlined
-          mandatory
-          class="buttons"
-          id="Flair"
-        >
-          <v-btn id="btn" @click="selectUserType('Adminstrator')">Food Pantry Client</v-btn>
-          <v-btn id="btn" @click="selectUserType('Client')">Food Pantry Admin</v-btn>
-          
+    <div class="d-flex flex-column" id="Flair">
+      <v-col cols="12" class="py-2">
+        <v-btn-toggle v-model="toggle_user_type" shaped outlined mandatory class="buttons" id="Flair">
+          <v-btn id="btn" @click="selectUserType('Client')">Food Pantry Client</v-btn>
+          <v-btn id="btn" @click="selectUserType('Administrator')">Food Pantry Admin</v-btn>
         </v-btn-toggle>
       </v-col>
     </div>
     <div v-show="hasSelected && userType == 'Client'">
       <CreateClientForm></CreateClientForm>
-
     </div>
-    <div v-show="hasSelected && userType == 'Adminstrator'">
+    <div v-show="hasSelected && userType == 'Administrator'">
       <PantryRegistration></PantryRegistration>
-
     </div>
     <button type="submit" class="button default">Register</button>
-      
 
     <!-- <fieldset>
       <div class="pure-control-group">

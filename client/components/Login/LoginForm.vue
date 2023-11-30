@@ -30,8 +30,8 @@ async function login() {
       <div class="pure-controls">
         <button type="submit" class="button default">Submit</button>
       </div>
-      <div class = "row">
-        <h6> Don't have an account</h6>
+      <div class="row">
+        <h6>Don't have an account</h6>
         <label name="Register Here" class="small" @click="emit('register')"> Register Here </label>
         <!-- <button type="submit" class="button small">Register Here</button> -->
       </div>
@@ -40,23 +40,23 @@ async function login() {
 </template>
 
 <style scoped>
-h3,h6 {
+h3,
+h6 {
   display: flex;
   justify-content: center;
 }
-.small{
+.small {
   font-size: small;
-  color:var(--lighter-header);
+  color: var(--lighter-header);
   text-decoration: underline;
 }
-.back{
+.back {
   background-color: var(--light-grey);
-  padding:.1em;
-  border-radius: .5em;
-
+  padding: 0.1em;
+  border-radius: 0.5em;
 }
-.center{
-  display:flex;
+.center {
+  display: flex;
   align-self: center;
 }
 .row {

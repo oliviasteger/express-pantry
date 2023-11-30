@@ -18,7 +18,7 @@ async function getCities() {
   const response = await fetch("https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-cities-demographics/records?group_by=city&limit=3000");
   const data = await response.json();
 
-  cities.value = data.results.map((record: { city: any; }) => record.city); // Extracting city names
+  cities.value = data.results.map((record: { city: any }) => record.city); // Extracting city names
 
   return cities;
 }
@@ -40,7 +40,7 @@ const registerPantry = async () => {
     body: {
       username: username.value,
       password: password.value,
-      UserType: "admin",
+      UserType: "Administrator",
     },
   });
 };
@@ -51,17 +51,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="pure-control-group">
-    <label for="aligned-name">Username</label>
-    <input v-model.trim="username" type="text" id="aligned-name" placeholder="Username" required />
-  </div>
-  <div class="pure-control-group">
-    <label for="aligned-password">Password</label>
-    <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
-  </div>
   <form class="pure-form pure-form-aligned" @submit.prevent="registerPantry">
     <h3>Register Pantry</h3>
     <fieldset>
+      <div class="pure-control-group">
+        <label for="aligned-name">Username</label>
+        <input v-model.trim="username" type="text" id="aligned-name" placeholder="Username" required />
+      </div>
+      <div class="pure-control-group">
+        <label for="aligned-password">Password</label>
+        <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
+      </div>
       <div class="pure-control-group">
         <label for="aligned-location">City of Pantry</label>
         <select v-model="location" id="aligned-location" required>

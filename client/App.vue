@@ -36,6 +36,18 @@ onBeforeMount(async () => {
         </li>
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
+          <ul v-if="userStore.userType === 'Administrator'">
+            <li>
+              <RouterLink :to="{ name: 'Admin Profile' }"> Admin Dashboard </RouterLink>
+            </li>
+            <!-- Add more admin-specific links as needed -->
+          </ul>
+
+          <ul v-else-if="userStore.userType === 'Client'">
+            <li>
+              <RouterLink :to="{ name: 'Account' }"> User Dashboard </RouterLink>
+            </li>
+          </ul>
         </li>
         <li v-else>
           <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
