@@ -28,8 +28,8 @@ async function userRegister() {
     body: {
       username: username.value,
       password: password.value,
-      UserType: "Client",
-      information: information.value,
+      type: "Client",
+      information: JSON.stringify(information.value),
     },
   });
 }

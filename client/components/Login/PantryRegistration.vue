@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { useUserStore } from "@/stores/user";
 import { onMounted, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
-
+const { updateSession } = useUserStore();
 const location = ref("");
 const name = ref("");
 const openHour = ref("");
@@ -24,6 +25,22 @@ async function getCities() {
 }
 
 const registerPantry = async () => {
+  console.log("GOT HERE");
+  await fetchy("/api/users", "POST", {
+    body: {
+      username: username.value,
+      password: password.value,
+      type: "Administrator",
+    },
+  });
+
+  await fetchy("/api/login", "POST", {
+    body: {
+      username: username.value,
+      password: password.value,
+    },
+  });
+
   await fetchy("/api/profiles", "POST", {
     body: {
       location: location.value,
@@ -35,14 +52,11 @@ const registerPantry = async () => {
       rules: rules.value,
     },
   });
+  console.log("HERE555");
 
-  await fetchy("/api/users", "POST", {
-    body: {
-      username: username.value,
-      password: password.value,
-      UserType: "Administrator",
-    },
-  });
+  //emit event to say registered event is submitted
+  void updateSession();
+  //void router.push({ name: "Home" });
 };
 
 onMounted(async () => {
@@ -94,7 +108,7 @@ onMounted(async () => {
       </div>
 
       <div class="pure-control-group">
-        <label for="aligned-pickupWindowLength">Pickup Window Length</label>
+        <label for="aligned-pickupWindowLength">Length of Pickup Slots (in minutes)</label>
         <input v-model.trim="pickupWindowLength" type="text" id="aligned-pickupWindowLength" placeholder="pickup Length" required />
       </div>
 

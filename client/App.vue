@@ -15,6 +15,7 @@ const { toast } = storeToRefs(useToastStore());
 onBeforeMount(async () => {
   try {
     await userStore.updateSession();
+    await userStore.updateType();
   } catch {
     // User is not logged in
   }
@@ -38,7 +39,7 @@ onBeforeMount(async () => {
           <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
           <ul v-if="userStore.userType === 'Administrator'">
             <li>
-              <RouterLink :to="{ name: 'Admin Profile' }"> Admin Dashboard </RouterLink>
+              <RouterLink :to="{ name: 'Admin Profile' }"> Admin Profile </RouterLink>
             </li>
             <!-- Add more admin-specific links as needed -->
           </ul>

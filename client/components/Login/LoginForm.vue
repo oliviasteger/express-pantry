@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
 
@@ -9,9 +8,10 @@ const emit = defineEmits(["register"]);
 const { loginUser, updateSession } = useUserStore();
 
 async function login() {
+  console.log("HERE");
   await loginUser(username.value, password.value);
   void updateSession();
-  void router.push({ name: "Home" });
+  //void router.push({ name: "Home" });
 }
 </script>
 

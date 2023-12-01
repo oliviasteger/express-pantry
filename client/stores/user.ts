@@ -17,9 +17,12 @@ export const useUserStore = defineStore(
 
     const updateType = async () => {
       try {
+        console.log("HEREfirst");
         const { username } = await fetchy("/api/session", "GET", { alert: false });
         const user = await fetchy(`api/users/${username}`, "GET");
+        console.log("HERE???", user);
         userType.value = user.type;
+        console.log(userType.value);
       } catch {
         userType.value = "";
       }
@@ -32,6 +35,8 @@ export const useUserStore = defineStore(
     };
 
     const loginUser = async (username: string, password: string) => {
+      console.log(username);
+      console.log(password);
       await fetchy("/api/login", "POST", {
         body: { username, password },
       });

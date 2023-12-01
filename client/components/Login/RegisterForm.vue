@@ -22,25 +22,24 @@ async function register() {
 </script>
 
 <template>
-  <form class="pure-form pure-form-aligned" @submit.prevent="register">
-    <h3>Register User</h3>
-    <div class="d-flex flex-column" id="Flair">
-      <v-col cols="12" class="py-2">
-        <v-btn-toggle v-model="toggle_user_type" shaped outlined mandatory class="buttons" id="Flair">
-          <v-btn id="btn" @click="selectUserType('Client')">Food Pantry Client</v-btn>
-          <v-btn id="btn" @click="selectUserType('Administrator')">Food Pantry Admin</v-btn>
-        </v-btn-toggle>
-      </v-col>
-    </div>
-    <div v-show="hasSelected && userType == 'Client'">
-      <CreateClientForm></CreateClientForm>
-    </div>
-    <div v-show="hasSelected && userType == 'Administrator'">
-      <PantryRegistration></PantryRegistration>
-    </div>
-    <button type="submit" class="button default">Register</button>
+  <h3>Register User</h3>
+  <div class="d-flex flex-column" id="Flair">
+    <v-col cols="12" class="py-2">
+      <v-btn-toggle v-model="toggle_user_type" shaped outlined mandatory class="buttons" id="Flair">
+        <v-btn id="btn" @click="selectUserType('Client')">Food Pantry Client</v-btn>
+        <v-btn id="btn" @click="selectUserType('Administrator')">Food Pantry Admin</v-btn>
+      </v-btn-toggle>
+    </v-col>
+  </div>
+  <div v-show="hasSelected && userType == 'Client'">
+    <CreateClientForm></CreateClientForm>
+  </div>
+  <div v-show="hasSelected && userType == 'Administrator'">
+    <PantryRegistration></PantryRegistration>
+  </div>
+  <!-- <button type="submit" class="button default">Register</button> -->
 
-    <!-- <fieldset>
+  <!-- <fieldset>
       <div class="pure-control-group">
         <h3 for="UserType">Account Type</h3>
         <div class="radio-container">
@@ -59,7 +58,6 @@ async function register() {
         <button type="submit" class="pure-button pure-button-primary">Register</button>
       </div>
     </fieldset> -->
-  </form>
 </template>
 
 <style scoped>
