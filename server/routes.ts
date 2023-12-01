@@ -32,6 +32,7 @@ class Routes {
   async createUser(session: WebSessionDoc, username: string, password: string, type: UserType, information?: string) {
     WebSession.isLoggedOut(session);
     let parsedInfo;
+    console.log("DID it get here");
     if (information) parsedInfo = JSON.parse(information);
     return await User.create(username, password, type, parsedInfo);
   }

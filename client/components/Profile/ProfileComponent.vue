@@ -12,6 +12,7 @@ rules
 
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
+import { RouterLink } from "vue-router";
 import { fetchy } from "../../utils/fetchy";
 
 const city = ref("");
@@ -51,6 +52,11 @@ onBeforeMount(async () => {
 <template>
   <div class="profile-container">
     <div class="profile-title">Profile: {{ name }}</div>
+    <RouterLink :to="{ name: 'Edit Profile' }">
+      <button class="edit-button">Edit Profile</button>
+    </RouterLink>
+    <br />
+    <br />
     <div class="profile-info-box">
       <div class="profile-label">City Location:</div>
       <div class="profile-value">{{ city }}</div>
@@ -73,12 +79,37 @@ onBeforeMount(async () => {
   </div>
 </template>
 <style scoped>
+.edit-button-container {
+  display: flex;
+  justify-content: right;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.edit-button {
+  text-align: center;
+  padding: 8px 16px;
+  background-color: transparent;
+  color: #007bff;
+  border: 2px solid #007bff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease-in-out,
+    color 0.3s ease-in-out;
+}
+
+.edit-button:hover {
+  background-color: #007bff;
+  color: #fff;
+}
 .profile-container {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  text-align: center;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
