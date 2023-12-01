@@ -33,6 +33,7 @@ class Routes {
     WebSession.isLoggedOut(session);
     let parsedInfo;
     console.log("DID it get here");
+    console.log("TYPE", type);
     if (information) parsedInfo = JSON.parse(information);
     return await User.create(username, password, type, parsedInfo);
   }

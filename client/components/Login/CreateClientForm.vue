@@ -32,6 +32,13 @@ async function userRegister() {
       information: JSON.stringify(information.value),
     },
   });
+
+  await fetchy("/api/login", "POST", {
+    body: {
+      username: username.value,
+      password: password.value,
+    },
+  });
 }
 </script>
 

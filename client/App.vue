@@ -43,12 +43,12 @@ onBeforeMount(async () => {
             </li>
             <!-- Add more admin-specific links as needed -->
           </ul>
-
+          <!-- 
           <ul v-else-if="userStore.userType === 'Client'">
             <li>
               <RouterLink :to="{ name: 'Account' }"> User Dashboard </RouterLink>
             </li>
-          </ul>
+          </ul> -->
         </li>
         <li v-else>
           <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>

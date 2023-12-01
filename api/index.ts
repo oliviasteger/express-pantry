@@ -36,12 +36,12 @@ app.use(
 app.use(express.static(path.join(__dirname, "../public")));
 app.use("/api/", router);
 
-// For all unrecognized requests, return a not found message.
-app.all("*", (req, res) => {
-  res.status(404).json({
-    msg: "Page not found",
-  });
-});
+// // For all unrecognized requests, return a not found message.
+// app.all("*", (req, res) => {
+//   res.status(404).json({
+//     msg: "Page not found",
+//   });
+// });
 
 void connectDb().then(() => {
   app.listen(PORT, () => {

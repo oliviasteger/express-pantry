@@ -87,6 +87,7 @@ export default class UserConcept {
       await this.isUsernameUnique(update.username);
     }
     await this.users.updateOne({ _id }, update);
+
     return { msg: "User updated successfully!" };
   }
 

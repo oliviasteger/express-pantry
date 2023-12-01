@@ -36,7 +36,6 @@ const updateField = async (type: "annualIncome" | "snapEligible" | "city") => {
   };
   if (fieldParsed) {
     await updateUser(JSON.stringify({ information: fieldParsed }));
-    await updateSession();
   } else {
     console.log("field didnt parse lol");
   }
