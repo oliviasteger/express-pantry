@@ -103,6 +103,49 @@ const operations: operation[] = [
     method: "GET",
     fields: {},
   },
+  {
+    name: "Get Available Times",
+    endpoint: "api/profiles/:profileId/availableTimes",
+    method: "GET",
+    fields: { profileId: "input" },
+  },
+  {
+    name: "Get your items",
+    endpoint: "/api/items",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Add items",
+    endpoint: "/api/items",
+    method: "POST",
+    fields: { barcode: "input", dropDate: "input", expirationDate: "input", status: "input" },
+  },
+  {
+    name: "Get user orders",
+    endpoint: "/api/order/user/:userId",
+    method: "GET",
+    fields: { userId: "input" },
+  },
+  {
+    name: "Get order",
+    endpoint: "/api/order/:_id",
+    method: "GET",
+    fields: { _id: "input" },
+  },
+  { name: "Place Order", endpoint: "/api/order", method: "POST", fields: { profileId: "input", pickupTime: "input", barcodes: "input" } },
+  {
+    name: "Update Order Status",
+    endpoint: "/api/order/status",
+    method: "PATCH",
+    fields: { orderId: "input", newStatus: "input" },
+  },
+  {
+    name: "Delete order",
+    endpoint: "/api/order",
+    method: "DELETE",
+    fields: { orderId: "input" },
+  },
 ];
 
 // Do not edit below here.

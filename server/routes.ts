@@ -3,13 +3,51 @@ import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
 import assert from "assert";
-import { ExpiringItem, Profile, Request, User, WebSession } from "./app";
+import { ExpiringItem, Order, Profile, Request, User, WebSession } from "./app";
 import { NotAllowedError } from "./concepts/errors";
 import { ExpiringItemDoc, ExpiringItemStatus } from "./concepts/expiringitem";
+import { OrderStatus } from "./concepts/order";
 import { ProfileDoc } from "./concepts/profile";
 import { RequestDoc } from "./concepts/request";
 import { UserDoc, UserDocUnparsed, UserType } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
+
+async function getAvailableTimes(profileId: string | ObjectId) {
+  const profile = await Profile.getProfileById(new ObjectId(profileId));
+  const availableTimes = new Map<string, number>();
+
+  for (let day = 1; day <= 7; day++) {
+    for (let hour = profile.openHour; hour < profile.closeHour; hour += 1) {
+      for (let minute = 0; minute < 60; minute += profile.pickupWindowLength) {
+        const date = new Date();
+        date.setDate(date.getDate() + day);
+        date.setHours(hour, minute, 0, 0);
+        availableTimes.set(date.toISOString(), 0);
+      }
+    }
+  }
+  // @ts-expect-error gte ruins type checking
+  const profileOrders = await Order.getordersByQuery({ recipient: profile.administrator, pickup: { $gte: new Date() } });
+
+  for (const order of profileOrders) {
+    const currentOrdersAtTime = availableTimes.get(order.pickup.toISOString());
+    if (currentOrdersAtTime !== undefined) {
+      availableTimes.set(order.pickup.toISOString(), currentOrdersAtTime + 1);
+      if (currentOrdersAtTime + 1 === profile.ordersPerWindow) {
+        availableTimes.delete(order.pickup.toISOString());
+      }
+    }
+  }
+
+  const orderableTimes = availableTimes.keys();
+  const parsedOrderableTimes = [];
+
+  for (const time of orderableTimes) {
+    parsedOrderableTimes.push(time);
+  }
+
+  return parsedOrderableTimes;
+}
 
 class Routes {
   @Router.get("/session")
@@ -123,9 +161,27 @@ class Routes {
     const user = WebSession.getUser(session);
     await User.isAdministrator(user);
     await ExpiringItem.isAdministrator(user, id);
-    return await ExpiringItem.delete(id);
 
-    // TODO: update any corresponding orders
+    const itemPromise = ExpiringItem.getExpiringItems({ _id: id });
+
+    // @ts-expect-error Though items is an array, if we query it for an individual item mongo processes it as asking if that id is in items.
+    const applicableOrders = await Order.getordersByQuery({ recipient: user, items: id });
+    assert(applicableOrders.length <= 1, "There should not be more than 1 order taking this item");
+    if (applicableOrders.length == 1) {
+      const targetOrder = applicableOrders[0];
+      const item = (await itemPromise)[0];
+      const claimableItems = await ExpiringItem.getExpiringItems({ administrator: user, barcode: item.barcode, status: "Claimable" });
+      if (claimableItems.length > 0) {
+        claimableItems.sort((i1, i2) => i1.expirationDate.getTime() - i2.expirationDate.getTime());
+        const chosenItem = claimableItems[0];
+
+        const orderItems = targetOrder.items.filter((itemId) => itemId !== id);
+        orderItems.push(chosenItem._id);
+
+        void Order.update(targetOrder._id, { items: orderItems });
+      }
+    }
+    return await ExpiringItem.delete(id);
   }
 
   @Router.post("/profiles")
@@ -155,6 +211,14 @@ class Routes {
   @Router.patch("/profiles")
   async updateProfile(session: WebSessionDoc, _id: string, update: Partial<ProfileDoc>) {
     const user = WebSession.getUser(session);
+    // @ts-expect-error thinks field is int
+    if (update.openHour) update.openHour = parseInt(update.openHour);
+    // @ts-expect-error thinks field is int
+    if (update.closeHour) update.closeHour = parseInt(update.closeHour);
+    // @ts-expect-error thinks field is int
+    if (update.pickupWindowLength) update.pickupWindowLength = parseInt(update.pickupWindowLength);
+    // @ts-expect-error thinks field is int
+    if (update.ordersPerWindow) update.ordersPerWindow = parseInt(update.ordersPerWindow);
     await Profile.assertAdministrator(user, new ObjectId(_id));
     return await Profile.update(new ObjectId(_id), update);
   }
@@ -246,6 +310,84 @@ class Routes {
     const eligiblePantries = pantries.filter((pantry) => Profile.isEligible(pantry._id, userObject));
 
     return eligiblePantries;
+  }
+  @Router.get("/profiles/:profileId/availableTimes")
+  async getAvailableTimes(profileId: string | ObjectId) {
+    return getAvailableTimes(profileId);
+  }
+
+  @Router.get("/order/:_id")
+  async getOrder(_id: string) {
+    return await Order.getorderById(new ObjectId(_id));
+  }
+  @Router.get("/order/user/:userId")
+  async getUserOrders(userId: string) {
+    return await Order.getordersByQuery({ sender: new ObjectId(userId) });
+  }
+
+  @Router.get("/order/admin/:userId")
+  async getAdminOrders(adminId: string) {
+    return await Order.getordersByQuery({ recipient: new ObjectId(adminId) });
+  }
+
+  @Router.patch("/order/status")
+  async updateOrderStatus(session: WebSessionDoc, orderId: string, newStatus: OrderStatus) {
+    const userId = WebSession.getUser(session);
+    const order = await Order.getorderById(new ObjectId(orderId));
+    assert(order.recipient.equals(userId), new NotAllowedError("User lacks permissions to change order status"));
+
+    const oldStatus = order.status;
+
+    if (oldStatus === "picked up" && newStatus !== "picked up") {
+      void Promise.all(order.items.map((itemId) => ExpiringItem.update(itemId, { status: "Ordered" })));
+    } else if (newStatus === "picked up") {
+      void Promise.all(order.items.map((itemId) => ExpiringItem.update(itemId, { status: "Used" })));
+    }
+
+    return await Order.update(new ObjectId(orderId), { status: newStatus });
+  }
+
+  @Router.delete("/order")
+  async deleteOrder(orderId: string, session: WebSessionDoc) {
+    const userId = WebSession.getUser(session);
+    const order = await Order.getorderById(new ObjectId(orderId));
+    assert(order.recipient.equals(userId), new NotAllowedError("User lacks permission to delete this order"));
+    assert(order.status !== "picked up", new NotAllowedError("Order is already picked up and cannot be deleted."));
+    void Promise.all(order.items.map((itemId) => ExpiringItem.update(itemId, { status: "Claimable" })));
+
+    return await Order.delete(new ObjectId(orderId));
+  }
+
+  @Router.post("/order")
+  async placeOrder(session: WebSessionDoc, profileId: string, pickupTime: string, barcodes: string) {
+    const userId = WebSession.getUser(session);
+    const user = User.getUserById(new ObjectId(userId));
+    const profile = Profile.getProfileById(new ObjectId(profileId));
+    const availableTimesPromise = getAvailableTimes(profileId);
+    await Profile.assertEligible(new ObjectId(profileId), await user);
+    const availableTimes = await availableTimesPromise;
+    assert(availableTimes.includes(pickupTime), "Pickup time not available");
+
+    const orderedItems: ExpiringItemDoc[] = [];
+    // Type: [[string, number]]
+    const barcodesParsed = JSON.parse(barcodes);
+
+    for (const barcodeQuant of barcodesParsed) {
+      const availableItems = await ExpiringItem.getExpiringItems({ barcode: barcodeQuant[0], administrator: (await profile).administrator, status: "Claimable" });
+      assert(availableItems.length >= barcodeQuant[1], `Not enough ${barcodeQuant[0]} for order`);
+
+      availableItems.sort((i1, i2) => i1.expirationDate.getTime() - i2.expirationDate.getTime());
+      orderedItems.push(...availableItems.slice(0, barcodeQuant[1]));
+    }
+    void Promise.all(orderedItems.map((item) => ExpiringItem.update(item._id, { status: "Ordered" })));
+
+    const order = Order.create(
+      new ObjectId(userId),
+      (await profile).administrator,
+      orderedItems.map((itemDoc) => itemDoc._id),
+      new Date(pickupTime),
+    );
+    return await order;
   }
 
   // @Router.get("/posts")
