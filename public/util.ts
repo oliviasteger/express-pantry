@@ -146,6 +146,66 @@ const operations: operation[] = [
     method: "DELETE",
     fields: { orderId: "input" },
   },
+  {
+    name: "Get expiring items by owner",
+    endpoint: "/api/users/:username/items",
+    method: "GET",
+    fields: { username: "input" },
+  },
+  {
+    name: "Get expiring items that you own",
+    endpoint: "/api/items",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Create expiring item",
+    endpoint: "/api/items",
+    method: "POST",
+    fields: { barcode: "input", dropDate: "input", expirationDate: "input", status: "input" },
+  },
+  {
+    name: "Update expiring item",
+    endpoint: "/api/items/:id",
+    method: "PATCH",
+    fields: { id: "input", update: { barcode: "input", dropDate: "input", expirationDate: "input", status: "input" } },
+  },
+  {
+    name: "Delete expiring item",
+    endpoint: "/api/items/:id",
+    method: "DELETE",
+    fields: { id: "input" },
+  },
+  {
+    name: "Get map",
+    endpoint: "/api/map",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Get requests",
+    endpoint: "/api/requests",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Create request",
+    endpoint: "/api/requests",
+    method: "POST",
+    fields: { barcode: "input", requestee: "input" },
+  },
+  {
+    name: "Update request",
+    endpoint: "/api/requests/:id",
+    method: "PATCH",
+    fields: { id: "input", update: { barcode: "input", requestee: "input" } },
+  },
+  {
+    name: "Delete request",
+    endpoint: "/api/requests/:id",
+    method: "DELETE",
+    fields: { id: "input" },
+  },
 ];
 
 // Do not edit below here.
