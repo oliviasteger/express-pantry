@@ -163,25 +163,30 @@ class Routes {
     await ExpiringItem.isAdministrator(user, id);
 
     const itemPromise = ExpiringItem.getExpiringItems({ _id: id });
-
     // @ts-expect-error Though items is an array, if we query it for an individual item mongo processes it as asking if that id is in items.
-    const applicableOrders = await Order.getordersByQuery({ recipient: user, items: id });
+    const applicableOrders = await Order.getordersByQuery({ recipient: user, items: new ObjectId(id) });
+    console.log(applicableOrders);
     assert(applicableOrders.length <= 1, "There should not be more than 1 order taking this item");
     if (applicableOrders.length == 1) {
       const targetOrder = applicableOrders[0];
       const item = (await itemPromise)[0];
       const claimableItems = await ExpiringItem.getExpiringItems({ administrator: user, barcode: item.barcode, status: "Claimable" });
       if (claimableItems.length > 0) {
+        console.log("Other items are claimable");
         claimableItems.sort((i1, i2) => i1.expirationDate.getTime() - i2.expirationDate.getTime());
         const chosenItem = claimableItems[0];
 
-        const orderItems = targetOrder.items.filter((itemId) => itemId !== id);
+        const orderItems = targetOrder.items.filter((itemId) => !new ObjectId(id).equals(itemId));
         orderItems.push(chosenItem._id);
+        void ExpiringItem.update(chosenItem._id, { status: "Ordered" });
 
         void Order.update(targetOrder._id, { items: orderItems });
+      } else {
+        console.log("No MOre claimable");
+        void Order.update(targetOrder._id, { items: targetOrder.items.filter((itemId) => !new ObjectId(id).equals(itemId)) });
       }
     }
-    return await ExpiringItem.delete(id);
+    return await ExpiringItem.delete(new ObjectId(id));
   }
 
   @Router.post("/profiles")
