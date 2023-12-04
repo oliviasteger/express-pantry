@@ -203,6 +203,11 @@ class Routes {
     return await Profile.getProfileById(new ObjectId(_id));
   }
 
+  @Router.get("/profiles/location/:location")
+  async getProfilesByLocation(location: string) {
+    return await Profile.getProfilesByQuery({ location });
+  }
+
   @Router.get("/profiles")
   async getProfiles(searchQuery: string) {
     return await Profile.getProfilesByQuery(JSON.parse(searchQuery));
