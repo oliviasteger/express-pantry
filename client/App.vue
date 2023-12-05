@@ -20,13 +20,13 @@ onBeforeMount(async () => {
     // User is not logged in
   }
 });
-// 
+//
 </script>
 
 <template>
   <header>
     <nav>
-      <div class="title" >
+      <div class="title">
         <img src="@/assets/images/betterlogo.svg.svg" />
         <RouterLink :to="{ name: 'Home' }">
           <h2>ExpressPantry</h2>
@@ -41,6 +41,9 @@ onBeforeMount(async () => {
           <ul v-if="userStore.userType === 'Administrator'">
             <li>
               <RouterLink :to="{ name: 'Profile' }"> Profile </RouterLink>
+            </li>
+            <li>
+              <RouterLink :to="{ name: 'Inventory' }"> Inventory </RouterLink>
             </li>
             <!-- Add more admin-specific links as needed -->
           </ul>
@@ -58,7 +61,7 @@ onBeforeMount(async () => {
         </li>
       </ul>
     </nav>
-    <hr width="90%" size=".1" id = "color" noshade>
+    <hr width="90%" size=".1" id="color" noshade />
     <article v-if="toast !== null" class="toast" :class="toast.style">
       <p>{{ toast.message }}</p>
     </article>
@@ -68,10 +71,10 @@ onBeforeMount(async () => {
 
 <style scoped>
 @import "./assets/toast.css";
-#color{
+#color {
   color: var(--line-color);
   opacity: 25%;
-  margin:auto;
+  margin: auto;
 }
 nav {
   padding: 1em 2em;
