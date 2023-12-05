@@ -13,7 +13,7 @@ let currentCity = ref("");
 const loaded = ref(false);
 const information = ref({
   annualIncome: "",
-  snapEligible: false,
+  snapEligible: "",
   city: "",
 });
 const cities = ref([]);
@@ -56,7 +56,7 @@ const updateField = async (type: "annualIncome" | "snapEligible" | "city") => {
 const emptyForm = () => {
   information.value = {
     annualIncome: "",
-    snapEligible: false,
+    snapEligible: "",
     city: "",
   };
   username.value = "";
@@ -108,17 +108,16 @@ async function updatePassword() {
   password.value = "";
 }
 async function getInformation() {
-  let query: Record<string, string> = { username: currentUsername.value };
   let user;
   try {
-    user = await fetchy("/api/user", "GET", { query });
+    user = await fetchy(`api/users/${currentUsername.value}`, "GET");
   } catch (_) {
+    console.log("failed")
     return;
   }
-  let obj = JSON.parse(user.information);
-  currentAnnualIncome.value = obj.annualIncome;
-  currentCity.value = obj.city;
-  currentSnapEligible.value = obj.snapEligible;
+  currentAnnualIncome.value = user.information.annualIncome;
+  currentCity.value = user.information.city;
+  currentSnapEligible.value = user.information.snapEligible;
 }
 
 onBeforeMount(async () => {
@@ -130,45 +129,48 @@ onBeforeMount(async () => {
 
 <template>
   <h2>Update User Profile</h2>
-  <v-form validate-on="submit lazy" @submit.prevent="updateUsername">
-    <v-text-field v-model="username" :placeholder="currentUsername" :persistent-placeholder="true" :rules="rules" label="Username"></v-text-field>
+  <div class = "form" id = "back">
+    <v-form validate-on="submit lazy" @submit.prevent="updateUsername">
+      <v-text-field v-model="username" :placeholder="currentUsername" :persistent-placeholder="true" :rules="rules" label="Username"></v-text-field>
 
-    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
-  </v-form>
-  <v-form validate-on="submit lazy" @submit.prevent="updatePassword">
-    <v-text-field v-model="password" label="Password" :rules="rules"></v-text-field>
+      <v-btn type="submit" id = "change" block class="mt-2" text="Change"></v-btn>
+    </v-form>
+    <v-form validate-on="submit lazy" @submit.prevent="updatePassword">
+      <v-text-field v-model="password" label="Password" :rules="rules"></v-text-field>
 
-    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
-  </v-form>
-  <v-form validate-on="submit lazy" @submit.prevent="updateField('annualIncome')">
-    <v-text-field v-model="information.annualIncome" :placeholder="currentAnnualIncome" label="Current Annual Income" :persistent-placeholder="true" :rules="rules"></v-text-field>
+      <v-btn type="submit" id = "change" block class="mt-2" text="Change"></v-btn>
+    </v-form>
+    <v-form validate-on="submit lazy" @submit.prevent="updateField('annualIncome')">
+      <v-text-field v-model="information.annualIncome" :placeholder="currentAnnualIncome" label="Current Annual Income" :persistent-placeholder="true" :rules="rules"></v-text-field>
 
-    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
-  </v-form>
-  <v-form validate-on="submit lazy" @submit.prevent="updateField('city')">
-    <!-- <v-text-field
-      v-model="information.city"
-      :placeholder= "currentCity"
-      :persistent-placeholder=true
-      label="Current Annual Income"
-      :rules="isSubmittable(information.city)"
-    ></v-text-field> -->
-    <div class="pure-control-group">
-      <label for="aligned-location">Choose the city You Live In: </label>
-      <select v-model="information.city" id="aligned-location" required>
-        <option value="" disabled>Select City</option>
-        <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
-      </select>
-    </div>
-    <!-- <v-select v-model="information.city" label="Select City" :placeholder="undefined" :persistent-placeholder="true" :items="cities" return-object></v-select> -->
-    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
-  </v-form>
+      <v-btn type="submit" block id = "change" class="mt-2" text="Change"></v-btn>
+    </v-form>
+    <v-form validate-on="submit lazy" @submit.prevent="updateField('city')">
+      <!-- <v-text-field
+        v-model="information.city"
+        :placeholder= "currentCity"
+        :persistent-placeholder=true
+        label="Current Annual Income"
+        :rules="isSubmittable(information.city)"
+      ></v-text-field> -->
+      <div class="pure-control-group">
+        <label for="aligned-location">Choose the city You Live In: </label>
+        <select v-model="information.city" id="aligned-location" required>
+          <option value="Current location" disabled>{{currentCity }}</option>
+          <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
+        </select>
+      </div>
+      <!-- <v-select v-model="information.city" label="Select City" :placeholder="undefined" :persistent-placeholder="true" :items="cities" return-object></v-select> -->
+      <v-btn type="submit" id = "change" block class="mt-2" text="Change"></v-btn>
+    </v-form>
 
-  <v-form validate-on="submit lazy" @submit.prevent="updateField('snapEligible')">
-    <v-switch color="primary" v-model="information.snapEligible" hide-details :label="`Do you recieve SNAP benefits/federal food assistance? ${information.snapEligible}`"></v-switch>
-    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
-  </v-form>
-
+    <v-form validate-on="submit lazy" @submit.prevent="updateField('snapEligible')">
+      <v-switch color="primary" inset   true-value="Yes" false-value="No" 
+      v-model="information.snapEligible" hide-details 
+      :label="`Do you recieve SNAP benefits/federal food assistance? ${currentSnapEligible}`"></v-switch>
+      <v-btn type="submit" id = "change" block class="mt-2" text="Change"></v-btn>
+    </v-form>
+  </div>
   <!-- <form @submit.prevent="updateUsername" class="pure-form">
     <fieldset>
       <legend>Change your username</legend>
@@ -184,4 +186,14 @@ onBeforeMount(async () => {
       <button type="submit" class="pure-button pure-button-primary">Update password</button>
     </fieldset>
   </form> -->
+  
 </template>
+<style>
+.form{
+  padding-bottom: 50px;
+}
+#change{
+  background-color:var(--lighter-header);
+  
+}
+</style>

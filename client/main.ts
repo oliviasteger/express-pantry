@@ -1,6 +1,7 @@
 import "@/assets/main.css";
 import "purecss";
-//@ts-ignore
+// @ts-ignore
+import VueGoogleMaps from "@fawmi/vue-google-maps";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
@@ -15,6 +16,7 @@ import router from "./router";
 
 const app = createApp(App);
 const pinia = createPinia();
+const API_KEY = import.meta.env.VITE_GOOGLEMAPS_API_KEY;
 export const vuetify = createVuetify({
   components,
   directives,
@@ -35,9 +37,16 @@ export const vuetify = createVuetify({
     },
   },
 });
+
 pinia.use(piniaPluginPersistedState);
 
 app.use(pinia);
 app.use(router);
+app.use(VueGoogleMaps, {
+  load: {
+    key: API_KEY,
+    // language: 'de',
+  },
+});
 
 app.use(vuetify).mount("#app");

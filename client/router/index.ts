@@ -3,8 +3,10 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
 import EditProfileForm from "../components/Profile/EditProfileForm.vue";
+import AccountView from "../views/AccountView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
+import MapView from "../views/MapView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import SettingView from "../views/SettingView.vue";
@@ -16,6 +18,18 @@ const router = createRouter({
       path: "/",
       name: "Home",
       component: HomeView,
+    },
+    {
+      path: "/",
+      name: "Map",
+      component: MapView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/account",
+      name: "Account",
+      component: AccountView,
+      meta: { requiresAuth: true },
     },
     {
       path: "/setting",

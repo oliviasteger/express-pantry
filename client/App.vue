@@ -20,15 +20,16 @@ onBeforeMount(async () => {
     // User is not logged in
   }
 });
+// 
 </script>
 
 <template>
   <header>
     <nav>
-      <div class="title">
-        <img src="@/assets/images/logo.svg" />
+      <div class="title" >
+        <img src="@/assets/images/betterlogo.svg.svg" />
         <RouterLink :to="{ name: 'Home' }">
-          <h1>Social Media App</h1>
+          <h2>ExpressPantry</h2>
         </RouterLink>
       </div>
       <ul>
@@ -43,18 +44,21 @@ onBeforeMount(async () => {
             </li>
             <!-- Add more admin-specific links as needed -->
           </ul>
-          <!-- 
           <ul v-else-if="userStore.userType === 'Client'">
             <li>
-              <RouterLink :to="{ name: 'Account' }"> User Dashboard </RouterLink>
+              <RouterLink :to="{ name: 'Account' }"> Dashboard </RouterLink>
             </li>
-          </ul> -->
+            <li>
+              <RouterLink :to="{ name: 'Map' }"> Map </RouterLink>
+            </li>
+          </ul>
         </li>
         <li v-else>
           <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
         </li>
       </ul>
     </nav>
+    <hr width="90%" size=".1" id = "color" noshade>
     <article v-if="toast !== null" class="toast" :class="toast.style">
       <p>{{ toast.message }}</p>
     </article>
@@ -64,10 +68,13 @@ onBeforeMount(async () => {
 
 <style scoped>
 @import "./assets/toast.css";
-
+#color{
+  color: var(--line-color);
+  opacity: 25%;
+  margin:auto;
+}
 nav {
   padding: 1em 2em;
-  background-color: lightgray;
   display: flex;
   align-items: center;
 }
@@ -80,6 +87,7 @@ h1 {
 .title {
   display: flex;
   align-items: center;
+  font-style: italic;
   gap: 0.5em;
 }
 
