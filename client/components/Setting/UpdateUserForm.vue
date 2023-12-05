@@ -44,14 +44,6 @@ const updateField = async (type: "annualIncome" | "snapEligible" | "city") => {
   emptyForm();
 };
 
-// const addField = async(name:"annualIncome" | "snapEligible" | "city", value:string|boolean) => {
-//   if (value){
-//     information.value.push({ type:name, value: value });
-//     await updateField(information.value);
-
-//   }
-
-// };
 
 const emptyForm = () => {
   information.value = {
@@ -68,7 +60,7 @@ const rules = [
   (value: any) => {
     if (value) return "value";
 
-    return "You must enter a first name.";
+    return "You must enter a value.";
   },
 ];
 // const isSubmittable = (value:any) => {
@@ -171,21 +163,7 @@ onBeforeMount(async () => {
       <v-btn type="submit" id = "change" block class="mt-2" text="Change"></v-btn>
     </v-form>
   </div>
-  <!-- <form @submit.prevent="updateUsername" class="pure-form">
-    <fieldset>
-      <legend>Change your username</legend>
-      <input type="text" placeholder="New username" v-model="username" required />
-      <button type="submit" class="pure-button pure-button-primary">Update username</button>
-    </fieldset>
-  </form>
-
-  <form @submit.prevent="updatePassword" class="pure-form">
-    <fieldset>
-      <legend>Change your password</legend>
-      <input type="password" placeholder="New password" v-model="password" required />
-      <button type="submit" class="pure-button pure-button-primary">Update password</button>
-    </fieldset>
-  </form> -->
+  
   
 </template>
 <style>

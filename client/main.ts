@@ -5,6 +5,7 @@ import VueGoogleMaps from "@fawmi/vue-google-maps";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
+
 import "vuetify/styles";
 
 import { createPinia } from "pinia";
@@ -12,7 +13,13 @@ import piniaPluginPersistedState from "pinia-plugin-persistedstate";
 import { createApp } from "vue";
 
 import App from "./App.vue";
+// import DayJsAdapter from "@date-io/dayjs";
+
+// createVuetify({
+
+// }
 import router from "./router";
+// import { VuetifyDateAdapter } from "vuetify/composables/date/adapters/vuetify";
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -25,6 +32,7 @@ export const vuetify = createVuetify({
       VBtn: { variant: "outlined" },
     },
   },
+  date: {},
   theme: {
     themes: {
       light: {

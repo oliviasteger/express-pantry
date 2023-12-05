@@ -77,6 +77,35 @@ button.default-disabled {
   padding: .5em;
   color:var(--dark-grey);
 }
+.vl-full {
+  border-left: 1px solid var(--line-color);
+  /* opacity: 25%; */
+  height: 100%;
+  margin:auto;
+}
+.vl-indented {
+  width: 1px; /* Line width */
+  background-color: var(--dark-grey); /* Line color */
+  height: 90%; /* Override in-line if you want specific height. */
+  position:inline-block; 
+  /* border-left: 1px solid var(--dark-grey); */
+  opacity: 25%;
+  margin:auto;
+}
+#line-full{
+  color: var(--line-color);
+  opacity: 25%;
+  margin:auto;
+  width:100%;
+  size:1px;
+}
+#line-indented{
+  color: var(--line-color);
+  opacity: 25%;
+  margin:auto;
+  width:90%;
+  size:1px;
+}
 a.button {
   color: #212529;
   background-color: #f1f3f5;
