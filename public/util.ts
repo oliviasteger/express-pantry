@@ -93,7 +93,6 @@ const operations: operation[] = [
     endpoint: "/api/profiles/eligibility/:profileId/:userId",
     method: "GET",
     fields: {
-      profileId: "input",
       userId: "input",
     },
   },
