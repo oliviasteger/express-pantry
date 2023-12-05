@@ -180,7 +180,7 @@ class Routes {
     // Create a pantry item
     const user = WebSession.getUser(session);
     await User.isAdministrator(user);
-
+    await organizePantryItems(new ObjectId(user));
     return await ExpiringItem.create(user, barcode, new Date(dropDate), new Date(expirationDate), status);
   }
 
@@ -228,6 +228,7 @@ class Routes {
         void Order.update(targetOrder._id, { items: targetOrder.items.filter((itemId) => !new ObjectId(id).equals(itemId)) });
       }
     }
+    await organizePantryItems(new ObjectId(user));
     return await ExpiringItem.delete(new ObjectId(id));
   }
 
@@ -385,6 +386,7 @@ class Routes {
   @Router.patch("/order/status")
   async updateOrderStatus(session: WebSessionDoc, orderId: string, newStatus: OrderStatus) {
     const userId = WebSession.getUser(session);
+    await organizePantryItems(new ObjectId(userId));
     const order = await Order.getorderById(new ObjectId(orderId));
     assert(order.recipient.equals(userId), new NotAllowedError("User lacks permissions to change order status"));
 
@@ -414,6 +416,7 @@ class Routes {
   async placeOrder(session: WebSessionDoc, profileId: string, pickupTime: string, barcodes: string) {
     const userId = WebSession.getUser(session);
     const user = User.getUserById(new ObjectId(userId));
+    await organizePantryItems(new ObjectId(userId));
     const profile = Profile.getProfileById(new ObjectId(profileId));
     const availableTimesPromise = getAvailableTimes(profileId);
     await Profile.assertEligible(new ObjectId(profileId), await user);
