@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
 import { Location } from "@/types/location";
+import { ref } from "vue";
 
 const markers = ref<Array<Location>>( [{lat:42.373611, lng: -71.110558}]); 
 </script>
@@ -10,8 +10,8 @@ const markers = ref<Array<Location>>( [{lat:42.373611, lng: -71.110558}]);
   >
     <GMapMarker
       :key="index"
-      v-for="(m, index) in markers.value"
-      :position="m.position"
+      v-for="(m, index) in markers"
+      :position="m"
       :clickable="true"
       :draggable="true"
     />

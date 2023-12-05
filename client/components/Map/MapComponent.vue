@@ -4,7 +4,7 @@
 import { Location } from "@/types/location";
 import { ref, watch } from "vue";
 
-const mapRef = ref<InstanceType<typeof GMapMap> | null>(null);
+const mapRef = ref();
 const isLocationAvailable = ref<Boolean>(true);
 const center = ref<Location | null>( {lat:42.373611, lng: -71.110558}); 
 const currentLocation = ref<Location>( {lat:42.373611, lng: -71.110558}); 
