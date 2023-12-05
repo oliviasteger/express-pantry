@@ -106,10 +106,10 @@ class Routes {
     return { msg: "Logged out!" };
   }
 
-  @Router.get("/users/:username/items")
-  async getOrderableBarcodesAndQuantities(username: string) {
+  @Router.get("/users/:id/items")
+  async getOrderableBarcodesAndQuantities(id: ObjectId) {
     // View all orderable items for a given pantry
-    const administrator = await User.getUserByUsername(username);
+    const administrator = await User.getUserById(id);
     await User.isAdministrator(administrator._id);
 
     const items = await ExpiringItem.getExpiringItems({ administrator: administrator, status: "Claimable" });

@@ -147,9 +147,9 @@ const operations: operation[] = [
   },
   {
     name: "Get expiring items by owner",
-    endpoint: "/api/users/:username/items",
+    endpoint: "/api/users/:id/items",
     method: "GET",
-    fields: { username: "input" },
+    fields: { id: "input" },
   },
   {
     name: "Get expiring items that you own",
