@@ -1,3 +1,4 @@
+import assert from "assert";
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { BadValuesError, NotAllowedError, NotFoundError } from "./errors";
@@ -33,6 +34,7 @@ export default class UserConcept {
 
   async create(username: string, password: string, type: UserType, information?: Record<string, string>) {
     await this.canCreate(username, password);
+    assert(["Administrator", "Client"].includes(type), "Type must be Administrator or Client");
     const _id = await this.users.createOne({ username, password, type, information });
     return { msg: "User created successfully!", user: await this.users.readOne({ _id }) };
   }

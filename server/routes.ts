@@ -49,6 +49,44 @@ async function getAvailableTimes(profileId: string | ObjectId) {
   return parsedOrderableTimes;
 }
 
+async function organizePantryItems(pantryAdminId: string | ObjectId) {
+  const items = await ExpiringItem.getExpiringItems({ administrator: new ObjectId(pantryAdminId) });
+
+  for (const item of items) {
+    const today = new Date();
+    const expirationDate = new Date(item.expirationDate);
+    const dropDate = new Date(item.dropDate);
+    // @ts-expect-error Doesn't understand mongo parsing for array queries
+    const applicableOrders = await Order.getordersByQuery({ recipient: new ObjectId(pantryAdminId), items: new ObjectId(item._id) });
+    if (dropDate > today) await ExpiringItem.update(item._id, { status: "Unreleased" });
+    else if (applicableOrders.length === 0 && expirationDate > today) await ExpiringItem.update(item._id, { status: "Claimable" });
+    else if (applicableOrders.length === 0 && expirationDate <= today) await ExpiringItem.update(item._id, { status: "Expired" });
+    else if (applicableOrders[0].status !== "picked up" && expirationDate > today) await ExpiringItem.update(item._id, { status: "Ordered" });
+    else if (applicableOrders[0].status === "picked up") await ExpiringItem.update(item._id, { status: "Used" });
+    else if (expirationDate <= today) {
+      if (item.status !== "Used") await ExpiringItem.update(item._id, { status: "Expired" });
+      if (applicableOrders.length > 0) {
+        assert(applicableOrders.length <= 1, "There should not be more than 1 order taking this item");
+        const targetOrder = applicableOrders[0];
+        const claimableItems = await ExpiringItem.getExpiringItems({ administrator: new ObjectId(pantryAdminId), barcode: item.barcode, status: "Claimable" });
+        if (claimableItems.length > 0) {
+          console.log("Other items are claimable");
+          claimableItems.sort((i1, i2) => new Date(i1.expirationDate).getTime() - new Date(i2.expirationDate).getTime());
+          const chosenItem = claimableItems[0];
+
+          const orderItems = targetOrder.items.filter((itemId) => !new ObjectId(item._id).equals(itemId));
+          orderItems.push(chosenItem._id);
+
+          await Promise.all([ExpiringItem.update(chosenItem._id, { status: "Ordered" }), Order.update(targetOrder._id, { items: orderItems })]);
+        } else {
+          console.log("No MOre claimable");
+          await Order.update(targetOrder._id, { items: targetOrder.items.filter((itemId) => !new ObjectId(item._id).equals(itemId)) });
+        }
+      }
+    } else if (!["Expired", "Used", "Ordered"].includes(item.status) && item.dropDate.getTime() < today.getTime()) await ExpiringItem.update(item._id, { status: "Claimable" });
+  }
+}
+
 class Routes {
   @Router.get("/session")
   async getSessionUser(session: WebSessionDoc) {
@@ -111,6 +149,7 @@ class Routes {
     // View all orderable items for a given pantry
     const administrator = await User.getUserById(id);
     await User.isAdministrator(administrator._id);
+    await organizePantryItems(administrator._id);
 
     const items = await ExpiringItem.getExpiringItems({ administrator: administrator, status: "Claimable" });
     const barcodesToQuantities: { [key: string]: number } = {};
@@ -131,6 +170,7 @@ class Routes {
     // View all items in pantry inventory
     const user = WebSession.getUser(session);
     await User.isAdministrator(user);
+    await organizePantryItems(user);
 
     return await ExpiringItem.getExpiringItems({ administrator: user });
   }
@@ -150,9 +190,11 @@ class Routes {
     const user = WebSession.getUser(session);
     await User.isAdministrator(user);
     await ExpiringItem.isAdministrator(user, id);
-    return await ExpiringItem.update(id, update);
-
-    // TODO: update any corresponding orders
+    const item = await ExpiringItem.update(id, update);
+    console.log("Past the first part");
+    // Organizes the orders and handles expirey information
+    await organizePantryItems(user);
+    return item;
   }
 
   @Router.delete("/items/:id")
@@ -398,6 +440,12 @@ class Routes {
       new Date(pickupTime),
     );
     return await order;
+  }
+
+  @Router.patch("/inventory/")
+  async organizeInventory(adminId: string) {
+    await organizePantryItems(adminId);
+    return { msg: "Pantry organized" };
   }
 
   // @Router.get("/posts")

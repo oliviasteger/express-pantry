@@ -32,7 +32,7 @@ export default class ExpiringItemConcept {
   async update(_id: ObjectId, update: Partial<ExpiringItemDoc>) {
     const expiringitem = await this.expiringitems.readOne({ _id });
     if (!expiringitem) throw new NotFoundError(`Expiring item ${_id} does not exist!`);
-    this.areDatesValid(update.dropDate ? update.dropDate : expiringitem?.dropDate, update.expirationDate ? update.expirationDate : expiringitem.dropDate);
+    this.areDatesValid(update.dropDate ? new Date(update.dropDate) : expiringitem?.dropDate, update.expirationDate ? new Date(update.expirationDate) : expiringitem.dropDate);
 
     const allowedUpdates = ["barcode", "dropDate", "expirationDate", "status"];
     for (const key in update) {
