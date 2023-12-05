@@ -2,6 +2,7 @@ import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
+import FoodListComponent from "../components/Food/FoodListComponent.vue";
 import EditProfileForm from "../components/Profile/EditProfileForm.vue";
 import AccountView from "../views/AccountView.vue";
 import HomeView from "../views/HomeView.vue";
@@ -59,6 +60,12 @@ const router = createRouter({
       path: "/editProfile",
       name: "Edit Profile",
       component: EditProfileForm,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/inventory",
+      name: "Inventory",
+      component: FoodListComponent,
       meta: { requiresAuth: true },
     },
 
