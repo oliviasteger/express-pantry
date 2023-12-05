@@ -37,8 +37,10 @@ onBeforeMount(async () => {
           <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
           <ul v-if="userStore.userType === 'Administrator'">
+            <li>
+              <RouterLink :to="{ name: 'Admin Settings' }"> Settings </RouterLink>
+            </li>
             <li>
               <RouterLink :to="{ name: 'Profile' }"> Profile </RouterLink>
             </li>
@@ -48,13 +50,13 @@ onBeforeMount(async () => {
             <!-- Add more admin-specific links as needed -->
           </ul>
           <ul v-else-if="userStore.userType === 'Client'">
-              <li>
-                <RouterLink :to="{ name: 'Account' }"> Dashboard </RouterLink>
-              </li>
-              <li>
-                <RouterLink :to="{ name: 'Map' }"> Map </RouterLink>
-              </li>
-            
+            <li><RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink></li>
+            <li>
+              <RouterLink :to="{ name: 'Account' }"> Dashboard </RouterLink>
+            </li>
+            <li>
+              <RouterLink :to="{ name: 'Map' }"> Map </RouterLink>
+            </li>
           </ul>
         </li>
         <li v-else>
@@ -62,7 +64,7 @@ onBeforeMount(async () => {
         </li>
       </ul>
     </nav>
-    <hr width="100%" size=".1" id = "color" noshade>
+    <hr width="100%" size=".1" id="color" noshade />
     <article v-if="toast !== null" class="toast" :class="toast.style">
       <p>{{ toast.message }}</p>
     </article>
@@ -114,7 +116,7 @@ ul {
 
   gap: 1em;
 }
-li{
+li {
   display: flex;
   flex-flow: row wrap;
   gap: 1em;

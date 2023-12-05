@@ -5,6 +5,7 @@ import { useUserStore } from "@/stores/user";
 import FoodListComponent from "../components/Food/FoodListComponent.vue";
 import EditProfileForm from "../components/Profile/EditProfileForm.vue";
 import AccountView from "../views/AccountView.vue";
+import AdminSettingView from "../views/AdminSettingView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import MapView from "../views/MapView.vue";
@@ -36,6 +37,12 @@ const router = createRouter({
       path: "/setting",
       name: "Settings",
       component: SettingView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/adminsetting",
+      name: "Admin Settings",
+      component: AdminSettingView,
       meta: { requiresAuth: true },
     },
     {
