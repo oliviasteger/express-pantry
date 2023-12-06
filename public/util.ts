@@ -205,6 +205,12 @@ const operations: operation[] = [
     method: "DELETE",
     fields: { id: "input" },
   },
+  {
+    name: "Organize Inventory",
+    endpoint: "/api/inventory",
+    method: "PATCH",
+    fields: { adminId: "input" },
+  },
 ];
 
 // Do not edit below here.
