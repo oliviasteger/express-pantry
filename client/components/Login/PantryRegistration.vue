@@ -52,7 +52,6 @@ const registerPantry = async () => {
       rules: rules.value,
     },
   });
-  console.log("HERE555");
 
   //emit event to say registered event is submitted
   void updateSession();
