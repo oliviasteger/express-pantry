@@ -1,6 +1,5 @@
 /* Add some global styles here! */
 @import url('https://fonts.googleapis.com/css2?family=PT+Serif&family=Roboto:wght@100;300;400;500&display=swap');
-
 @import url('https://fonts.googleapis.com/css2?family=Fredoka&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
 html, body {
@@ -15,6 +14,43 @@ html, body {
   height: 100vh; */
 
 }
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: local('Material Icons'),
+       local('MaterialIcons-Regular'),
+       url(MaterialIcons-Regular.woff2) format('woff2'),
+       url(MaterialIcons-Regular.woff) format('woff'),
+       url(MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
 
 :root {
   --light-pink: #ffdefdff;
@@ -22,7 +58,7 @@ html, body {
   --header-color: #3066be;
   --darker-header:#173565;
   --lighter-header:#6693dc;
-  --green: #0a6824;
+  --green: #19a240;
   --red:#a22c29;
   --light-red:#eb6e6e;
   --light-green:#81c28f;

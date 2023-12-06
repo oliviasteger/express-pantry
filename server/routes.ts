@@ -151,14 +151,14 @@ class Routes {
     await User.isAdministrator(administrator._id);
     await organizePantryItems(administrator._id);
 
-    const items = await ExpiringItem.getExpiringItems({ administrator: administrator, status: "Claimable" });
+    const items = await ExpiringItem.getExpiringItems({ administrator: administrator._id, status: "Claimable" });
     const barcodesToQuantities: { [key: string]: number } = {};
 
-    for (const item in items) {
-      if (item in barcodesToQuantities) {
-        barcodesToQuantities[item] += 1;
+    for (const item of items) {
+      if (item.barcode in barcodesToQuantities) {
+        barcodesToQuantities[item.barcode] += 1;
       } else {
-        barcodesToQuantities[item] = 1;
+        barcodesToQuantities[item.barcode] = 1;
       }
     }
 
@@ -253,7 +253,7 @@ class Routes {
 
   @Router.get("/profiles/location/:location")
   async getProfilesByLocation(location: string) {
-    return await Profile.getProfilesByQuery({ location });
+    return await Profile.getProfilesByQuery({ location: location });
   }
 
   @Router.get("/profiles")
@@ -283,10 +283,10 @@ class Routes {
     return await Profile.delete(new ObjectId(_id));
   }
 
-  @Router.get("/profiles/eligibility/:profileId/:userId")
-  async isEligible(profileId: string, userId: string) {
-    const user = await User.getUserById(new ObjectId(userId));
-    await Profile.assertEligible(new ObjectId(profileId), user);
+  @Router.get("/profiles/eligibility/:profileId/:username")
+  async isEligible(profileId: ObjectId, username: string) {
+    const user = await User.getUserByUsername(username);
+    await Profile.assertEligible(profileId, user);
     return { msg: "User is eligible" };
   }
 

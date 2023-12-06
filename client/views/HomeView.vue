@@ -24,8 +24,20 @@ const printr = (model:any) => {
 <template>
   <main>
     {{ expirationDate }}
-    <h1>Home Page</h1>
     
+    <div class="icon-container">
+      <v-icon icon = "mdi-circle" color = "var(--green)" class="base-icon"></v-icon>
+      <v-icon icon = "mdi-plus" color ="white" class="overlay-icon"></v-icon>
+    </div>
+    <!-- <v-icon icon = "mdi-circle" color = "var(--green)">
+      <v-icon icon = "mdi-plus" color ="var(--white)">
+      
+    </v-icon>
+    </v-icon> -->
+    <h1>Home Page</h1>
+    <span class="material-icons-outlined">
+add_circle
+</span>
     <section>
       <h1 v-if="isLoggedIn">Welcome {{ currentUsername }}!</h1>
       <h1 v-else>Please login!</h1>
@@ -49,5 +61,20 @@ const printr = (model:any) => {
 <style scoped>
 h1 {
   text-align: center;
+}
+.icon-container {
+  position: relative;
+  display: inline-block; /* Ensures icons are in the same line */
+}
+
+.base-icon, .overlay-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Adjust z-index if needed */
+}
+
+.overlay-icon {
+  color: red; /* Change the color or styling for the overlay icon */
 }
 </style>
