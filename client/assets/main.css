@@ -77,20 +77,25 @@ button.default-disabled {
   padding: .5em;
   color:var(--dark-grey);
 }
-.vl-full {
+.vl-full::before {
   border-left: 1px solid var(--line-color);
   /* opacity: 25%; */
   height: 100%;
   margin:auto;
 }
-.vl-indented {
-  width: 1px; /* Line width */
-  background-color: var(--dark-grey); /* Line color */
-  height: 90%; /* Override in-line if you want specific height. */
-  position:inline-block; 
+.vl-indented::before {
+  content: '';
+  border-left: 1px solid var(--dark-grey);
+  min-height:100%;
+  height:100%; /* Adjust the color, width, and style as needed */
+   /* Adjust the height of the line */
+  display: inline-block;
+  margin-right: 10px; 
+  /* Line width */
+  /* Line color */
+  
   /* border-left: 1px solid var(--dark-grey); */
-  opacity: 25%;
-  margin:auto;
+  
 }
 #line-full{
   color: var(--line-color);
@@ -120,6 +125,15 @@ a.button {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 1em;
+}
+.c-row {
+  margin: 0 auto;
+  max-width: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
   gap: 1em;
 }
 @font-face {

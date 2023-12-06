@@ -1,10 +1,12 @@
 import "@/assets/main.css";
+import "@mdi/font/css/materialdesignicons.css";
 import "purecss";
 // @ts-ignore
 import VueGoogleMaps from "@fawmi/vue-google-maps";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
+import { mdi } from "vuetify/iconsets/mdi";
 
 import "vuetify/styles";
 
@@ -33,6 +35,12 @@ export const vuetify = createVuetify({
     },
   },
   date: {},
+  icons: {
+    defaultSet: "mdi",
+    sets: {
+      mdi,
+    },
+  },
   theme: {
     themes: {
       light: {

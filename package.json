@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "@fawmi/vue-google-maps": "0.9.67",
+    "@mdi/font": "^7.3.67",
     "connect-mongo": "^5.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
