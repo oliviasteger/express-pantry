@@ -5,7 +5,9 @@ import { useUserStore } from "@/stores/user";
 import FoodListComponent from "../components/Food/FoodListComponent.vue";
 import EditProfileForm from "../components/Profile/EditProfileForm.vue";
 import AccountView from "../views/AccountView.vue";
+import AdminOrdersView from "../views/AdminOrdersView.vue";
 import AdminSettingView from "../views/AdminSettingView.vue";
+import ClientOrdersView from "../views/ClientOrdersView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import MapView from "../views/MapView.vue";
@@ -31,6 +33,19 @@ const router = createRouter({
       path: "/account",
       name: "Account",
       component: AccountView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/adminorders",
+      name: "Admin Orders",
+      component: AdminOrdersView,
+      meta: { requiresAuth: true },
+    },
+
+    {
+      path: "/clientorders",
+      name: "Client Orders",
+      component: ClientOrdersView,
       meta: { requiresAuth: true },
     },
     {

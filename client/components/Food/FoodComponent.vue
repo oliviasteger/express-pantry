@@ -39,16 +39,6 @@ const getName = async (barcode: string) => {
       }
     })
     .then((data) => {
-      // Process the response data here
-      //   let name = data.product.generic_name;
-      //   let brand = data.product.brand_owner;
-      //   let url = data.product.image_url;
-      //   let group = data.product.food_groups;
-      //   console.log("food name: ", name);
-      //   console.log("food brand: ", brand);
-      //   console.log("food image URL: ", url);
-      //   console.log("food group: ", group);
-
       name.value = data.product.generic_name_en;
       brand.value = data.product.brands;
       imageURL.value = data.product.image_url;
@@ -73,22 +63,6 @@ onBeforeMount(async () => {
   }
 });
 </script>
-
-<!-- <template>
-  <div>
-    <p><strong>Barcode</strong> {{ props.item.barcode }}</p>
-    <p><strong>Status</strong> {{ props.item.status }}</p>
-    <p><strong>Expiration Date</strong> {{ new Date(props.item.expirationDate).toLocaleString() }}</p>
-    <p><strong>Drop Date</strong> {{ new Date(props.item.dropDate).toLocaleString() }}</p>
-    <p><strong>Name</strong> {{ name }}</p>
-    <p><strong>Brand </strong> {{ brand }}</p>
-    <p><strong>Image </strong></p>
-    <p><img :src="imageURL" alt="Input ImageURL" class="image" width="300" height="200" /></p>
-    <p><strong>Food Group </strong> {{ group }}</p>
-    <li><button class="button-error btn-small pure-button" @click="deleteItem">Delete</button></li>
-    <li><button class="btn-small pure-button" @click="emit('editItem', props.item._id)">Edit</button></li>
-  </div>
-</template> -->
 
 <template>
   <v-row>

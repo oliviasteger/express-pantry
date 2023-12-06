@@ -39,23 +39,29 @@ onBeforeMount(async () => {
         <li v-if="isLoggedIn">
           <ul v-if="userStore.userType === 'Administrator'">
             <li>
-              <RouterLink :to="{ name: 'Admin Settings' }"> Settings </RouterLink>
+              <RouterLink :to="{ name: 'Admin Settings' }" :class="{ underline: currentRouteName == 'Admin Settings' }"> Settings </RouterLink>
             </li>
             <li>
-              <RouterLink :to="{ name: 'Profile' }"> Profile </RouterLink>
+              <RouterLink :to="{ name: 'Profile' }" :class="{ underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
             </li>
             <li>
-              <RouterLink :to="{ name: 'Inventory' }"> Inventory </RouterLink>
+              <RouterLink :to="{ name: 'Inventory' }" :class="{ underline: currentRouteName == 'Inventory' }"> Inventory </RouterLink>
+            </li>
+            <li>
+              <RouterLink :to="{ name: 'Admin Orders' }" :class="{ underline: currentRouteName == 'Admin Orders' }"> Orders </RouterLink>
             </li>
             <!-- Add more admin-specific links as needed -->
           </ul>
           <ul v-else-if="userStore.userType === 'Client'">
             <li><RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink></li>
             <li>
-              <RouterLink :to="{ name: 'Account' }"> Dashboard </RouterLink>
+              <RouterLink :to="{ name: 'Account' }" :class="{ underline: currentRouteName == 'Account' }"> Dashboard </RouterLink>
             </li>
             <li>
-              <RouterLink :to="{ name: 'Map' }"> Map </RouterLink>
+              <RouterLink :to="{ name: 'Map' }" :class="{ underline: currentRouteName == 'Map' }"> Map </RouterLink>
+            </li>
+            <li>
+              <RouterLink :to="{ name: 'Client Orders' }" :class="{ underline: currentRouteName == 'Client Orders' }"> Orders </RouterLink>
             </li>
           </ul>
         </li>
