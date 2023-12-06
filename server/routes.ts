@@ -405,7 +405,8 @@ class Routes {
   async deleteOrder(orderId: string, session: WebSessionDoc) {
     const userId = WebSession.getUser(session);
     const order = await Order.getorderById(new ObjectId(orderId));
-    assert(order.recipient.equals(userId), new NotAllowedError("User lacks permission to delete this order"));
+
+    assert(order.recipient.equals(userId) || order.sender.equals(userId), new NotAllowedError("User lacks permission to delete this order"));
     assert(order.status !== "picked up", new NotAllowedError("Order is already picked up and cannot be deleted."));
     void Promise.all(order.items.map((itemId) => ExpiringItem.update(itemId, { status: "Claimable" })));
 
