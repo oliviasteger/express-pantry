@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { defineProps, ref } from "vue"; // Import defineProps and defineEmits
+import { defineProps, onBeforeMount, ref } from "vue"; // Import defineProps and defineEmits
 import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["order"]);
@@ -33,12 +33,35 @@ const deleteOrder = async () => {
   emit("refreshItems");
   emit("refreshOrders");
 };
+const clientName = ref("");
+const profileName = ref("");
+
+// const getClientUsername = async () => {
+//   const clientIdCheck = props.order.sender;2
+//   console.log(clientIdCheck);
+//   clientName.value = await fetchy(`/api/users/id/${clientIdCheck}`, "GET");
+// };
+
+const getProfile = async () => {
+  console.log("HELLO");
+  const currentId = await fetchy("/api/profiles", "GET");
+  console.log("CHECK", currentId);
+  profileName.value = currentId;
+};
+
+onBeforeMount(async () => {
+  try {
+    await getProfile();
+  } catch {
+    // User is not logged in
+  }
+});
 </script>
 
 <template>
   <v-row>
     <v-col> <strong>Sender:</strong> {{ props.order.sender }} </v-col>
-    <v-col> <strong>Recipient:</strong> {{ props.order.recipient }} </v-col>
+    <v-col> <strong>Recipient:</strong> {{ profileName }} </v-col>
     <v-col> <strong>Status:</strong> {{ props.order.status }} </v-col>
     <v-col> <strong>pickup Date:</strong> {{ new Date(props.order.pickup).toLocaleString() }} </v-col>
 
