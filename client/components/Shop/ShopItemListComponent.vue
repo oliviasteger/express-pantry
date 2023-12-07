@@ -17,27 +17,56 @@ const closeHours = ref("");
 const rules = ref("");
 const { currentUsername } = storeToRefs(useUserStore());
 const props = defineProps(["shop"]);
-const emit = defineEmits(["openShop", "refreshPantryList"]);
+const emit = defineEmits(["openShop", "leaveShop","refreshPantryList"]);
+const order = ref<
+  Array<{
+    [key: string]: number;
+  }>
+>([]);
 
 
-const setUpShop = async () => {
+const setUpShop = async (shop: any) => {
   try {
-    const results = await fetchy(`/users/${props.shop.adminstrator}/items`, "GET");
+    const administrator = shop.administrator;
+    console.log(administrator);
+    console.log(`${shop.administrator}`);
+    const adminURL = "api/users/" + administrator +"/items";
+    console.log(adminURL);
+    // const results = await fetchy(`api/users/${shop.adminstrator}/items`, "GET");
+    const results = await fetchy(adminURL, "GET");
+    console.log("I tried the request")
     orderableBarcodesAndQuantities.value  = results;
+    console.log(results);
+
   } catch {
+    console.log("Failure in setupShop")
     return;
   }
 };
-const addToCart = async (barcode:string, quantity:number) => {
-  // to do 
+const openCart = async (item:any, number?:number) => {
   return;
+};
+const addToCart = async (barcode:string, number?:number) => {
+  if (!number){
+    number = 1; 
+  }
+  order.value.push({ [barcode]: number});
+  //do I need to update orderable barcodes and quantities
+  // try {
+  //   const results = await fetchy(`/users/${props.shop.adminstrator}/items`, "GET");
+  //   orderableBarcodesAndQuantities.value  = results;
+  // } catch {
+  //   return;
+  // }
+  // return;
 };
 async function getCurrentCity() {
   let user;
   try {
     user = await fetchy(`api/users/${currentUsername.value}`, "GET");
+    console.log("city success")
   } catch (_) {
-    console.log("failed")
+    console.log("city failed")
     return;
   }
   
@@ -45,7 +74,7 @@ async function getCurrentCity() {
 }
 onBeforeMount(async () => {
     await getCurrentCity(); 
-    await setUpShop();
+    await setUpShop(props.shop);
     loaded.value = true;
 });
 </script>
@@ -57,34 +86,55 @@ onBeforeMount(async () => {
   <div class="pure-control-group">Requirements: Maximum Annual Income: {{ rules }}</div>
 </template> -->
 <template>
+  <v-row justify="start">
+    <v-col>
+    Shopping At 
+  </v-col>
+  <v-col>
+    <button class="default-disabled"> Sally's Food Pantry</button>
+  </v-col>
+  
+</v-row>
+<v-row justify="end">
+    <v-col>
+    <!-- <SearchShopForm @getItemsByFilter="getOrderable" /> -->
+  </v-col>
+  <div class="container" @click="openCart">
+
+            <v-col>Cart</v-col>
+            <v-col cols="2"><v-icon icon = "mdi-circle" color = "white" size= "10px" class="base-icon"></v-icon></v-col>
+            <!-- need to get # of items in cart -->
+
+          
+        </div>
+
+  
+</v-row>
+      <ul>
+        <li>
+          
+        </li>
+  
+        <li>
+          
+          
+        </li>
+
+      </ul>
+    
     <div class="row">
       
     </div>
     <section class="posts" v-if="loaded && orderableBarcodesAndQuantities.length !== 0">
-      <article v-for="(object,index) in orderableBarcodesAndQuantities" :key="object.key">
-          <ShopItemComponent :item="object" @refreshShopItems="setUpShop" :index="index" @addedToCart="addToCart"/>
+      <article v-for="(object, index) of Object.entries(orderableBarcodesAndQuantities)" :key="object.key">
+          <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop" :index="index" @addedToCart="addToCart"/>
         <!-- <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
         <EditPostForm v-else :post="post" @refreshPosts="getPosts" @editPost="updateEditing" /> -->
       </article>
     </section>
     <p v-else-if="loaded">No posts found</p>
     <p v-else>Loading...</p>
-    <div class = "row">Shopping At <button class="default-disabled"> Sally's Food Pantry</button>
-      <ul>
-        <li>
-          <!-- <SearchShopForm @getItemsByFilter="getOrderable" /> -->
-        </li>
-        <li>
-          <div class="container">
-            
-            <h3>Cart</h3>
-            <!-- need to get # of items in cart -->
-          </div>
-          
-        </li>
-
-      </ul>
-    </div>
+    
     <hr class = "line-full">
     <div class="list-title">Food Pantries Located in {{ selectedCity }}</div>
     <!-- <div class="list-container" v-if = "profiles.length !== 0">
@@ -96,7 +146,16 @@ onBeforeMount(async () => {
   
 </template>
 <style scoped>
-
+.container{
+  padding: .1em;
+  font-size: small;
+  font-weight: bold;
+  border-radius: 8px;
+  border-style: solid;
+  border-width: medium;
+  background: black;
+  color:white;
+}
 
 
 
@@ -167,5 +226,16 @@ article {
   margin-bottom: 20px;
 }
 
+.posts {
+  display: flex;
+  padding: 1em;
+  flex-wrap: wrap;
+}
+/* .row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 60em;
+} */
 /* Add more styling as needed */
 </style>

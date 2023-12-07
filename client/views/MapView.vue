@@ -3,7 +3,7 @@
 import MapComponent from "@/components/Map/MapComponent.vue";
 import MyMarker from "@/components/Map/MyMarker.vue";
 import PantryListComponent from "@/components/Profile/PantryListComponent.vue";
-// import ShopItemComponent from "@/components/Shop/ShopItemListComponent.vue";
+import ShopItemListComponent from "@/components/Shop/ShopItemListComponent.vue";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { useUserStore } from "../stores/user";
@@ -53,8 +53,8 @@ onBeforeMount(async () => {
         </MapComponent>
       </div>
     </div>
-    <div v-show = "inShop">
-      <!-- <ShopItemComponent :profile="shop" @leaveShop="switchFromShop"></ShopItemComponent> -->
+    <div v-if="inShop">
+      <ShopItemListComponent :shop="shop" @leaveShop="switchFromShop"></ShopItemListComponent>
     </div>
     
     

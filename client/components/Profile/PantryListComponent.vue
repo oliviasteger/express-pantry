@@ -8,12 +8,12 @@ import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
 
 const name = ref("");
-let profiles = ref<Array<Record<string, string>>>([]);
+let eligibleProfiles = ref<Array<Record<string, string>>>([]);
 const openHours = ref("");
 const closeHours = ref("");
 const rules = ref("");
 const loaded = ref(false); 
-const hasProfiles = ref(false);
+const hasEligibleProfiles = ref(false);
 const props = defineProps(["selectedCity"]);
 const emit = defineEmits(["openShop", "refreshPantryList"]);
 const {currentUsername} = storeToRefs(useUserStore());
@@ -22,12 +22,30 @@ let currentSnapEligible = ref("");
 let currentCity = ref("");
 
 
-const getProfile = async () => {
+const getEligibleProfiles = async () => {
   try {
-    console.log(props.selectedCity)
-    console.log("ehrer")
+    console.log("in get Profile");
+    console.log(`this is props.selectedd ${props.selectedCity}`);
+    console.log(`this is currentCity ${currentCity}`);
     const results = await fetchy(`api/profiles/location/${props.selectedCity}`, "GET");
-    profiles.value = results
+    const profiles = [];
+    for (let profile of results){
+      const id = profile._id;
+      console.log(`this is id ${id}`);
+      try {
+        const eligibilityCheck = await fetchy(`api/profiles/eligibility/${id}/${currentUsername.value}`, "GET");
+        console.log(`this is eligibility check ${eligibilityCheck}`);
+        console.log(`this is eligibility check msg ${eligibilityCheck.msg}`);
+        if (eligibilityCheck.msg === "User is eligible" ){
+          profiles.push(profile);
+        }
+      } catch {
+          continue;
+      }
+
+    }
+
+    eligibleProfiles.value = profiles;
     
   } catch {
     return;
@@ -49,13 +67,16 @@ async function getInformation() {
 
 
 onBeforeMount(async () => {
-    await getProfile();
+    
     await getInformation();
+    await getEligibleProfiles();
     loaded.value = true; 
 });
 </script>
 <template>
   <div v-show = "loaded">
+    {{ currentCity }}
+    {{ props.selectedCity }}
     <button class="default-disabled info ">
       <div class ="side">
         Based on your account information to the right, these are the food pantries within your selected area that you are eligible for
@@ -109,8 +130,8 @@ onBeforeMount(async () => {
         </v-card>
     </button>
     <div class="list-title">Your Food Pantries</div>
-    <div class="list-container" v-if = "loaded && profiles.length !== 0">
-        <button class="profile-button" v-for="profile,index in profiles" :key="profile._id" @click="emit('openShop', profile)">
+    <div class="list-container" v-if = "loaded && eligibleProfiles.length !== 0">
+        <button class="profile-button" v-for="profile,index in eligibleProfiles" :key="profile._id" @click="emit('openShop', profile)">
             {{ profile.name }}
         </button>
         

@@ -4,35 +4,41 @@
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { defineProps, onBeforeMount, ref } from "vue"; // Import defineProps and defineEmits
-import { fetchy } from "../../utils/fetchy";
 
-const props = defineProps(["item"]);
+const props = defineProps(["item"]); //{ [""]: -1} key which maps to a quantity 
 const { currentUsername } = storeToRefs(useUserStore());
-const emit = defineEmits(["editItem", "refreshShopItems"]);
+const emit = defineEmits(["addedToCart", "refreshShopItems", "maximizeItem"]);
 const loading = ref(false);
 // const emit = defineEmits(); // Use defineEmits without arguments
 const deleting = ref(false); // Track if the item is being deleted
+const viewing = ref(false); // Track if the item is being deleted
 const name = ref("");
 const imageURL = ref("");
 const brand = ref("");
 const group = ref("");
 
-const deleteItem = async () => {
-  if (deleting.value) return; // Prevent multiple delete requests
-  deleting.value = true;
+// const deleteItem = async () => {
+//   if (deleting.value) return; // Prevent multiple delete requests
+//   deleting.value = true;
 
-  try {
-    await fetchy(`/api/items/${props.item._id}`, "DELETE");
-  } catch (error) {
-    console.error("Error deleting item:", error);
-  } finally {
-    deleting.value = false;
-  }
+//   try {
+//     await fetchy(`/api/items/${props.item._id}`, "DELETE");
+//   } catch (error) {
+//     console.error("Error deleting item:", error);
+//   } finally {
+//     deleting.value = false;
+//   }
+//   emit("refreshShopItems");
+// };
+const viewItem = () => {
+  if (viewing.value) return; // Prevent multiple view requests
+  viewing.value = true;
   emit("refreshShopItems");
+  emit("maximizeItem",props.item);
 };
-
 const getName = async (barcode: string) => {
-  fetch("https://world.openfoodfacts.org/api/v2/product/" + barcode + ".json")
+  const barcodeNew = barcode;
+  fetch("https://world.openfoodfacts.org/api/v2/product/" + barcodeNew + ".json")
     .then((response) => {
       if (response.ok) {
         return response.json(); // Parse the response data as JSON
@@ -69,7 +75,7 @@ const getName = async (barcode: string) => {
 
 onBeforeMount(async () => {
   try {
-    await getName(props.item.barcode);
+    await getName(props.item);
   } catch {
     // User is not logged in
   }
@@ -78,25 +84,55 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  
-    <v-col> <strong>Barcode:</strong> {{ props.item.barcode }} </v-col>
+  <v-card>
+    <!-- <v-col> <strong>Barcode:</strong> {{ props.item.barcode }} </v-col>
     <v-col> <strong>Status:</strong> {{ props.item.status }} </v-col>
     <v-col> <strong>Expiration Date:</strong> {{ new Date(props.item.expirationDate).toLocaleString() }} </v-col>
     <v-col> <strong>Drop Date:</strong> {{ new Date(props.item.dropDate).toLocaleString() }} </v-col>
-    
-    <v-col> <strong>Brand:</strong> {{ brand }} </v-col>
-    <v-col>
-        <v-img
-        aspect-ratio="1/1"
-        cover
-        :src="imageURL"
-        ></v-img>
-        <v-row> {{ name }} </v-row>
-    </v-col>
-    <v-col> <strong>Food Group:</strong> {{ group }} </v-col>
+             -->
+          
+    <v-img
+    aspect-ratio="1/1"
+    cover
+    :src="imageURL"
+    ></v-img>
+    <v-row>
+        <v-card-title class="text-h6">
+            <v-row>
+                <v-col> {{ name }} </v-col>
+                <v-col>
+                    <div class="icon-container" @click="emit('addedToCart', props.item.key)">
+                        <v-icon icon = "mdi-circle" color = "var(--green)" class="base-icon"></v-icon>
+                        <v-icon icon = "mdi-plus" color ="white" class="overlay-icon"></v-icon>
+                    </div>
+                </v-col>
+            </v-row>
+        
+        </v-card-title>
 
-    <v-col>
-      <v-btn class="button-error btn-small" @click="deleteItem">Delete</v-btn>
-      <v-btn class="btn-small" @click="emit('editItem', props.item._id)">Edit</v-btn>
-    </v-col>
+        <v-col>
+        <!-- <v-btn class="button-error btn-small" @click="deleteItem">Delete</v-btn> -->
+        <v-btn class="default btn-small" @click="viewItem">View</v-btn>
+        </v-col>
+    </v-row>
+</v-card>
 </template>
+
+<style scoped>
+.icon-container {
+    position: relative;
+    display: inline-block; /* Ensures icons are in the same line */
+  }
+  
+  .base-icon, .overlay-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Adjust z-index if needed */
+  }
+  
+  .overlay-icon {
+    color: red; /* Change the color or styling for the overlay icon */
+  }
+
+</style>

@@ -1,6 +1,7 @@
 import "@/assets/main.css";
 import "@mdi/font/css/materialdesignicons.css";
 import "purecss";
+
 // @ts-ignore
 import VueGoogleMaps from "@fawmi/vue-google-maps";
 import { createVuetify } from "vuetify";
