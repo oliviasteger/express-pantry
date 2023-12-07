@@ -151,7 +151,7 @@ class Routes {
     await User.isAdministrator(administrator._id);
     await organizePantryItems(administrator._id);
 
-    const items = await ExpiringItem.getExpiringItems({ administrator: administrator, status: "Claimable" });
+    const items = await ExpiringItem.getExpiringItems({ administrator: administrator._id, status: "Claimable" });
     const barcodesToQuantities: { [key: string]: number } = {};
 
     for (const item in items) {
