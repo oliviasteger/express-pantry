@@ -13,7 +13,8 @@ async function getOrders() {
   let orderResults;
   try {
     const clientId = await fetchy("api/session", "GET");
-    orderResults = await fetchy(`/api/order/user/${clientId}`, "GET");
+    console.log(clientId, " this is client id ");
+    orderResults = await fetchy(`/api/order/user/${clientId._id}`, "GET");
   } catch (_) {
     return;
   }

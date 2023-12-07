@@ -131,7 +131,7 @@ onBeforeMount(async () => {
     </button>
     <div class="list-title">Your Food Pantries</div>
     <div class="list-container" v-if = "loaded && eligibleProfiles.length !== 0">
-        <button class="profile-button" v-for="profile,index in eligibleProfiles" :key="profile._id" @click="emit('openShop', profile)">
+        <button class="profile-button" v-for="profile,index in eligibleProfiles" :key="profile._id" @click="emit('openShop', profile._id)">
             {{ profile.name }}
         </button>
         

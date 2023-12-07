@@ -3,25 +3,25 @@
 import MapComponent from "@/components/Map/MapComponent.vue";
 import MyMarker from "@/components/Map/MyMarker.vue";
 import PantryListComponent from "@/components/Profile/PantryListComponent.vue";
-import ShopItemListComponent from "@/components/Shop/ShopItemListComponent.vue";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
+import router from "../router";
 import { useUserStore } from "../stores/user";
 import { fetchy } from "../utils/fetchy";
 
 const shop = ref();
 const loading = ref(false);
 const inShop = ref(false);
+const emit = defineEmits(["sendShopProfile"]);
 const { currentUsername } = storeToRefs(useUserStore());
 const selectedCity = ref("");
-const switchToShop = (shop_profile:any) => {
-  shop.value = shop_profile;
-  inShop.value = true; 
+
+const switchToShop = (shop_id:any) => {
+  console.log(shop_id, shop_id, " in switch to shop");
+  void router.push({ name: 'Shop', params:{shopId:shop_id}});
 };
-const switchFromShop = () => {
-  shop.value = null;
-  inShop.value = false; 
-};
+
+
 async function getCurrentCity() {
   let user;
   try {
@@ -54,7 +54,8 @@ onBeforeMount(async () => {
       </div>
     </div>
     <div v-if="inShop">
-      <ShopItemListComponent :shop="shop" @leaveShop="switchFromShop"></ShopItemListComponent>
+      <ShopView :shop="shop" @leaveShop="switchFromShop"></ShopView>
+      
     </div>
     
     

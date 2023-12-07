@@ -6,15 +6,9 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
-import ShopItemComponent from "./ShopItemComponent.vue";
 
-const selectedCity = ref("");
-const name = ref("");
 let orderableBarcodesAndQuantities = ref<Array<Record<string, string>>>([]);
 const loaded = ref(false);
-const openHours = ref("");
-const closeHours = ref("");
-const rules = ref("");
 const { currentUsername } = storeToRefs(useUserStore());
 const props = defineProps(["shop"]);
 const emit = defineEmits(["openShop", "leaveShop","refreshPantryList"]);
@@ -27,14 +21,30 @@ const order = ref<
 
 const setUpShop = async (shop: any) => {
   try {
+    let results;
+    const shopString = JSON.stringify(shop);
+    const shopHolder = JSON.parse(shopString);
     const administrator = shop.administrator;
-    console.log(administrator);
-    console.log(`${shop.administrator}`);
+    console.log(`${administrator +"he"}`, "got in setUpShop");
+    console.log(`${shop.administrator} is the shop `);
     const adminURL = "api/users/" + administrator +"/items";
+    console.log(typeof shopHolder.administrator); 
     console.log(adminURL);
-    // const results = await fetchy(`api/users/${shop.adminstrator}/items`, "GET");
-    const results = await fetchy(adminURL, "GET");
-    console.log("I tried the request")
+    try{
+      results = await fetchy(`api/users/${shopHolder.administrator}/items`, "GET");
+      if (!results.ok) {
+          throw new Error(`HTTP error! Status: ${results.status}`);
+        }
+      console.log("I tried the request");
+    }catch (error) {
+        console.error("There was a problem with the fetch operation in orderableBarcodesAndQuantities:", error);
+      }finally{
+        console.log('go to sleep');
+
+      }
+    
+    //const results = await fetchy(adminURL, "GET");
+   
     orderableBarcodesAndQuantities.value  = results;
     console.log(results);
 
@@ -53,27 +63,15 @@ const addToCart = async (barcode:string, number?:number) => {
   order.value.push({ [barcode]: number});
   //do I need to update orderable barcodes and quantities
   // try {
-  //   const results = await fetchy(`/users/${props.shop.adminstrator}/items`, "GET");
+  //   const results = await fetchy(`/users/${props.shop.administrator}/items`, "GET");
   //   orderableBarcodesAndQuantities.value  = results;
   // } catch {
   //   return;
   // }
   // return;
 };
-async function getCurrentCity() {
-  let user;
-  try {
-    user = await fetchy(`api/users/${currentUsername.value}`, "GET");
-    console.log("city success")
-  } catch (_) {
-    console.log("city failed")
-    return;
-  }
-  
-  selectedCity.value = user.information.city;
-}
+
 onBeforeMount(async () => {
-    await getCurrentCity(); 
     await setUpShop(props.shop);
     loaded.value = true;
 });
@@ -86,46 +84,55 @@ onBeforeMount(async () => {
   <div class="pure-control-group">Requirements: Maximum Annual Income: {{ rules }}</div>
 </template> -->
 <template>
-  <v-row justify="start">
-    <v-col>
-    Shopping At 
-  </v-col>
-  <v-col>
-    <button class="default-disabled"> Sally's Food Pantry</button>
-  </v-col>
-  
-</v-row>
-<v-row justify="end">
-    <v-col>
-    <!-- <SearchShopForm @getItemsByFilter="getOrderable" /> -->
-  </v-col>
-  <div class="container" @click="openCart">
+  <v-layout class="rounded rounded-md bar">
+    <v-app-bar class="custom-app-bar" :elevation="3"  density="compact">
+        <template v-slot:prepend>
+          <v-icon icon="mdi-chevron-left"></v-icon>
+          <v-app-bar-title absolute="false"
+            >Shopping At
+            <button class="default-disabled">
+              <strong text-color="black">{{props.shop.name }}</strong>
+            </button></v-app-bar-title>
+        </template>
+        
+        <template v-slot:append>
+         
+          <v-text-field
+            clearable
+            hide-details
+            label="Search Inventory"
+            prepend-inner-icon="mdi-magnify"
+            single-line
+          ></v-text-field>
+         
+          <v-chip variant="elevated" @click="openCart">
+            <strong>Cart&nbsp;&nbsp;</strong>
+            <template v-slot:append>
+              <v-chip
+                size="small"
+                color="white"
+                variant="flat"
+                text-color="black"
+                class="custom-chip"
+              >
+                <strong>5 items</strong>
+              </v-chip>
+            </template>
+          </v-chip>
+          <v-app-bar-nav-icon>
+          </v-app-bar-nav-icon>
+        <!-- </div> -->
+        </template>
+      </v-app-bar>
 
-            <v-col>Cart</v-col>
-            <v-col cols="2"><v-icon icon = "mdi-circle" color = "white" size= "10px" class="base-icon"></v-icon></v-col>
-            <!-- need to get # of items in cart -->
+    <v-navigation-drawer class="custom-navigation-drawer">
+      <v-list>
+        <v-list-item title="Navigation drawer" ></v-list-item>
+      </v-list>
+    </v-navigation-drawer>
 
-          
-        </div>
-
-  
-</v-row>
-      <ul>
-        <li>
-          
-        </li>
-  
-        <li>
-          
-          
-        </li>
-
-      </ul>
-    
-    <div class="row">
-      
-    </div>
-    <section class="posts" v-if="loaded && orderableBarcodesAndQuantities.length !== 0">
+    <v-main class="d-flex align-center justify-center" style="min-height: 300px;">
+      <section class="posts" v-if="loaded && orderableBarcodesAndQuantities.length !== 0">
       <article v-for="(object, index) of Object.entries(orderableBarcodesAndQuantities)" :key="object.key">
           <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop" :index="index" @addedToCart="addToCart"/>
         <!-- <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
@@ -134,18 +141,13 @@ onBeforeMount(async () => {
     </section>
     <p v-else-if="loaded">No posts found</p>
     <p v-else>Loading...</p>
-    
-    <hr class = "line-full">
-    <div class="list-title">Food Pantries Located in {{ selectedCity }}</div>
-    <!-- <div class="list-container" v-if = "profiles.length !== 0">
-        <button class="profile-button" v-for="profile,index in profiles" :key="profile._id" @click="emit('openShop', profile._id)">
-            <h3>{{ profile.name }}</h3>
-        </button>
-        
-    </div> -->
+    </v-main>
+  </v-layout>
+  
   
 </template>
 <style scoped>
+
 .container{
   padding: .1em;
   font-size: small;
@@ -156,8 +158,17 @@ onBeforeMount(async () => {
   background: black;
   color:white;
 }
-
-
+.custom-app-bar {
+  position: relative !important; 
+  top: auto !important; 
+  height:fit-content !important;
+  padding:.1em !important; 
+  
+}
+/* .custom-navigation-drawer {
+  position: sticky !important; 
+  top: auto !important; 
+} */
 
 section {
   display: flex;

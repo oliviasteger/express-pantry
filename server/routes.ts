@@ -145,9 +145,10 @@ class Routes {
   }
 
   @Router.get("/users/:id/items")
-  async getOrderableBarcodesAndQuantities(id: ObjectId) {
+  async getOrderableBarcodesAndQuantities(id: string) {
     // View all orderable items for a given pantry
-    const administrator = await User.getUserById(id);
+    console.log(`id is ${id}`);
+    const administrator = await User.getUserById(new ObjectId(id));
     await User.isAdministrator(administrator._id);
     await organizePantryItems(administrator._id);
 

@@ -14,6 +14,7 @@ import MapView from "../views/MapView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import SettingView from "../views/SettingView.vue";
+import ShopView from "../views/ShopView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -24,9 +25,15 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: "/",
+      path: "/map",
       name: "Map",
       component: MapView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/shop/:shopId",
+      name: "Shop",
+      component: ShopView,
       meta: { requiresAuth: true },
     },
     {
