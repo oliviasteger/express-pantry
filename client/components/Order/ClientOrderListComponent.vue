@@ -3,17 +3,29 @@
 <script setup lang="ts">
 import { fetchy } from "@/utils/fetchy";
 import { computed, onBeforeMount, ref } from "vue";
+import EditOrderForm from "./EditOrderForm.vue";
 import OrderComponent from "./OrderComponent.vue";
 
 const loaded = ref(false);
 let orders = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
+let items = ref<Array<Record<string, string>>>([]);
+
+async function getItems() {
+  let itemResults;
+  try {
+    itemResults = await fetchy("/api/items", "GET");
+  } catch (_) {
+    return;
+  }
+  items.value = itemResults;
+}
 
 async function getOrders() {
   let orderResults;
   try {
-    const clientId = await fetchy("api/session", "GET");
-    orderResults = await fetchy(`/api/order/user/${clientId}`, "GET");
+    const clientId = await fetchy("/api/session", "GET");
+    orderResults = await fetchy(`/api/order/user/${clientId._id}`, "GET");
   } catch (_) {
     return;
   }
@@ -40,24 +52,17 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <!-- <section class="posts" v-if="loaded && orders.length !== 0">
-    <h2>Orders</h2>
-    <article v-for="order in orders" :key="order._id">
-      <OrderComponent v-if="editing !== order._id" :item="order" @refreshItems="getOrders" @editOrder="updateEditing" />
-    </article>
-  </section> -->
-
   <section class="posts" v-if="loaded && orders.length !== 0">
     <h2>Unfulfilled Orders</h2>
     <article v-for="order in unfulfilledOrders" :key="order._id">
-      <OrderComponent v-if="editing !== order._id" :item="order" @refreshItems="getOrders" @editItem="updateEditing" />
-      <EditOrderForm v-else :item="order" @refreshItems="getOrders" @editItem="updateEditing" />
+      <OrderComponent v-if="editing !== order._id" :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" />
+      <EditOrderForm v-else :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" />
     </article>
 
     <h2>Completed Orders</h2>
     <article v-for="order in pickedUpOrders" :key="order._id">
-      <OrderComponent v-if="editing !== order._id" :item="order" @refreshItems="getOrders" @editItem="updateEditing" />
-      <EditOrderForm v-else :item="order" @refreshItems="getOrders" @editItem="updateEditing" />
+      <OrderComponent v-if="editing !== order._id" :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" />
+      <EditOrderForm v-else :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" />
     </article>
   </section>
   <p v-else-if="loaded">No Orders found</p>
