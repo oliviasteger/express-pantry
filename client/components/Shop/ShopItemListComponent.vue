@@ -1,6 +1,7 @@
 Set up express pantry
 
 <script setup lang="ts">
+import ShopItemComponent from "@/components/Shop/ShopItemComponent.vue";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { useUserStore } from "../../stores/user";
@@ -20,30 +21,19 @@ const order = ref<
 const setUpShop = async (shop: any) => {
   try {
     let results;
-    const shopString = JSON.stringify(shop);
-    const shopHolder = JSON.parse(shopString);
     const administrator = shop.administrator;
-    console.log(`${administrator +"he"}`, "got in setUpShop");
-    console.log(`${shop.administrator} is the shop `);
-    const adminURL = "api/users/" + administrator +"/items";
-    console.log(typeof shopHolder.administrator); 
-    console.log(adminURL);
-    try{
-      results = await fetchy(`api/users/${shopHolder.administrator}/items`, "GET");
-      if (!results.ok) {
-          throw new Error(`HTTP error! Status: ${results.status}`);
-        }
-      console.log("I tried the request");
-    }catch (error) {
-        console.error("There was a problem with the fetch operation in orderableBarcodesAndQuantities:", error);
-      }finally{
-        console.log('go to sleep');
+    const adminURL = "/api/users/" + administrator + "/items";
+    try {
+      results = await fetchy(adminURL, "GET");
+    } catch (error) {
+      console.error("There was a problem with the fetch operation in orderableBarcodesAndQuantities:", error);
+    } finally {
+      console.log("go to sleep");
+    }
 
-      }
-    
     //const results = await fetchy(adminURL, "GET");
-   
-    orderableBarcodesAndQuantities.value  = results;
+
+    orderableBarcodesAndQuantities.value = results;
     console.log(results);
   } catch {
     console.log("Failure in setupShop");
@@ -68,8 +58,8 @@ const addToCart = async (barcode: string, number?: number) => {
   // return;
 };
 onBeforeMount(async () => {
-    await setUpShop(props.shop);
-    loaded.value = true;
+  await setUpShop(props.shop);
+  loaded.value = true;
 });
 </script>
 
@@ -81,71 +71,55 @@ onBeforeMount(async () => {
 </template> -->
 <template>
   <v-layout class="rounded rounded-md bar">
-    <v-app-bar class="custom-app-bar" :elevation="3"  density="compact">
-        <template v-slot:prepend>
-          <v-icon icon="mdi-chevron-left"></v-icon>
-          <v-app-bar-title absolute="false"
-            >Shopping At
-            <button class="default-disabled">
-              <strong text-color="black">{{props.shop.name }}</strong>
-            </button></v-app-bar-title>
-        </template>
-        
-        <template v-slot:append>
-         
-          <v-text-field
-            clearable
-            hide-details
-            label="Search Inventory"
-            prepend-inner-icon="mdi-magnify"
-            single-line
-          ></v-text-field>
-         
-          <v-chip variant="elevated" @click="openCart">
-            <strong>Cart&nbsp;&nbsp;</strong>
-            <template v-slot:append>
-              <v-chip
-                size="small"
-                color="white"
-                variant="flat"
-                text-color="black"
-                class="custom-chip"
-              >
-                <strong>5 items</strong>
-              </v-chip>
-            </template>
-          </v-chip>
-          <v-app-bar-nav-icon>
-          </v-app-bar-nav-icon>
+    <v-app-bar class="custom-app-bar" :elevation="3" density="compact">
+      <template v-slot:prepend>
+        <v-icon icon="mdi-chevron-left"></v-icon>
+        <v-app-bar-title absolute="false"
+          >Shopping At
+          <button class="default-disabled">
+            <strong text-color="black">{{ props.shop.name }}</strong>
+          </button></v-app-bar-title
+        >
+      </template>
+
+      <template v-slot:append>
+        <v-text-field clearable hide-details label="Search Inventory" prepend-inner-icon="mdi-magnify" single-line></v-text-field>
+
+        <v-chip variant="elevated" @click="openCart">
+          <strong>Cart&nbsp;&nbsp;</strong>
+          <template v-slot:append>
+            <v-chip size="small" color="white" variant="flat" text-color="black" class="custom-chip">
+              <strong>5 items</strong>
+            </v-chip>
+          </template>
+        </v-chip>
+        <v-app-bar-nav-icon> </v-app-bar-nav-icon>
         <!-- </div> -->
-        </template>
-      </v-app-bar>
+      </template>
+    </v-app-bar>
 
     <v-navigation-drawer class="custom-navigation-drawer">
       <v-list>
-        <v-list-item title="Navigation drawer" ></v-list-item>
+        <v-list-item title="Navigation drawer"></v-list-item>
       </v-list>
     </v-navigation-drawer>
 
-    <v-main class="d-flex align-center justify-center" style="min-height: 300px;">
+    <v-main class="d-flex align-center justify-center" style="min-height: 300px">
       <section class="posts" v-if="loaded && orderableBarcodesAndQuantities.length !== 0">
-      <article v-for="(object, index) of Object.entries(orderableBarcodesAndQuantities)" :key="object.key">
-          <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop" :index="index" @addedToCart="addToCart"/>
-        <!-- <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
+        <article v-for="object of Object.entries(orderableBarcodesAndQuantities)" :key="object[0]">
+          <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop" @addedToCart="addToCart" />
+          <!-- <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
         <EditPostForm v-else :post="post" @refreshPosts="getPosts" @editPost="updateEditing" /> -->
-      </article>
-    </section>
-    <p v-else-if="loaded">No posts found</p>
-    <p v-else>Loading...</p>
+        </article>
+      </section>
+      <p v-else-if="loaded">No posts found</p>
+      <p v-else>Loading...</p>
     </v-main>
   </v-layout>
-  
-  
 </template>
 <style scoped>
-
-.container{
-  padding: .1em;
+.container {
+  padding: 0.1em;
   font-size: small;
   font-weight: bold;
   border-radius: 8px;
@@ -155,11 +129,10 @@ onBeforeMount(async () => {
   color: white;
 }
 .custom-app-bar {
-  position: relative !important; 
-  top: auto !important; 
-  height:fit-content !important;
-  padding:.1em !important; 
-  
+  position: relative !important;
+  top: auto !important;
+  height: fit-content !important;
+  padding: 0.1em !important;
 }
 /* .custom-navigation-drawer {
   position: sticky !important; 

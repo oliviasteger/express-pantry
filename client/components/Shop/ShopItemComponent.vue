@@ -5,7 +5,7 @@ import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { defineProps, onBeforeMount, ref } from "vue"; // Import defineProps and defineEmits
 
-const props = defineProps(["item"]); //{ [""]: -1} key which maps to a quantity 
+const props = defineProps(["item"]); //{ [""]: -1} key which maps to a quantity
 const { currentUsername } = storeToRefs(useUserStore());
 const emit = defineEmits(["addedToCart", "refreshShopItems", "maximizeItem"]);
 const loading = ref(false);
@@ -34,9 +34,10 @@ const viewItem = () => {
   if (viewing.value) return; // Prevent multiple view requests
   viewing.value = true;
   emit("refreshShopItems");
-  emit("maximizeItem",props.item);
+  emit("maximizeItem", props.item);
 };
 const getName = async (barcode: string) => {
+  console.log("barcode: ", barcode);
   const barcodeNew = barcode;
   fetch("https://world.openfoodfacts.org/api/v2/product/" + barcodeNew + ".json")
     .then((response) => {
@@ -90,49 +91,44 @@ onBeforeMount(async () => {
     <v-col> <strong>Expiration Date:</strong> {{ new Date(props.item.expirationDate).toLocaleString() }} </v-col>
     <v-col> <strong>Drop Date:</strong> {{ new Date(props.item.dropDate).toLocaleString() }} </v-col>
              -->
-          
-    <v-img
-    aspect-ratio="1/1"
-    cover
-    :src="imageURL"
-    ></v-img>
-    <v-row>
-        <v-card-title class="text-h6">
-            <v-row>
-                <v-col> {{ name }} </v-col>
-                <v-col>
-                    <div class="icon-container" @click="emit('addedToCart', props.item.key)">
-                        <v-icon icon = "mdi-circle" color = "var(--green)" class="base-icon"></v-icon>
-                        <v-icon icon = "mdi-plus" color ="white" class="overlay-icon"></v-icon>
-                    </div>
-                </v-col>
-            </v-row>
-        
-        </v-card-title>
 
-        <v-col>
+    <v-img aspect-ratio="1/1" cover :src="imageURL"></v-img>
+    <v-row>
+      <v-card-title class="text-h6">
+        <v-row>
+          <v-col> {{ name }} </v-col>
+          <v-col>
+            <div class="icon-container" @click="emit('addedToCart', props.item.key)">
+              <v-icon icon="mdi-circle" color="var(--green)" class="base-icon"></v-icon>
+              <v-icon icon="mdi-plus" color="white" class="overlay-icon"></v-icon>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-title>
+
+      <v-col>
         <!-- <v-btn class="button-error btn-small" @click="deleteItem">Delete</v-btn> -->
         <v-btn class="default btn-small" @click="viewItem">View</v-btn>
-        </v-col>
+      </v-col>
     </v-row>
-</v-card>
+  </v-card>
 </template>
 
 <style scoped>
 .icon-container {
-    position: relative;
-    display: inline-block; /* Ensures icons are in the same line */
-  }
-  
-  .base-icon, .overlay-icon {
-    position: absolute;
-    top: 0;
-    left: 0;
-    /* Adjust z-index if needed */
-  }
-  
-  .overlay-icon {
-    color: red; /* Change the color or styling for the overlay icon */
-  }
+  /*position: relative;*/
+  display: inline-block; /* Ensures icons are in the same line */
+}
 
+.base-icon,
+.overlay-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Adjust z-index if needed */
+}
+
+.overlay-icon {
+  color: red; /* Change the color or styling for the overlay icon */
+}
 </style>
