@@ -382,7 +382,7 @@ class Routes {
     return await Order.getordersByQuery({ sender: new ObjectId(userId) });
   }
 
-  @Router.get("/order/admin/:userId")
+  @Router.get("/order/admin/:adminId")
   async getAdminOrders(adminId: string) {
     return await Order.getordersByQuery({ recipient: new ObjectId(adminId) });
   }
