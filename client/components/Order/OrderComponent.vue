@@ -44,8 +44,11 @@ const profileName = ref("");
 
 const getProfile = async () => {
   console.log("HELLO");
-  const currentId = await fetchy("/api/profiles", "GET");
+  //const currentId = await fetchy("/api/profiles", "GET");
+  let currentId = await fetchy(`/api/profiles/admin/${props.order.recipient}`, "GET");
+  //const currentId = await fetchy(`api/profiles?searchQuery=${JSON.stringify({ administrator: props.order.recipient })}`, "GET");
   console.log("CHECK", currentId);
+  currentId = currentId[0].name;
   profileName.value = currentId;
 };
 
