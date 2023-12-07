@@ -7,10 +7,12 @@ import PickupTimeComponent from "../components/Cart/PickupTimeComponent.vue";
 const { isLoggedIn } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
+
+const createOrder = async () => {};
 </script>
 
 <template>
-  <section v-if="isLoggedIn">
+  <section v-if="isLoggedIn" @submit.prevent(createOrder)>
     <h2>Your Current Cart</h2>
     <CartComponent />
     <PickupTimeComponent />
