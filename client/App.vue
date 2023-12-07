@@ -55,9 +55,6 @@ onBeforeMount(async () => {
           <ul v-else-if="userStore.userType === 'Client'">
             <li><RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink></li>
             <li>
-              <RouterLink :to="{ name: 'Account' }" :class="{ underline: currentRouteName == 'Account' }"> Dashboard </RouterLink>
-            </li>
-            <li>
               <RouterLink :to="{ name: 'Map' }" :class="{ underline: currentRouteName == 'Map' }"> Map </RouterLink>
             </li>
             <li>
