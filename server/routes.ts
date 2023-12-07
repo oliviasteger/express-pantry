@@ -103,6 +103,11 @@ class Routes {
     return await User.getUsers();
   }
 
+  @Router.get("/users/id/:_id")
+  async getUserById(_id: string) {
+    return await User.getUserById(new ObjectId(_id));
+  }
+
   @Router.get("/users/:username")
   async getUser(username: string) {
     return await User.getUserByUsername(username);
