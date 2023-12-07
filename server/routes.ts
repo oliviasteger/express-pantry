@@ -15,14 +15,18 @@ import { WebSessionDoc } from "./concepts/websession";
 async function getAvailableTimes(profileId: string | ObjectId) {
   const profile = await Profile.getProfileById(new ObjectId(profileId));
   const availableTimes = new Map<string, number>();
+  console.log(profile.openHour);
+  console.log(profile.closeHour);
 
-  for (let day = 1; day <= 7; day++) {
+  for (let day = 0; day < 7; day++) {
     for (let hour = profile.openHour; hour < profile.closeHour; hour += 1) {
       for (let minute = 0; minute < 60; minute += profile.pickupWindowLength) {
         const date = new Date();
         date.setDate(date.getDate() + day);
-        date.setHours(hour, minute, 0, 0);
+        date.setUTCHours(hour, minute, 0, 0);
         availableTimes.set(date.toISOString(), 0);
+        console.log(date);
+        console.log(hour);
       }
     }
   }
@@ -423,6 +427,7 @@ class Routes {
     const availableTimesPromise = getAvailableTimes(profileId);
     await Profile.assertEligible(new ObjectId(profileId), await user);
     const availableTimes = await availableTimesPromise;
+    console.log(availableTimes);
     assert(availableTimes.includes(pickupTime), "Pickup time not available");
 
     const orderedItems: ExpiringItemDoc[] = [];

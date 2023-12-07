@@ -1,6 +1,5 @@
 Set up express pantry
 
-
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
@@ -11,13 +10,12 @@ let orderableBarcodesAndQuantities = ref<Array<Record<string, string>>>([]);
 const loaded = ref(false);
 const { currentUsername } = storeToRefs(useUserStore());
 const props = defineProps(["shop"]);
-const emit = defineEmits(["openShop", "leaveShop","refreshPantryList"]);
+const emit = defineEmits(["openShop", "leaveShop", "refreshPantryList"]);
 const order = ref<
   Array<{
     [key: string]: number;
   }>
 >([]);
-
 
 const setUpShop = async (shop: any) => {
   try {
@@ -47,20 +45,19 @@ const setUpShop = async (shop: any) => {
    
     orderableBarcodesAndQuantities.value  = results;
     console.log(results);
-
   } catch {
-    console.log("Failure in setupShop")
+    console.log("Failure in setupShop");
     return;
   }
 };
-const openCart = async (item:any, number?:number) => {
+const openCart = async (item: any, number?: number) => {
   return;
 };
-const addToCart = async (barcode:string, number?:number) => {
-  if (!number){
-    number = 1; 
+const addToCart = async (barcode: string, number?: number) => {
+  if (!number) {
+    number = 1;
   }
-  order.value.push({ [barcode]: number});
+  order.value.push({ [barcode]: number });
   //do I need to update orderable barcodes and quantities
   // try {
   //   const results = await fetchy(`/users/${props.shop.administrator}/items`, "GET");
@@ -70,7 +67,6 @@ const addToCart = async (barcode:string, number?:number) => {
   // }
   // return;
 };
-
 onBeforeMount(async () => {
     await setUpShop(props.shop);
     loaded.value = true;
@@ -156,7 +152,7 @@ onBeforeMount(async () => {
   border-style: solid;
   border-width: medium;
   background: black;
-  color:white;
+  color: white;
 }
 .custom-app-bar {
   position: relative !important; 
@@ -176,7 +172,7 @@ section {
   flex-wrap: wrap;
   gap: 1em;
 }
-.side{
+.side {
   list-style-type: none;
   margin-left: auto;
   display: flex;

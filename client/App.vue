@@ -4,6 +4,7 @@ import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { computed, onBeforeMount } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
+import router from "./router";
 
 const currentRoute = useRoute();
 const currentRouteName = computed(() => currentRoute.name);
@@ -16,6 +17,9 @@ onBeforeMount(async () => {
   try {
     await userStore.updateSession();
     await userStore.updateType();
+    if (isLoggedIn.value) {
+      await router.push({ name: "Home" });
+    }
   } catch {
     // User is not logged in
   }
@@ -54,9 +58,6 @@ onBeforeMount(async () => {
           </ul>
           <ul v-else-if="userStore.userType === 'Client'">
             <li><RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink></li>
-            <li>
-              <RouterLink :to="{ name: 'Account' }" :class="{ underline: currentRouteName == 'Account' }"> Dashboard </RouterLink>
-            </li>
             <li>
               <RouterLink :to="{ name: 'Map' }" :class="{ underline: currentRouteName == 'Map' }"> Map </RouterLink>
             </li>
