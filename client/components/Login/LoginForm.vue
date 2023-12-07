@@ -13,7 +13,7 @@ async function login() {
   await loginUser(username.value, password.value);
   void updateSession();
   void updateType();
-  void router.push({ name: "Settings" });
+  await router.push({ name: "Home" });
 }
 </script>
 
