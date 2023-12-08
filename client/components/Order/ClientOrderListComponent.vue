@@ -3,8 +3,7 @@
 <script setup lang="ts">
 import { fetchy } from "@/utils/fetchy";
 import { computed, onBeforeMount, ref } from "vue";
-import EditOrderForm from "./EditOrderForm.vue";
-import OrderComponent from "./OrderComponent.vue";
+import ClientOrderComponent from "./ClientOrderComponent.vue";
 
 const loaded = ref(false);
 let orders = ref<Array<Record<string, string>>>([]);
@@ -55,14 +54,14 @@ onBeforeMount(async () => {
   <section class="posts" v-if="loaded && orders.length !== 0">
     <h2>Unfulfilled Orders</h2>
     <article v-for="order in unfulfilledOrders" :key="order._id">
-      <OrderComponent v-if="editing !== order._id" :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" />
-      <EditOrderForm v-else :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" />
+      <ClientOrderComponent v-if="editing !== order._id" :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" />
+      <!-- <EditOrderForm v-else :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" /> -->
     </article>
 
     <h2>Completed Orders</h2>
     <article v-for="order in pickedUpOrders" :key="order._id">
-      <OrderComponent v-if="editing !== order._id" :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" />
-      <EditOrderForm v-else :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" />
+      <ClientOrderComponent v-if="editing !== order._id" :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" />
+      <!-- <EditOrderForm v-else :order="order" @refreshItems="getItems" @refreshOrders="getOrders" @editItem="updateEditing" /> -->
     </article>
   </section>
   <p v-else-if="loaded">No Orders found</p>
