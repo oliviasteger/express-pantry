@@ -12,6 +12,7 @@ const rules = ref({
 const name = ref("");
 
 const loaded = ref(false);
+const hoursOptions = Array.from({ length: 24 }, (_, index) => String(index));
 
 const cities = ref([]);
 async function getCities() {
@@ -116,14 +117,15 @@ onBeforeMount(async () => {
   <br /><br />
   <v-form validate-on="submit lazy" @submit.prevent="updateOpenHour">
     <v-row class="mx-auto" style="width: 50%">
-      <v-text-field v-model="openHours" label="Hour that Pantry Opens" :persistent-placeholder="true"></v-text-field>
+      <v-select v-model="openHours" label="Hour that Pantry Opens" :persistent-placeholder="true" :items="hoursOptions"></v-select>
       <v-btn type="submit" block class="mt-0 mb-0" text="Change Open Hour"></v-btn>
     </v-row>
   </v-form>
   <br /><br />
   <v-form validate-on="submit lazy" @submit.prevent="updateCloseHour">
     <v-row class="mx-auto" style="width: 50%">
-      <v-text-field v-model="closeHours" label="Hour that Pantry Closes" :persistent-placeholder="true"></v-text-field>
+      <v-select v-model="closeHours" label="Hour that Pantry Closes" :persistent-placeholder="true" :items="hoursOptions"></v-select>
+
       <v-btn type="submit" block class="mt-0 mb-0" text="Change Close Hour"></v-btn>
     </v-row>
   </v-form>
