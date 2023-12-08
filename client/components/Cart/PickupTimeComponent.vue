@@ -14,7 +14,7 @@ const getAvailableTime = async (administrator: string) => {
     const availableTimes = await fetchy(`/api/profiles/${administrator}/availableTimes`, "GET");
     const parsedTimes = availableTimes.map((time: string) => {
       const stringTime = new Date(time);
-      return stringTime.toLocaleString("en-GB", { timeZone: "EST" });
+      return stringTime.toLocaleString();
     });
     times.value = parsedTimes;
   } catch {

@@ -13,9 +13,10 @@ import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import MapView from "../views/MapView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
+import OrderConfirmationView from "../views/OrderConfirmationView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import SettingView from "../views/SettingView.vue";
-import { default as OrderConfirmationView, default as ShopView } from "../views/ShopView.vue";
+import ShopView from "../views/ShopView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
