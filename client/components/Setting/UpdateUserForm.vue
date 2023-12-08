@@ -80,20 +80,28 @@ async function updatePassword() {
 }
 async function updateIncome() {
   await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
-  console.log(await fetchy(`/api/users/${currentUsername.value}`, "GET"));
-  currentAnnualIncome.value = information.value.annualIncome;
+  const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
+  currentAnnualIncome.value = user.information.annualIncome;
+  currentCity.value = user.information.city;
+  currentSnapEligible.value = user.information.snapEligible;
 }
 
 async function updateSnap() {
   await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
   console.log(await fetchy(`/api/users/${currentUsername.value}`, "GET"));
-  currentSnapEligible.value = information.value.snapEligible;
+  const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
+  currentAnnualIncome.value = user.information.annualIncome;
+  currentCity.value = user.information.city;
+  currentSnapEligible.value = user.information.snapEligible;
 }
 
 async function updateLocation() {
   await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
   console.log(await fetchy(`/api/users/${currentUsername.value}`, "GET"));
-  currentCity.value = information.value.city;
+  const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
+  currentAnnualIncome.value = user.information.annualIncome;
+  currentCity.value = user.information.city;
+  currentSnapEligible.value = user.information.snapEligible;
 }
 
 async function getInformation() {
