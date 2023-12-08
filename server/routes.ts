@@ -302,7 +302,7 @@ class Routes {
   @Router.get("/profiles/eligibility/:profileId/:username")
   async isEligible(profileId: ObjectId, username: string) {
     const user = await User.getUserByUsername(username);
-    await Profile.assertEligible(profileId, user);
+    await Profile.isEligible(profileId, user);
     return { msg: "User is eligible" };
   }
 
