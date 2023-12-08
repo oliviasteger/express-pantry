@@ -6,14 +6,10 @@ import { fetchy } from "../../utils/fetchy";
 
 let username = ref("");
 let password = ref("");
-let currentAnnualIncome = ref("");
-let currentSnapEligible = ref("");
-let currentCity = ref("");
-
 const loaded = ref(false);
 const information = ref({
   annualIncome: "",
-  snapEligible: "",
+  snapEligible: false,
   city: "",
 });
 const cities = ref([]);
@@ -47,7 +43,7 @@ const updateField = async (type: "annualIncome" | "snapEligible" | "city") => {
 const emptyForm = () => {
   information.value = {
     annualIncome: "",
-    snapEligible: "",
+    snapEligible: false,
     city: "",
   };
   username.value = "";
@@ -62,26 +58,10 @@ const rules = [
     return "You must enter a value.";
   },
 ];
-// const isSubmittable = (value:any) => {
-//       // You can set your own validation logic here.
-//       if (value.value) return true;
-//       return 'You must enter a value.';
+const currentAnnualIncome = ref("");
+const currentCity = ref("");
+const currentSnapEligible = ref(false);
 
-// };
-// const isUpdatePasswordDisabled = computed(() => {
-//       // You can set your own validation logic here.
-//       if (password.value) return true;
-//       return 'You must enter a value.';
-// });
-// const isUpdateSnapEligibilityDisabled = computed(() => {
-//       // You can set your own validation logic here.
-//       if (snapEligi.value) return true;
-//       return 'You must enter a value.';
-// });
-// const isUpdateAnnualIncomeDisabled = computed(() => {
-//       // You can set your own validation logic here.
-//       return (!information.value.annualIncome);
-// });
 const isUpdateCityDisabled = computed(() => {
   // You can set your own validation logic here.
   return !information.value.city;
@@ -98,10 +78,36 @@ async function updatePassword() {
   await updateSession();
   password.value = "";
 }
+async function updateIncome() {
+  await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
+  const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
+  currentAnnualIncome.value = user.information.annualIncome;
+  currentCity.value = user.information.city;
+  currentSnapEligible.value = user.information.snapEligible;
+}
+
+async function updateSnap() {
+  await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
+  console.log(await fetchy(`/api/users/${currentUsername.value}`, "GET"));
+  const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
+  currentAnnualIncome.value = user.information.annualIncome;
+  currentCity.value = user.information.city;
+  currentSnapEligible.value = user.information.snapEligible;
+}
+
+async function updateLocation() {
+  await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
+  console.log(await fetchy(`/api/users/${currentUsername.value}`, "GET"));
+  const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
+  currentAnnualIncome.value = user.information.annualIncome;
+  currentCity.value = user.information.city;
+  currentSnapEligible.value = user.information.snapEligible;
+}
+
 async function getInformation() {
   let user;
   try {
-    user = await fetchy(`api/users/${currentUsername.value}`, "GET");
+    user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
   } catch (_) {
     console.log("failed");
     return;
@@ -124,26 +130,22 @@ onBeforeMount(async () => {
     <v-form validate-on="submit lazy" @submit.prevent="updateUsername">
       <v-text-field v-model="username" :placeholder="currentUsername" :persistent-placeholder="true" :rules="rules" label="Username"></v-text-field>
 
-      <v-btn type="submit" id="change" block class="mt-2" text="Change"></v-btn>
+      <v-btn type="submit" id="change" block class="mt-2" text="Change Username"></v-btn>
     </v-form>
+    <br /><br />
     <v-form validate-on="submit lazy" @submit.prevent="updatePassword">
       <v-text-field v-model="password" label="Password" :rules="rules"></v-text-field>
 
-      <v-btn type="submit" id="change" block class="mt-2" text="Change"></v-btn>
+      <v-btn type="submit" id="change" block class="mt-2" text="Change Password"></v-btn>
     </v-form>
-    <v-form validate-on="submit lazy" @submit.prevent="updateField('annualIncome')">
+    <br /><br />
+    <v-form validate-on="submit lazy" @submit.prevent="updateIncome">
       <v-text-field v-model="information.annualIncome" :placeholder="currentAnnualIncome" label="Current Annual Income" :persistent-placeholder="true" :rules="rules"></v-text-field>
 
-      <v-btn type="submit" block id="change" class="mt-2" text="Change"></v-btn>
+      <v-btn type="submit" block id="change" class="mt-2" text="Change Income Amount"></v-btn>
     </v-form>
-    <v-form validate-on="submit lazy" @submit.prevent="updateField('city')">
-      <!-- <v-text-field
-        v-model="information.city"
-        :placeholder= "currentCity"
-        :persistent-placeholder=true
-        label="Current Annual Income"
-        :rules="isSubmittable(information.city)"
-      ></v-text-field> -->
+    <br /><br />
+    <v-form validate-on="submit lazy" @submit.prevent="updateLocation">
       <div class="pure-control-group">
         <label for="aligned-location">Choose the city You Live In: </label>
         <select v-model="information.city" id="aligned-location" required>
@@ -152,10 +154,11 @@ onBeforeMount(async () => {
         </select>
       </div>
       <!-- <v-select v-model="information.city" label="Select City" :placeholder="undefined" :persistent-placeholder="true" :items="cities" return-object></v-select> -->
-      <v-btn type="submit" id="change" block class="mt-2" text="Change"></v-btn>
+      <v-btn type="submit" id="change" block class="mt-2" text="Change Location"></v-btn>
     </v-form>
+    <br /><br />
 
-    <v-form validate-on="submit lazy" @submit.prevent="updateField('snapEligible')">
+    <v-form validate-on="submit lazy" @submit.prevent="updateSnap">
       <v-switch
         color="primary"
         inset
@@ -167,6 +170,7 @@ onBeforeMount(async () => {
       ></v-switch>
       <v-btn type="submit" id="change" block class="mt-2" text="Change"></v-btn>
     </v-form>
+    <br /><br />
   </div>
 </template>
 <style>

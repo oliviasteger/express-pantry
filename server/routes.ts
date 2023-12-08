@@ -103,6 +103,11 @@ class Routes {
     return await User.getUsers();
   }
 
+  @Router.get("/users/id/:_id")
+  async getUserById(_id: string) {
+    return await User.getUserById(new ObjectId(_id));
+  }
+
   @Router.get("/users/:username")
   async getUser(username: string) {
     return await User.getUserByUsername(username);
@@ -261,6 +266,12 @@ class Routes {
     return await Profile.getProfilesByQuery({ location: location });
   }
 
+  @Router.get("/profiles/admin/:administrator")
+  async getProfilesByAdmin(administrator: string) {
+    console.log("WHY");
+    return await Profile.getProfilesByQuery({ administrator: new ObjectId(administrator) });
+  }
+
   @Router.get("/profiles")
   async getProfiles(searchQuery: string) {
     return await Profile.getProfilesByQuery(JSON.parse(searchQuery));
@@ -383,7 +394,7 @@ class Routes {
     return await Order.getordersByQuery({ sender: new ObjectId(userId) });
   }
 
-  @Router.get("/order/admin/:userId")
+  @Router.get("/order/admin/:adminId")
   async getAdminOrders(adminId: string) {
     return await Order.getordersByQuery({ recipient: new ObjectId(adminId) });
   }
