@@ -66,6 +66,12 @@ const operations: operation[] = [
     fields: { _id: "input" },
   },
   {
+    name: "Get Profile by location",
+    endpoint: "/api/profiles/location/:location",
+    method: "GET",
+    fields: { location: "input" },
+  },
+  {
     name: "Get Profiles by Query",
     endpoint: "/api/profiles",
     method: "GET",
