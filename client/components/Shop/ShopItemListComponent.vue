@@ -60,58 +60,46 @@ const openCart = async () => {
 const addToCart = async (barcode: string, number?: number) => {
   
   //checking if the number is greater than amount of barcode in stock 
-  try {
-    if (!number) {
-      number = 1;
-    }
-    const orderables = orderableBarcodesAndQuantities.value;
+  // try {
+    // if (!number) {
+    //   number = 1;
+    // }
+    order.value.push(barcode);
+    
     //console.log(orderableArray);
     // const matchingBarcodeIndex = orderableArray.findIndex(entry => entry[barcode] !== undefined);
 
-    if (orderables[barcode] !== undefined) {
-      const quantityInStock:number = orderableBarcodesAndQuantities.value[barcode];
+  //   if (orderables[barcode] !== undefined) {
+  //     const quantityInStock:number = orderableBarcodesAndQuantities.value[barcode];
 
-      const existingOrderIndex:number = order.value.findIndex(item => item[barcode]);
-
-      if (existingOrderIndex !== -1) {
-        const existingQuantity:number = order.value[existingOrderIndex][barcode];
-        //since things are claimable by anyone unless the order is placed 
-        if (quantityInStock >= existingQuantity + number) {
-          order.value[existingOrderIndex][barcode] += number;
-        } else {
-          console.error('Insufficient quantity available for this barcode');
-        }
-      } else {
-        if (quantityInStock >= number) {
-          order.value.push({ [barcode]: number });
-        } else {
-          console.error('Insufficient quantity available for this barcode');
-        }
-      }
-    } else {
-      console.error('Barcode not found in orderableBarcodesAndQuantities');
-    }
-  } catch (error) {
-    console.error('Error in addToCart:', error);
-  }
+  //       //since things are claimable by anyone unless the order is placed 
+  //       if (quantityInStock >= order.count()) {
+  //         order.value[existingOrderIndex][barcode] += number;
+  //       } else {
+  //         console.error('Insufficient quantity available for this barcode');
+  //       }
+  //     } else {
+  //       if (quantityInStock >= number) {
+  //         order.value.push({ [barcode]: number });
+  //       } else {
+  //         console.error('Insufficient quantity available for this barcode');
+  //       }
+  //     }
+  //   } else {
+  //     console.error('Barcode not found in orderableBarcodesAndQuantities');
+  //   }
+  // } catch (error) {
+  //   console.error('Error in addToCart:', error);
+  // }
   // else if(barcode in order.value.keys()){
   // }
   // order.value.push({ [barcode]: number });
 
 };
 const removeFromCart = (barcode: string, number?: number) => {
-  const index = order.value.findIndex(item => Object.keys(item)[0] === barcode);
-  if (!number){
-    number = 1;
-  }
-  if (index !== -1) {
-    const currentItem = order.value[index];
-    if (currentItem[barcode] > number) {
-      currentItem[barcode] -= number;
-    } else {
-      order.value.splice(index, 1);
-    }
-  }
+
+  const index = order.value.findIndex(item => item === barcode);
+  order.value.splice(index, 1);
 };
 watch(() => props.shop, async (newShop:Shop|null, oldShop) => {
       if (newShop) {
