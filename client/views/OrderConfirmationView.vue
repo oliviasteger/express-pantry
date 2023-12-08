@@ -4,21 +4,37 @@ import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import CartComponent from "../components/Cart/CartComponent.vue";
 import PickupTimeComponent from "../components/Cart/PickupTimeComponent.vue";
+import router from "../router";
+import { fetchy } from "../utils/fetchy";
+
 const { isLoggedIn } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
 
-const createOrder = async () => {};
+const time = ref<Date>(new Date());
+const barcodes = ref("");
+const shopId = ref("");
+
+const createOrder = async () => {
+  await fetchy("/api/order", "POST", { body: { profileId: "", barcodes: [], pickupTime: time.value?.toISOString() } });
+  await router.push({ name: "Client Orders" });
+};
+
+function updateCart(sender: string, recipient: string, items: string[]) {}
+
+function updateTime(newTime: string) {
+  time.value = new Date(newTime);
+}
 </script>
 
 <template>
-  <section v-if="isLoggedIn" @submit.prevent(createOrder)>
+  <section v-if="isLoggedIn" @submit.prevent="createOrder">
     <h2>Your Current Cart</h2>
     <CartComponent />
-    <PickupTimeComponent />
+    <PickupTimeComponent @addTime="updateTime" required />
   </section>
 
-  <p v-else-if="loaded">No posts found</p>
+  <p v-else-if="loaded">No cart</p>
   <p v-else>Loading...</p>
 </template>
 

@@ -5,7 +5,7 @@ import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["shop"]);
-const emit = defineEmits(["openShop", "refreshPantryList"]);
+const emit = defineEmits(["addTime"]);
 let times = ref<Array<Record<string, string>>>([]);
 const selectedTime = ref("");
 
@@ -29,8 +29,11 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <v-select :items="times" v-model="selectedTime"></v-select>
-  <div>
-    <p>Selected time: {{ selectedTime }}</p>
-  </div>
+  <v-form @submit.prevent="emit('addTime', selectedTime)">
+    <v-select :items="times" v-model="selectedTime"></v-select>
+    <div>
+      <p>Selected time: {{ selectedTime }}</p>
+    </div>
+    <v-btn type="submit" block class="mt-0 mb-0" text="Select time"></v-btn>
+  </v-form>
 </template>
