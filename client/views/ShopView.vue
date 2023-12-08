@@ -4,6 +4,7 @@ import ShopItemListComponent from "@/components/Shop/ShopItemListComponent.vue";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { useRoute } from "vue-router";
+import router from "../router";
 import { useUserStore } from "../stores/user";
 import { fetchy } from "../utils/fetchy";
 
@@ -23,8 +24,17 @@ async function getProfileById(_id:any) {
   }
   shop.value = profile;
 };
-const switchFromShop = () => {
+const switchToMap = () => {
+    console.log('in goToMap');
   shop.value = null;
+  void router.push({ name: 'Map'});
+
+};
+const switchToCart = (order:Array<{
+    [key: string]: number;
+  }>) => {
+    console.log('in switchFromShop');
+    void router.push({ name: 'Cart', params: {}, query: { order: JSON.stringify(order) } });
 
 };
 
@@ -50,7 +60,7 @@ onBeforeMount(async () => {
 <template>
   <main class="w-screen h-screen" v-show = "loading">
     
-    <ShopItemListComponent :shop="shop" @leaveShop="switchFromShop"></ShopItemListComponent>
+    <ShopItemListComponent :shop="shop" @goToCart="switchToCart" @goToMap="switchToMap"></ShopItemListComponent>
     
     
   </main>

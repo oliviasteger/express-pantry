@@ -53,10 +53,10 @@ onBeforeMount(async () => {
         </MapComponent>
       </div>
     </div>
-    <div v-if="inShop">
+    <!-- <div v-if="inShop">
       <ShopView :shop="shop" @leaveShop="switchFromShop"></ShopView>
       
-    </div>
+    </div> -->
     
     
   </main>

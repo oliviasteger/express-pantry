@@ -7,7 +7,7 @@ import { defineProps, onBeforeMount, ref } from "vue"; // Import defineProps and
 
 const props = defineProps(["item"]); //{ [""]: -1} key which maps to a quantity
 const { currentUsername } = storeToRefs(useUserStore());
-const emit = defineEmits(["addedToCart", "refreshShopItems", "maximizeItem"]);
+const emit = defineEmits(["addedToCart", "removeFromCart", "refreshShopItems", "maximizeItem"]);
 const loading = ref(false);
 // const emit = defineEmits(); // Use defineEmits without arguments
 const deleting = ref(false); // Track if the item is being deleted
@@ -66,7 +66,7 @@ const getName = async (barcode: string) => {
       console.log("food name: ", name);
       console.log("food brand: ", brand);
       console.log("DATA", data);
-      emit("refreshShopItems");
+    //   emit("refreshShopItems");
     })
     .catch((error) => {
       // Handle any errors here
@@ -85,24 +85,30 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <v-card>
+  <v-card elevation="3" height="300px">
     <!-- <v-col> <strong>Barcode:</strong> {{ props.item.barcode }} </v-col>
     <v-col> <strong>Status:</strong> {{ props.item.status }} </v-col>
     <v-col> <strong>Expiration Date:</strong> {{ new Date(props.item.expirationDate).toLocaleString() }} </v-col>
     <v-col> <strong>Drop Date:</strong> {{ new Date(props.item.dropDate).toLocaleString() }} </v-col>
              -->
 
-    <v-img aspect-ratio="1/1" cover :src="imageURL"></v-img>
+    <v-img aspect-ratio="1/1" height=200 width=200 :src="imageURL"></v-img>
     <v-row>
       <v-card-title class="text-h6">
-        <v-row>
+        <v-row justify="space-between">
           <v-col> {{ name }} </v-col>
           <v-col>
-            <div class="icon-container" @click="emit('addedToCart', props.item.key)">
-              <v-icon icon="mdi-circle" color="var(--green)" class="base-icon"></v-icon>
-              <v-icon icon="mdi-plus" color="white" class="overlay-icon"></v-icon>
+            <div position="relative" class="icon-container" @click="emit('addedToCart', props.item.key)">
+              <v-icon icon="mdi-circle" color="var(--green)" class="base-left-icon"></v-icon>
+              <v-icon icon="mdi-plus" color="white" class="overlay-left-icon"></v-icon>
             </div>
           </v-col>
+          <v-col>
+          <div class="icon-container" @click="emit('removeFromCart', props.item.key)">
+            <v-icon icon="mdi-circle" color="var(--red)" class="base-right-icon"></v-icon>
+            <v-icon icon="mdi-minus" color="white" class="overlay-right-icon"></v-icon>
+          </div>
+        </v-col>
         </v-row>
       </v-card-title>
 
@@ -120,11 +126,30 @@ onBeforeMount(async () => {
   display: inline-block; /* Ensures icons are in the same line */
 }
 
-.base-icon,
-.overlay-icon {
+.base-left-icon{
+    position: absolute;
+    top: 0;
+    left: 0; 
+    
+}
+.base-right-icon{
+    position: absolute;
+    top: 0;
+    right: 0; 
+    
+}
+.overlay-left-icon {
   position: absolute;
   top: 0;
   left: 0;
+  
+  /* Adjust z-index if needed */
+}
+.overlay-right-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  
   /* Adjust z-index if needed */
 }
 

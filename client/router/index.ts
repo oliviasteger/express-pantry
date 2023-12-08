@@ -15,6 +15,7 @@ import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import SettingView from "../views/SettingView.vue";
 import ShopView from "../views/ShopView.vue";
+import CartView from "../views/CartView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -35,6 +36,14 @@ const router = createRouter({
       name: "Shop",
       component: ShopView,
       meta: { requiresAuth: true },
+    },
+    {
+      path: "/cart",
+      name: "Cart",
+      component: CartView,
+      props: (route) => ({
+        order: JSON.parse(route.query.order),
+      }),
     },
     {
       path: "/account",
