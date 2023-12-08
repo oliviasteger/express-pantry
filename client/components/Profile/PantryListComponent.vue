@@ -22,10 +22,11 @@ let currentCity = ref("");
 
 const getEligibleProfiles = async () => {
   try {
+    const city = props.selectedCity ? props.selectedCity : currentCity.value;
     console.log("in get Profile");
     console.log(`this is props.selectedd ${props.selectedCity}`);
     console.log(`this is currentCity ${currentCity.value}`);
-    const results = await fetchy(`api/profiles/location/${props.selectedCity}`, "GET");
+    const results = await fetchy(`/api/profiles/location/${city}`, "GET");
     const profiles = [];
     for (let profile of results) {
       const id = profile._id;
@@ -106,7 +107,7 @@ onBeforeMount(async () => {
     </button>
     <div class="list-title">Your Food Pantries</div>
     <div class="list-container" v-if="loaded && eligibleProfiles.length !== 0">
-      <button class="profile-button" v-for="(profile, index) in eligibleProfiles" :key="profile._id" @click="emit('openShop', profile)">
+      <button class="profile-button" v-for="(profile, index) in eligibleProfiles" :key="profile._id" @click="emit('openShop', profile._id)">
         {{ profile.name }}
       </button>
     </div>

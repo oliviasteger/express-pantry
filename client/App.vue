@@ -28,7 +28,7 @@ onBeforeMount(async () => {
 
 <template>
   <header>
-    <nav>
+    <nav order="0">
       <div class="title">
         <img src="@/assets/images/betterlogo.svg.svg" />
         <RouterLink :to="{ name: 'Home' }">

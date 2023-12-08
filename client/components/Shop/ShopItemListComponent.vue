@@ -1,77 +1,129 @@
 Set up express pantry
 
 <script setup lang="ts">
+import ShopItemComponent from "@/components/Shop/ShopItemComponent.vue";
 import { storeToRefs } from "pinia";
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
-import ShopItemComponent from "./ShopItemComponent.vue";
+interface Shop {
+  administrator: string;
+  location: string;
+  name: string;
+  openHour: number;
+  closeHour: number;
+  pickupWindowLength: number;
+  ordersPerWindow: number;
+  rules: string;
+}
 
-const selectedCity = ref("");
-const name = ref("");
-let orderableBarcodesAndQuantities = ref<Array<Record<string, string>>>([]);
+let orderableBarcodesAndQuantities = ref< { [key: string]: number }>({});
 const loaded = ref(false);
-const openHours = ref("");
-const closeHours = ref("");
-const rules = ref("");
 const { currentUsername } = storeToRefs(useUserStore());
-const props = defineProps(["shop"]);
+const props: {readonly shop:Shop}|{readonly shop:null}= defineProps(["shop"]);
+const name = ref();
 const emit = defineEmits(["openShop", "leaveShop", "refreshPantryList"]);
-const order = ref<
-  Array<{
-    [key: string]: number;
-  }>
+const order = ref<Array<
+    string>
 >([]);
 
-const setUpShop = async (shop: any) => {
+const setUpShop = async (shop:Shop) => {
   try {
+    
+    let results;
+    
+    console.log(`this is passed in shop ${JSON.stringify(shop)}, and this is the adminstrator ${shop.administrator}`);
     const administrator = shop.administrator;
-    console.log(administrator);
-    console.log(`${shop.administrator}`);
-    const adminURL = "api/users/" + administrator + "/items";
-    console.log(adminURL);
-    // const results = await fetchy(`api/users/${shop.adminstrator}/items`, "GET");
-    const results = await fetchy(adminURL, "GET");
-    console.log("I tried the request");
+    // const adminURL = `/api/users/${administrator}/items`;
+    const adminURL = "/api/users/" + administrator + "/items";
+    try {
+      results = await fetchy(adminURL, "GET");
+    } catch (error) {
+      console.error("There was a problem with the fetch operation in orderableBarcodesAndQuantities:", error);
+    } finally {
+      console.log("setUpShop completed");
+    }
+
+    //const results = await fetchy(adminURL, "GET");
+
     orderableBarcodesAndQuantities.value = results;
     console.log(results);
-  } catch {
-    console.log("Failure in setupShop");
+  } catch(error) {
+    console.error("Failure in setupShop ", error);
     return;
   }
 };
-const openCart = async (item: any, number?: number) => {
+const openCart = async () => {
   return;
 };
+
 const addToCart = async (barcode: string, number?: number) => {
-  if (!number) {
+  
+  //checking if the number is greater than amount of barcode in stock 
+  try {
+    if (!number) {
+      number = 1;
+    }
+    const orderables = orderableBarcodesAndQuantities.value;
+    //console.log(orderableArray);
+    // const matchingBarcodeIndex = orderableArray.findIndex(entry => entry[barcode] !== undefined);
+
+    if (orderables[barcode] !== undefined) {
+      const quantityInStock:number = orderableBarcodesAndQuantities.value[barcode];
+
+      const existingOrderIndex:number = order.value.findIndex(item => item[barcode]);
+
+      if (existingOrderIndex !== -1) {
+        const existingQuantity:number = order.value[existingOrderIndex][barcode];
+        //since things are claimable by anyone unless the order is placed 
+        if (quantityInStock >= existingQuantity + number) {
+          order.value[existingOrderIndex][barcode] += number;
+        } else {
+          console.error('Insufficient quantity available for this barcode');
+        }
+      } else {
+        if (quantityInStock >= number) {
+          order.value.push({ [barcode]: number });
+        } else {
+          console.error('Insufficient quantity available for this barcode');
+        }
+      }
+    } else {
+      console.error('Barcode not found in orderableBarcodesAndQuantities');
+    }
+  } catch (error) {
+    console.error('Error in addToCart:', error);
+  }
+  // else if(barcode in order.value.keys()){
+  // }
+  // order.value.push({ [barcode]: number });
+
+};
+const removeFromCart = (barcode: string, number?: number) => {
+  const index = order.value.findIndex(item => Object.keys(item)[0] === barcode);
+  if (!number){
     number = 1;
   }
-  order.value.push({ [barcode]: number });
-  //do I need to update orderable barcodes and quantities
-  // try {
-  //   const results = await fetchy(`/users/${props.shop.adminstrator}/items`, "GET");
-  //   orderableBarcodesAndQuantities.value  = results;
-  // } catch {
-  //   return;
-  // }
-  // return;
-};
-async function getCurrentCity() {
-  let user;
-  try {
-    user = await fetchy(`api/users/${currentUsername.value}`, "GET");
-    console.log("city success");
-  } catch (_) {
-    console.log("city failed");
-    return;
+  if (index !== -1) {
+    const currentItem = order.value[index];
+    if (currentItem[barcode] > number) {
+      currentItem[barcode] -= number;
+    } else {
+      order.value.splice(index, 1);
+    }
   }
-
-  selectedCity.value = user.information.city;
-}
+};
+watch(() => props.shop, async (newShop:Shop|null, oldShop) => {
+      if (newShop) {
+        await setUpShop(newShop);
+      }
+    });
 onBeforeMount(async () => {
-  await getCurrentCity();
-  await setUpShop(props.shop);
+  if (props.shop) {
+        await setUpShop(props.shop);
+      }
+  // console.log(`in onBeforeMount this is props ${props.shop.name}`);
+  // name.value = await props.shop.name;
   loaded.value = true;
 });
 </script>
@@ -83,47 +135,55 @@ onBeforeMount(async () => {
   <div class="pure-control-group">Requirements: Maximum Annual Income: {{ rules }}</div>
 </template> -->
 <template>
-  <v-row justify="start">
-    <v-col> Shopping At </v-col>
-    <v-col>
-      <button class="default-disabled">Sally's Food Pantry</button>
-    </v-col>
-  </v-row>
-  <v-row justify="end">
-    <v-col>
-      <!-- <SearchShopForm @getItemsByFilter="getOrderable" /> -->
-    </v-col>
-    <div class="container" @click="openCart">
-      <v-col>Cart</v-col>
-      <v-col cols="2"><v-icon icon="mdi-circle" color="white" size="10px" class="base-icon"></v-icon></v-col>
-      <!-- need to get # of items in cart -->
-    </div>
-  </v-row>
-  <ul>
-    <li></li>
+  <v-app class="rounded rounded-md bar" v-if="props.shop">
+    <v-app-bar class="custom-app-bar" :elevation="3" density="compact">
+      <template v-slot:prepend>
+        <v-icon icon="mdi-chevron-left"></v-icon>
+        <v-app-bar-title absolute="false"
+          >Shopping At
+          <button class="default-disabled">
+            <strong text-color="black">{{props.shop.name }}</strong>
+          </button></v-app-bar-title
+        >
+      </template>
 
-    <li></li>
-  </ul>
+      <template v-slot:append>
+        <v-text-field clearable hide-details label="Search Inventory" prepend-inner-icon="mdi-magnify" single-line></v-text-field>
 
-  <div class="row"></div>
-  <section class="posts" v-if="loaded && orderableBarcodesAndQuantities.length !== 0">
-    <article v-for="(object, index) of Object.entries(orderableBarcodesAndQuantities)" :key="object.key">
-      <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop" :index="index" @addedToCart="addToCart" />
-      <!-- <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
+        <v-chip variant="elevated" @click="openCart" >
+          <strong>Cart&nbsp;&nbsp;</strong>
+          <template v-slot:append>
+            <v-chip size="small" color="white" variant="flat" text-color="black" class="custom-chip">
+              <!-- <strong>5 items</strong> -->
+            </v-chip>
+          </template>
+        </v-chip>
+        <v-app-bar-nav-icon> </v-app-bar-nav-icon>
+        <!-- </div> -->
+      </template>
+    </v-app-bar>
+
+    <v-navigation-drawer class="custom-navigation-drawer">
+      <v-list>
+        <v-list-item title="Navigation drawer"></v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-main class="d-flex align-start justify-center" style="min-height: 300px">
+      <section class="posts" v-if="loaded && orderableBarcodesAndQuantities.length !== 0">
+        <article v-for="object of Object.entries(orderableBarcodesAndQuantities)" :key="object[0]">
+          <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop(props.shop)" @addedToCart="addToCart" @removeFromCart="removeFromCart"/>
+          <!-- <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
         <EditPostForm v-else :post="post" @refreshPosts="getPosts" @editPost="updateEditing" /> -->
-    </article>
-  </section>
-  <p v-else-if="loaded">No posts found</p>
-  <p v-else>Loading...</p>
-
-  <hr class="line-full" />
-  <div class="list-title">Food Pantries Located in {{ selectedCity }}</div>
-  <!-- <div class="list-container" v-if = "profiles.length !== 0">
-        <button class="profile-button" v-for="profile,index in profiles" :key="profile._id" @click="emit('openShop', profile._id)">
-            <h3>{{ profile.name }}</h3>
-        </button>
-        
-    </div> -->
+        </article>
+      </section>
+      <p v-else-if="loaded">No posts found</p>
+      <p v-else>Loading...</p>
+    </v-main>
+  </v-app>
+  <p v-else>
+    <v-img aspect-ratio="1/1" cover src="https://media.licdn.com/dms/image/C5612AQEPYce5KpNLyg/article-cover_image-shrink_720_1280/0/1551659700811?e=2147483647&v=beta&t=O9mBMiF-V12jCRJwaBNDWLKNL8cku2QSoCXtKP3vCHg"></v-img>
+  </p>
 </template>
 <style scoped>
 .container {
@@ -136,6 +196,16 @@ onBeforeMount(async () => {
   background: black;
   color: white;
 }
+.custom-app-bar {
+  position: relative !important;
+  top: auto !important;
+  height: fit-content !important;
+  padding: 0.1em !important;
+}
+/* .custom-navigation-drawer {
+  position: sticky !important; 
+  top: auto !important; 
+} */
 
 section {
   display: flex;
