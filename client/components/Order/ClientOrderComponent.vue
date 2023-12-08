@@ -14,6 +14,10 @@ const props = defineProps(["order"]);
 const { currentUsername } = storeToRefs(useUserStore());
 const emit = defineEmits(["editOrder", "refreshItems", "refreshOrders"]);
 
+import BasicFoodComponent from "../Food/BasicFoodComponent.vue";
+const items = ref<{ _id: string; sender: string; recipient: string; items: string[]; status: "placed" | "packed" | "picked up"; pickup: Date }[][]>([]);
+const loaded = ref(false);
+
 // const emit = defineEmits(); // Use defineEmits without arguments
 const deleting = ref(false); // Track if the order is being deleted
 
@@ -52,10 +56,23 @@ const getProfile = async () => {
   profileName.value = currentId;
 };
 
+const getOrderItems = async () => {
+  const itemIds = props.order.items;
+  const loadedItems = [];
+  for (let itemId of itemIds) {
+    const item = await fetchy(`/api/items/${itemId}`, "GET");
+    loadedItems.push(item);
+  }
+
+  items.value = loadedItems;
+};
+
 onBeforeMount(async () => {
   try {
     await getProfile();
     await getClientUsername();
+    await getOrderItems();
+    loaded.value = true;
   } catch {
     // User is not logged in
   }
@@ -73,4 +90,16 @@ onBeforeMount(async () => {
       <v-btn class="button-error btn-small" @click="deleteOrder">Delete</v-btn>
     </v-col>
   </v-row>
+  <v-row v-if="loaded && items.length !== 0">
+    <h3>Order Items</h3>
+    <article v-for="item in items" :key="item[0]._id">
+      <BasicFoodComponent :item="item[0]" />
+    </article>
+  </v-row>
 </template>
+
+<style scoped>
+article {
+  margin: 1em;
+}
+</style>

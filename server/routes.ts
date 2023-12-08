@@ -194,6 +194,11 @@ class Routes {
     return await ExpiringItem.create(user, barcode, new Date(dropDate), new Date(expirationDate), status);
   }
 
+  @Router.get("/items/:id")
+  async getItemById(session: WebSessionDoc, id: ObjectId) {
+    return await ExpiringItem.getExpiringItems({ _id: id });
+  }
+
   @Router.patch("/items/:id")
   async updateItem(session: WebSessionDoc, id: ObjectId, update: Partial<ExpiringItemDoc>) {
     // Update a pantry item
