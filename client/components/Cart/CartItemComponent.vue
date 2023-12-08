@@ -84,9 +84,9 @@ onBeforeMount(async () => {
     <template v-slot:subtitle>
       <div><strong>Quantity:</strong>{{ props.quantity }}</div>
     </template>
-    <!-- <v-list-item-action>
+    <v-list-item-action>
             <button class="profile-button" @click="emit('removeFromCart',props.item)">Remove From Cart</button>
-          </v-list-item-action> -->
+          </v-list-item-action>
   </v-list-item>
 </template>
 

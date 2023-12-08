@@ -15,7 +15,7 @@ import MapView from "../views/MapView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import SettingView from "../views/SettingView.vue";
-import ShopView from "../views/ShopView.vue";
+import { default as OrderConfirmationView, default as ShopView } from "../views/ShopView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -35,6 +35,9 @@ const router = createRouter({
       path: "/shop/:shopId",
       name: "Shop",
       component: ShopView,
+      props: (route) => ({
+        order: JSON.parse(route.query.order ? (route.query.order as unknown as string) : "{}"),
+      }),
       meta: { requiresAuth: true },
     },
     {
@@ -44,6 +47,16 @@ const router = createRouter({
       props: (route) => ({
         order: JSON.parse(route.query.order as unknown as string),
       }),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/order/:shopId",
+      name: "OrderConfirmation",
+      component: OrderConfirmationView,
+      props: (route) => ({
+        order: JSON.parse(route.query.order as unknown as string),
+      }),
+      meta: { requiresAuth: true },
     },
     {
       path: "/account",

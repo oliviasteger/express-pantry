@@ -20,7 +20,7 @@ interface Shop {
 let orderableBarcodesAndQuantities = ref<{ [key: string]: number }>({});
 const loaded = ref(false);
 const { currentUsername } = storeToRefs(useUserStore());
-const props: { readonly shop: Shop } | { readonly shop: null } = defineProps(["shop"]);
+const props = defineProps(["shop", "order", "hasOrder"]);
 const name = ref();
 const emit = defineEmits(["openShop", "leaveShop", "refreshPantryList", "goToCart"]);
 const order = ref<Array<string>>([]);
@@ -61,6 +61,7 @@ const addToCart = async (barcode: string) => {
   // if (!number) {
   //   number = 1;
   // }
+  console.log(`order ${order.value}`);
   order.value.push(barcode);
   console.log(barcode);
   console.log(order.value);
@@ -110,7 +111,13 @@ onBeforeMount(async () => {
   if (props.shop) {
     await setUpShop(props.shop);
   }
-  // console.log(`in onBeforeMount this is props ${props.shop.name}`);
+  if (props.hasOrder){
+    console.log("props has order")
+    order.value = props.order;
+  }else{
+    console.log("this in onBefore", order.value);
+  }
+  console.log(`in onBeforeMount this is order ${order.value}`);
   // name.value = await props.shop.name;
   loaded.value = true;
 });

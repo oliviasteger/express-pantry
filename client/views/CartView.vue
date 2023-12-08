@@ -11,7 +11,7 @@ const hasOrder = ref(false);
 const shop = ref();
 const shopId: Ref<string> = ref("");
 const loaded = ref(false);
-//const order = ref<Array<string>>([]);
+const order = ref<Array<string>>([]);
 const { currentUsername } = storeToRefs(useUserStore());
 interface Shop {
   administrator: string;
@@ -41,9 +41,15 @@ async function getProfileById(_id: any) {
 //     });
 const switchToShop = () => {
   console.log(shopId, " switching from cart to shop");
-  void router.push({ name: "Shop", params: { shopId: shopId.value } });
+  console.log(`this is the order ${order}`);
+  if (order.value.length === 0){
+    order.value = props.order;
+  }
+  console.log(`this is the order after the check ${order}`);
+  void router.push({ name: 'Shop', params: {shopId:shopId.value}, query: { order: JSON.stringify(order.value) } });
+  // void router.push({ name: "Shop", params: { shopId: shopId.value } });
   // if(order){
-  //     void router.push({ name: 'Shop', params: {shopId:shopId.value}, query: { order: JSON.stringify(order) } });
+      
   // }else{
   //     void router.push({ name: 'Shop', params:{shopId:shopId.value}});
   // }
@@ -52,7 +58,21 @@ const updateOrder = (newOrder: Array<string>) => {
   console.log(newOrder, " edited the order in cart");
   order.value = newOrder;
 };
-
+const checkout = () => {
+  console.log(shopId, " switching from cart to shop");
+  console.log(`this is the order ${order}`);
+  if (order.value.length === 0){
+    order.value = props.order;
+  }
+  console.log(`this is the order after the check ${order}`);
+  void router.push({ name: 'OrderConfirmation', params: {shopId:shopId.value}, query: { order: JSON.stringify(order.value) } });
+  // void router.push({ name: "Shop", params: { shopId: shopId.value } });
+  // if(order){
+      
+  // }else{
+  //     void router.push({ name: 'Shop', params:{shopId:shopId.value}});
+  // }
+};
 onBeforeMount(async () => {
   const route = useRoute();
   console.log(route.params.shopId, "this is shopId");
@@ -86,11 +106,8 @@ onBeforeMount(async () => {
       </template>
 
       <template v-slot:append>
-        <v-chip variant="elevated">
-          <strong>Cart&nbsp;&nbsp;</strong>
-          <template v-slot:append>
-            <v-chip size="small" color="white" variant="flat" text-color="black" class="custom-chip"> {/* <strong>5 items</strong> */} </v-chip>
-          </template>
+        <v-chip @click="checkout" variant="elevated">
+          <strong>Checkout</strong>
         </v-chip>
       </template>
     </v-app-bar>

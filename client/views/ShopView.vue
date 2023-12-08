@@ -6,9 +6,11 @@ import { useRoute } from "vue-router";
 import router from "../router";
 import { useUserStore } from "../stores/user";
 import { fetchy } from "../utils/fetchy";
-
+const props = defineProps(["order"]);
+const hasOrder = ref(false);
 const shop = ref();
 const shopId = ref();
+const order = ref<Array<string>>([]);
 const loading = ref(false);
 const { currentUsername } = storeToRefs(useUserStore());
 
@@ -43,14 +45,22 @@ onBeforeMount(async () => {
   } else {
     console.log("route parameter wasn't passed correctly");
   }
+  if (props.order.value) {
+    console.log(order.value);
+    hasOrder.value = true;
+    order.value = props.order.value;
+  }
   await getProfileById(route.params.shopId);
   loading.value = true;
 });
 </script>
 
 <template>
-  <main class="w-screen h-screen" v-show="loading">
-    <ShopItemListComponent :shop="shop" @goToCart="switchToCart" @goToMap="switchToMap"></ShopItemListComponent>
+  <main class="w-screen h-screen" v-show="loading" v-if="hasOrder">
+    <ShopItemListComponent :shop="shop" :order="order" :hasOrder="hasOrder" @goToCart="switchToCart" @goToMap="switchToMap"></ShopItemListComponent>
+  </main>
+  <main class="w-screen h-screen" v-show="loading" v-else>
+    <ShopItemListComponent :shop="shop" :hasOrder="hasOrder" @goToCart="switchToCart" @goToMap="switchToMap"></ShopItemListComponent>
   </main>
 </template>
 <style>
