@@ -7,6 +7,7 @@ import EditProfileForm from "../components/Profile/EditProfileForm.vue";
 import AccountView from "../views/AccountView.vue";
 import AdminOrdersView from "../views/AdminOrdersView.vue";
 import AdminSettingView from "../views/AdminSettingView.vue";
+import CartView from "../views/CartView.vue";
 import ClientOrdersView from "../views/ClientOrdersView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
@@ -15,7 +16,6 @@ import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import SettingView from "../views/SettingView.vue";
 import ShopView from "../views/ShopView.vue";
-import CartView from "../views/CartView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -42,7 +42,7 @@ const router = createRouter({
       name: "Cart",
       component: CartView,
       props: (route) => ({
-        order: JSON.parse(route.query.order),
+        order: JSON.parse(route.query.order as unknown as string),
       }),
     },
     {
