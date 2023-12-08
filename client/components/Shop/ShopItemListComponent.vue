@@ -17,21 +17,18 @@ interface Shop {
   rules: string;
 }
 
-let orderableBarcodesAndQuantities = ref< { [key: string]: number }>({});
+let orderableBarcodesAndQuantities = ref<{ [key: string]: number }>({});
 const loaded = ref(false);
 const { currentUsername } = storeToRefs(useUserStore());
-const props: {readonly shop:Shop}|{readonly shop:null}= defineProps(["shop"]);
+const props: { readonly shop: Shop } | { readonly shop: null } = defineProps(["shop"]);
 const name = ref();
-const emit = defineEmits(["openShop", "leaveShop", "refreshPantryList"]);
-const order = ref<Array<
-    string>
->([]);
+const emit = defineEmits(["openShop", "leaveShop", "refreshPantryList", "goToCart"]);
+const order = ref<Array<string>>([]);
 
-const setUpShop = async (shop:Shop) => {
+const setUpShop = async (shop: Shop) => {
   try {
-    
     let results;
-    
+
     console.log(`this is passed in shop ${JSON.stringify(shop)}, and this is the adminstrator ${shop.administrator}`);
     const administrator = shop.administrator;
     // const adminURL = `/api/users/${administrator}/items`;
@@ -48,31 +45,33 @@ const setUpShop = async (shop:Shop) => {
 
     orderableBarcodesAndQuantities.value = results;
     console.log(results);
-  } catch(error) {
+  } catch (error) {
     console.error("Failure in setupShop ", error);
     return;
   }
 };
 const openCart = async () => {
+  emit("goToCart", order.value);
   return;
 };
 
-const addToCart = async (barcode: string, number?: number) => {
-  
-  //checking if the number is greater than amount of barcode in stock 
+const addToCart = async (barcode: string) => {
+  //checking if the number is greater than amount of barcode in stock
   // try {
-    // if (!number) {
-    //   number = 1;
-    // }
-    order.value.push(barcode);
-    
-    //console.log(orderableArray);
-    // const matchingBarcodeIndex = orderableArray.findIndex(entry => entry[barcode] !== undefined);
+  // if (!number) {
+  //   number = 1;
+  // }
+  order.value.push(barcode);
+  console.log(barcode);
+  console.log(order.value);
+
+  //console.log(orderableArray);
+  // const matchingBarcodeIndex = orderableArray.findIndex(entry => entry[barcode] !== undefined);
 
   //   if (orderables[barcode] !== undefined) {
   //     const quantityInStock:number = orderableBarcodesAndQuantities.value[barcode];
 
-  //       //since things are claimable by anyone unless the order is placed 
+  //       //since things are claimable by anyone unless the order is placed
   //       if (quantityInStock >= order.count()) {
   //         order.value[existingOrderIndex][barcode] += number;
   //       } else {
@@ -94,22 +93,23 @@ const addToCart = async (barcode: string, number?: number) => {
   // else if(barcode in order.value.keys()){
   // }
   // order.value.push({ [barcode]: number });
-
 };
 const removeFromCart = (barcode: string, number?: number) => {
-
-  const index = order.value.findIndex(item => item === barcode);
+  const index = order.value.findIndex((item) => item === barcode);
   order.value.splice(index, 1);
 };
-watch(() => props.shop, async (newShop:Shop|null, oldShop) => {
-      if (newShop) {
-        await setUpShop(newShop);
-      }
-    });
+watch(
+  () => props.shop,
+  async (newShop: Shop | null, oldShop) => {
+    if (newShop) {
+      await setUpShop(newShop);
+    }
+  },
+);
 onBeforeMount(async () => {
   if (props.shop) {
-        await setUpShop(props.shop);
-      }
+    await setUpShop(props.shop);
+  }
   // console.log(`in onBeforeMount this is props ${props.shop.name}`);
   // name.value = await props.shop.name;
   loaded.value = true;
@@ -130,7 +130,7 @@ onBeforeMount(async () => {
         <v-app-bar-title absolute="false"
           >Shopping At
           <button class="default-disabled">
-            <strong text-color="black">{{props.shop.name }}</strong>
+            <strong text-color="black">{{ props.shop.name }}</strong>
           </button></v-app-bar-title
         >
       </template>
@@ -138,7 +138,7 @@ onBeforeMount(async () => {
       <template v-slot:append>
         <v-text-field clearable hide-details label="Search Inventory" prepend-inner-icon="mdi-magnify" single-line></v-text-field>
 
-        <v-chip variant="elevated" @click="openCart" >
+        <v-chip variant="elevated" @click="openCart">
           <strong>Cart&nbsp;&nbsp;</strong>
           <template v-slot:append>
             <v-chip size="small" color="white" variant="flat" text-color="black" class="custom-chip">
@@ -160,7 +160,7 @@ onBeforeMount(async () => {
     <v-main class="d-flex align-start justify-center" style="min-height: 300px">
       <section class="posts" v-if="loaded && orderableBarcodesAndQuantities.length !== 0">
         <article v-for="object of Object.entries(orderableBarcodesAndQuantities)" :key="object[0]">
-          <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop(props.shop)" @addedToCart="addToCart" @removeFromCart="removeFromCart"/>
+          <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop(props.shop)" @addedToCart="addToCart" @removeFromCart="removeFromCart" />
           <!-- <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
         <EditPostForm v-else :post="post" @refreshPosts="getPosts" @editPost="updateEditing" /> -->
         </article>
@@ -170,7 +170,11 @@ onBeforeMount(async () => {
     </v-main>
   </v-app>
   <p v-else>
-    <v-img aspect-ratio="1/1" cover src="https://media.licdn.com/dms/image/C5612AQEPYce5KpNLyg/article-cover_image-shrink_720_1280/0/1551659700811?e=2147483647&v=beta&t=O9mBMiF-V12jCRJwaBNDWLKNL8cku2QSoCXtKP3vCHg"></v-img>
+    <v-img
+      aspect-ratio="1/1"
+      cover
+      src="https://media.licdn.com/dms/image/C5612AQEPYce5KpNLyg/article-cover_image-shrink_720_1280/0/1551659700811?e=2147483647&v=beta&t=O9mBMiF-V12jCRJwaBNDWLKNL8cku2QSoCXtKP3vCHg"
+    ></v-img>
   </p>
 </template>
 <style scoped>

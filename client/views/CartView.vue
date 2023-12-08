@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import CartComponent from "@/components/Cart/CartComponent.vue";
 import { storeToRefs } from "pinia";
 import { Ref, onBeforeMount, ref } from "vue";
@@ -10,11 +9,9 @@ import { fetchy } from "../utils/fetchy";
 const props = defineProps(["order"]);
 const hasOrder = ref(false);
 const shop = ref();
-const shopId:Ref<string> = ref("");
+const shopId: Ref<string> = ref("");
 const loaded = ref(false);
-const order = ref<
-  Array<string>
->([]);
+//const order = ref<Array<string>>([]);
 const { currentUsername } = storeToRefs(useUserStore());
 interface Shop {
   administrator: string;
@@ -26,63 +23,54 @@ interface Shop {
   ordersPerWindow: number;
   rules: string;
 }
-async function getProfileById(_id:any) {
+async function getProfileById(_id: any) {
   let profile;
   try {
     profile = await fetchy(`/api/profiles/id/${_id}`, "GET");
     console.log(profile, "in get ProfileById");
   } catch (_) {
-    console.log("failed")
+    console.log("failed");
     return;
   }
   shop.value = profile;
-};
+}
 // watch(() => props.order, async (newOrder: any, oldOrder: any) => {
 //       if (newOrder) {
 //         await setUpShop(newShop);
 //       }
 //     });
 const switchToShop = () => {
-    console.log(shopId, " switching from cart to shop");
-    void router.push({ name: 'Shop', params:{shopId:shopId.value}});
-    // if(order){
-    //     void router.push({ name: 'Shop', params: {shopId:shopId.value}, query: { order: JSON.stringify(order) } });
-    // }else{
-    //     void router.push({ name: 'Shop', params:{shopId:shopId.value}});
-    // }
-  
-
+  console.log(shopId, " switching from cart to shop");
+  void router.push({ name: "Shop", params: { shopId: shopId.value } });
+  // if(order){
+  //     void router.push({ name: 'Shop', params: {shopId:shopId.value}, query: { order: JSON.stringify(order) } });
+  // }else{
+  //     void router.push({ name: 'Shop', params:{shopId:shopId.value}});
+  // }
 };
 const updateOrder = (newOrder: Array<string>) => {
-    console.log(newOrder, " edited the order in cart");
-    order.value = newOrder; 
-
+  console.log(newOrder, " edited the order in cart");
+  order.value = newOrder;
 };
 
 onBeforeMount(async () => {
-    const route = useRoute();
-    console.log(route.params.shopId, "this is shopId");
-    
-     // Access route parameter 'id'
-      if (route.params.shopId) {
-        console.log("in onBeforeMount in CartView");
-        shopId.value = route.params.shopId.toString();
-        
-      } else {
-        console.log("route parameter wasn't passed correctly");
-       
-      }
-      await getProfileById(route.params.shopId);
-    if(props.order){
-        hasOrder.value = true;
-    }
-    loaded.value = true;
-    
-    
+  const route = useRoute();
+  console.log(route.params.shopId, "this is shopId");
+
+  // Access route parameter 'id'
+  if (route.params.shopId) {
+    console.log("in onBeforeMount in CartView");
+    shopId.value = route.params.shopId.toString();
+  } else {
+    console.log("route parameter wasn't passed correctly");
+  }
+  await getProfileById(route.params.shopId);
+  if (props.order) {
+    hasOrder.value = true;
+  }
+  loaded.value = true;
 });
-
 </script>
-
 
 <template>
   <v-app class="rounded rounded-md bar" v-if="shop">
@@ -92,37 +80,35 @@ onBeforeMount(async () => {
         <v-app-bar-title absolute="false"
           >Shopping At
           <button class="default-disabled">
-            <strong text-color="black">{{shop.name }}</strong>
-          </button></v-app-bar-title>
+            <strong text-color="black">{{ shop.name }}</strong>
+          </button></v-app-bar-title
+        >
       </template>
 
       <template v-slot:append>
-        
-
         <v-chip variant="elevated">
           <strong>Cart&nbsp;&nbsp;</strong>
           <template v-slot:append>
-            <v-chip size="small" color="white" variant="flat" text-color="black" class="custom-chip">
-              {/* <strong>5 items</strong> */}
-            </v-chip>
+            <v-chip size="small" color="white" variant="flat" text-color="black" class="custom-chip"> {/* <strong>5 items</strong> */} </v-chip>
           </template>
         </v-chip>
-        
       </template>
     </v-app-bar>
 
     <v-main class="d-flex align-start justify-center" style="min-height: 300px">
       <section class="posts" v-if="loaded && hasOrder">
-        
-          <CartComponent :order="order" @changedOrder="updateOrder"/>
-          
+        <CartComponent :order="props.order" @changedOrder="updateOrder" />
       </section>
       <p v-else-if="loaded">No items in cart yet!</p>
       <p v-else>Loading...</p>
     </v-main>
   </v-app>
   <p v-else>
-    <v-img aspect-ratio="1/1" cover src="https://media.licdn.com/dms/image/C5612AQEPYce5KpNLyg/article-cover_image-shrink_720_1280/0/1551659700811?e=2147483647&v=beta&t=O9mBMiF-V12jCRJwaBNDWLKNL8cku2QSoCXtKP3vCHg"></v-img>
+    <v-img
+      aspect-ratio="1/1"
+      cover
+      src="https://media.licdn.com/dms/image/C5612AQEPYce5KpNLyg/article-cover_image-shrink_720_1280/0/1551659700811?e=2147483647&v=beta&t=O9mBMiF-V12jCRJwaBNDWLKNL8cku2QSoCXtKP3vCHg"
+    ></v-img>
   </p>
 </template>
 <style>
@@ -226,5 +212,4 @@ article {
   max-width: 60em;
 } */
 /* Add more styling as needed */
-
 </style>

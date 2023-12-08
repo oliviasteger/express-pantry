@@ -38,7 +38,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/cart",
+      path: "/cart/:shopId",
       name: "Cart",
       component: CartView,
       props: (route) => ({

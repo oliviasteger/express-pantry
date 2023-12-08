@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import ShopItemListComponent from "@/components/Shop/ShopItemListComponent.vue";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
@@ -13,54 +12,45 @@ const shopId = ref();
 const loading = ref(false);
 const { currentUsername } = storeToRefs(useUserStore());
 
-async function getProfileById(_id:any) {
+async function getProfileById(_id: any) {
   let profile;
   try {
     profile = await fetchy(`/api/profiles/id/${_id}`, "GET");
     console.log(profile, "in get ProfileById");
   } catch (_) {
-    console.log("failed")
+    console.log("failed");
     return;
   }
   shop.value = profile;
-};
+}
 const switchToMap = () => {
-    console.log('in goToMap');
+  console.log("in goToMap");
   shop.value = null;
-  void router.push({ name: 'Map'});
-
+  void router.push({ name: "Map" });
 };
-const switchToCart = (order:Array<string>) => {
-    console.log('in switchFromShop');
-    void router.push({ name: 'Cart', params: {}, query: { order: JSON.stringify(order) } });
-
+const switchToCart = (order: Array<string>) => {
+  console.log("in switchFromShop");
+  void router.push({ name: "Cart", params: { shopId: shopId.value }, query: { order: JSON.stringify(order) } });
 };
 
 onBeforeMount(async () => {
-    const route = useRoute();
-    console.log(route.params.shopId, "this is shopId");
-    shopId.value = route.params.shopId;
-     // Access route parameter 'id'
-      if (route.params.shopId) {
-        console.log("in onBeforeMount in ShopView");
-      } else {
-        console.log("route parameter wasn't passed correctly");
-       
-      }
-    await getProfileById(route.params.shopId);
-    loading.value = true;
-    
-    
+  const route = useRoute();
+  console.log(route.params.shopId, "this is shopId");
+  shopId.value = route.params.shopId;
+  // Access route parameter 'id'
+  if (route.params.shopId) {
+    console.log("in onBeforeMount in ShopView");
+  } else {
+    console.log("route parameter wasn't passed correctly");
+  }
+  await getProfileById(route.params.shopId);
+  loading.value = true;
 });
-
 </script>
 
 <template>
-  <main class="w-screen h-screen" v-show = "loading">
-    
+  <main class="w-screen h-screen" v-show="loading">
     <ShopItemListComponent :shop="shop" @goToCart="switchToCart" @goToMap="switchToMap"></ShopItemListComponent>
-    
-    
   </main>
 </template>
 <style>
@@ -68,38 +58,37 @@ onBeforeMount(async () => {
   display: flex;
   align-self: center;
 }
-.header{
+.header {
   width: 100%;
-  display:flex;
-  flex-direction:row;
-  align-items:center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  
 }
 .sub-title {
   font-weight: 300;
   margin: 0 auto;
   padding-left: 20px;
-  padding-right:20px;
+  padding-right: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
 }
 .list-title {
   font-size: 1.5em;
   font-weight: 600;
-  display:flex;
+  display: flex;
   text-align: center;
-  padding-top:.5em;
+  padding-top: 0.5em;
 }
-.row{
-  display:flex;
+.row {
+  display: flex;
   flex-direction: row;
   justify-content: space-evenly;
   width: 100%;
 }
-#color{
+#color {
   color: var(--line-color);
   opacity: 25%;
-  margin:auto;
+  margin: auto;
 }
 </style>

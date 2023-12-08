@@ -18,17 +18,14 @@ const brand = ref("");
 const group = ref("");
 
 const addToCart = async (barcode: string, number?: number) => {
-    //prob emit to ya ya 
-    
-
+  //prob emit to ya ya
 };
 const deleteItem = async (barcode: string) => {
-    emit("deleteItem", barcode);
-   
+  emit("deleteItem", barcode);
 };
 const removeFromCart = (barcode: string, number?: number) => {
-  //prob emit to ya ya 
-}
+  //prob emit to ya ya
+};
 
 const getName = async (barcode: string) => {
   console.log("barcode: ", barcode);
@@ -60,7 +57,7 @@ const getName = async (barcode: string) => {
       console.log("food name: ", name);
       console.log("food brand: ", brand);
       console.log("DATA", data);
-    //   emit("refreshShopItems");
+      //   emit("refreshShopItems");
     })
     .catch((error) => {
       // Handle any errors here
@@ -79,22 +76,18 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-    <v-list-item
-          :prepend-avatar="imageURL"
-          ripple
-        >
-          <template v-slot:title>
-            <div v-html="name"></div>
-          </template>
+  <v-list-item :prepend-avatar="imageURL" ripple>
+    <template v-slot:title>
+      <div v-html="name"></div>
+    </template>
 
-          <template v-slot:subtitle>
-            <div><strong>Quantity:</strong>{{ props.quantity }}</div>
-          </template>
-          <v-list-item-action>
+    <template v-slot:subtitle>
+      <div><strong>Quantity:</strong>{{ props.quantity }}</div>
+    </template>
+    <!-- <v-list-item-action>
             <button class="profile-button" @click="emit('removeFromCart',props.item)">Remove From Cart</button>
-          </v-list-item-action>
-        </v-list-item>
-  
+          </v-list-item-action> -->
+  </v-list-item>
 </template>
 
 <style scoped>
