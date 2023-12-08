@@ -4,15 +4,14 @@ Set up express pantry
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
-const props = defineProps(["shop"]);
+const props = defineProps(["administrator"]);
 const emit = defineEmits(["addTime"]);
 let times = ref<Array<Record<string, string>>>([]);
 const selectedTime = ref("");
 
-const getAvailableTime = async () => {
-  // replace hardcode with props.shop.administrator
+const getAvailableTime = async (administrator: string) => {
   try {
-    const availableTimes = await fetchy(`/api/profiles/656ec25d6453c6b495a7ea39/availableTimes`, "GET");
+    const availableTimes = await fetchy(`/api/profiles/${administrator}/availableTimes`, "GET");
     const parsedTimes = availableTimes.map((time: string) => {
       const stringTime = new Date(time);
       return stringTime.toLocaleString("en-GB", { timeZone: "EST" });
@@ -24,7 +23,7 @@ const getAvailableTime = async () => {
 };
 
 onBeforeMount(async () => {
-  await getAvailableTime();
+  await getAvailableTime(props.administrator);
 });
 </script>
 

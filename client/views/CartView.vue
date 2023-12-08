@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import CartComponent from "@/components/Cart/CartComponent.vue";
-import { storeToRefs } from "pinia";
 import { Ref, onBeforeMount, ref } from "vue";
 import { useRoute } from "vue-router";
 import router from "../router";
-import { useUserStore } from "../stores/user";
 import { fetchy } from "../utils/fetchy";
 const props = defineProps(["order"]);
 const hasOrder = ref(false);
@@ -12,17 +10,7 @@ const shop = ref();
 const shopId: Ref<string> = ref("");
 const loaded = ref(false);
 const order = ref<Array<string>>([]);
-const { currentUsername } = storeToRefs(useUserStore());
-interface Shop {
-  administrator: string;
-  location: string;
-  name: string;
-  openHour: number;
-  closeHour: number;
-  pickupWindowLength: number;
-  ordersPerWindow: number;
-  rules: string;
-}
+
 async function getProfileById(_id: any) {
   let profile;
   try {
@@ -41,15 +29,15 @@ async function getProfileById(_id: any) {
 //     });
 const switchToShop = () => {
   console.log(shopId, " switching from cart to shop");
-  console.log(`this is the order ${order}`);
-  if (order.value.length === 0){
+  console.log(`this is the order ${order.value}`);
+  if (order.value.length === 0) {
     order.value = props.order;
   }
-  console.log(`this is the order after the check ${order}`);
-  void router.push({ name: 'Shop', params: {shopId:shopId.value}, query: { order: JSON.stringify(order.value) } });
+  console.log(`this is the order after the check ${order.value}`);
+  void router.push({ name: "Shop", params: { shopId: shopId.value }, query: { order: JSON.stringify(order.value) } });
   // void router.push({ name: "Shop", params: { shopId: shopId.value } });
   // if(order){
-      
+
   // }else{
   //     void router.push({ name: 'Shop', params:{shopId:shopId.value}});
   // }
@@ -60,15 +48,15 @@ const updateOrder = (newOrder: Array<string>) => {
 };
 const checkout = () => {
   console.log(shopId, " switching from cart to shop");
-  console.log(`this is the order ${order}`);
-  if (order.value.length === 0){
+  console.log(`this is the order ${order.value}`);
+  if (order.value.length === 0) {
     order.value = props.order;
   }
-  console.log(`this is the order after the check ${order}`);
-  void router.push({ name: 'OrderConfirmation', params: {shopId:shopId.value}, query: { order: JSON.stringify(order.value) } });
+  console.log(`this is the order after the check ${order.value}`);
+  void router.push({ name: "OrderConfirmation", params: { shopId: shopId.value }, query: { order: JSON.stringify(order.value) } });
   // void router.push({ name: "Shop", params: { shopId: shopId.value } });
   // if(order){
-      
+
   // }else{
   //     void router.push({ name: 'Shop', params:{shopId:shopId.value}});
   // }
