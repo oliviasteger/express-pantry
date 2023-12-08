@@ -24,6 +24,12 @@ const operations: operation[] = [
     fields: { username: "input", password: "input", information: "input" },
   },
   {
+    name: "Get Profile By Admin",
+    endpoint: "/api/profiles/admin/:administrator",
+    method: "GET",
+    fields: { administrator: "input" },
+  },
+  {
     name: "Login",
     endpoint: "/api/login",
     method: "POST",

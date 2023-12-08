@@ -1,19 +1,24 @@
 <script setup lang="ts">
+import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { onMounted, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
-const { updateSession } = useUserStore();
+const { updateSession, updateType } = useUserStore();
 const location = ref("");
 const name = ref("");
 const openHour = ref("");
 const closeHour = ref("");
 const pickupWindowLength = ref("");
 const ordersPerWindow = ref("");
-const rules = ref("");
+// const rules = ref<string[]>([]);
 const cities = ref([]);
 const hoursOptions = Array.from({ length: 24 }, (_, index) => String(index + 1));
 const username = ref("");
 const password = ref("");
+const rules = ref({
+  annualIncome: "",
+  snapRequired: false,
+});
 
 async function getCities() {
   const response = await fetch("https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-cities-demographics/records?group_by=city&limit=3000");
@@ -25,7 +30,6 @@ async function getCities() {
 }
 
 const registerPantry = async () => {
-  console.log("GOT HERE");
   await fetchy("/api/users", "POST", {
     body: {
       username: username.value,
@@ -40,7 +44,7 @@ const registerPantry = async () => {
       password: password.value,
     },
   });
-
+  console.log("RULESSSS", rules.value, JSON.stringify(rules.value));
   await fetchy("/api/profiles", "POST", {
     body: {
       location: location.value,
@@ -49,13 +53,14 @@ const registerPantry = async () => {
       closeHour: closeHour.value,
       pickupWindowLength: pickupWindowLength.value,
       ordersPerWindow: ordersPerWindow.value,
-      rules: rules.value,
+      rules: JSON.stringify(rules.value),
     },
   });
 
   //emit event to say registered event is submitted
   void updateSession();
-  //void router.push({ name: "Home" });
+  void updateType();
+  await router.push({ name: "Home" });
 };
 
 onMounted(async () => {
@@ -117,8 +122,11 @@ onMounted(async () => {
       </div>
 
       <div class="pure-control-group">
-        <label for="aligned-rules">Annual Income Max (optional)</label>
-        <input v-model.trim="rules" type="text" id="aligned-rules" placeholder="rules" />
+        <h3>Requirements: Check the requirements your pantry has:</h3>
+        <input type="checkbox" id="vehicle1" name="vehicle1" value="annual_income_max" />
+        <label for="vehicle1"> Annual Income Max</label> Input Amount: <input type="text" id="vehicle1input" v-model="rules.annualIncome" /><br />
+        <input type="checkbox" id="vehicle2" name="vehicle2" value="snap_benefits" v-model="rules.snapRequired" />
+        <label for="vehicle2">Snap Benefits Required</label><br />
       </div>
 
       <br />

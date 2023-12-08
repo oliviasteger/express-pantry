@@ -265,6 +265,12 @@ class Routes {
     return await Profile.getProfilesByQuery({ location: location });
   }
 
+  @Router.get("/profiles/admin/:administrator")
+  async getProfilesByAdmin(administrator: string) {
+    console.log("WHY");
+    return await Profile.getProfilesByQuery({ administrator: new ObjectId(administrator) });
+  }
+
   @Router.get("/profiles")
   async getProfiles(searchQuery: string) {
     return await Profile.getProfilesByQuery(JSON.parse(searchQuery));

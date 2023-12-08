@@ -1,60 +1,50 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
-import { useDate } from 'vuetify';
 
 const { currentUsername, isLoggedIn, userType } = storeToRefs(useUserStore());
 
-
-const adapter = useDate();
-const date = '2023-11-30'
-const expirationDate = ref("");
+// const adapter = useDate();
+// const date = "2023-11-30";
+// const expirationDate = ref("");
 // console.log("TYPE:", userType.value);
-const printr = (model:any) => {
-  // console.log(model);
-  // console.log(model.toString());
-  const part = model.toString();
-  const end = part.search(":");
-  expirationDate.value = part.slice(0,end-3);
-  // console.log(expirationDate);
-};
+// const printr = (model: any) => {
+//   // console.log(model);
+//   // console.log(model.toString());
+//   const part = model.toString();
+//   const end = part.search(":");
+//   expirationDate.value = part.slice(0, end - 3);
+//   // console.log(expirationDate);
+// };
 </script>
 
 <template>
   <main>
-    {{ expirationDate }}
-    
-    <div class="icon-container">
-      <v-icon icon = "mdi-circle" color = "var(--green)" class="base-icon"></v-icon>
-      <v-icon icon = "mdi-plus" color ="white" class="overlay-icon"></v-icon>
-    </div>
+    <!-- {{ expirationDate }} -->
+
+    <!-- <div class="icon-container">
+      <v-icon icon="mdi-circle" color="var(--green)" class="base-icon"></v-icon>
+      <v-icon icon="mdi-plus" color="white" class="overlay-icon"></v-icon>
+    </div> -->
     <!-- <v-icon icon = "mdi-circle" color = "var(--green)">
       <v-icon icon = "mdi-plus" color ="var(--white)">
       
     </v-icon>
     </v-icon> -->
     <h1>Home Page</h1>
-    <span class="material-icons-outlined">
-add_circle
-</span>
+
     <section>
       <h1 v-if="isLoggedIn">Welcome {{ currentUsername }}!</h1>
       <h1 v-else>Please login!</h1>
     </section>
-    <div
-    class="pure-control-group">
+    <div class="pure-control-group">
+      <!-- <label for="aligned-expirationDate">What is the Expiration date of this food item?</label> -->
 
-    <label
-    for="aligned-expirationDate">What is the Expiration date of this food item?</label>
-
-    <v-date-picker
+      <!-- <v-date-picker
     @update:model-value="printr"
     id="aligned-expirationDate"
-    required></v-date-picker>
-
+    required></v-date-picker> -->
     </div>
-
   </main>
 </template>
 
@@ -67,7 +57,8 @@ h1 {
   display: inline-block; /* Ensures icons are in the same line */
 }
 
-.base-icon, .overlay-icon {
+.base-icon,
+.overlay-icon {
   position: absolute;
   top: 0;
   left: 0;
