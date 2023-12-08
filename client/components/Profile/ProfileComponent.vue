@@ -19,7 +19,10 @@ const city = ref("");
 const name = ref("");
 const openHours = ref("");
 const closeHours = ref("");
-const rules = ref("");
+const rules = ref({
+  annualIncome: "",
+  snapRequired: false,
+});
 
 //1. get profile
 //2. populate screen with profile
@@ -27,12 +30,15 @@ const rules = ref("");
 
 const getProfile = async () => {
   try {
+    console.log("HEREEEE");
     const profile = await fetchy("api/profiles/currentUser", "GET");
     city.value = profile.location;
     name.value = profile.name;
     openHours.value = profile.openHour;
     closeHours.value = profile.closeHour;
     rules.value = profile.rules;
+    console.log(profile.rules);
+    console.log("RULES", rules.value);
   } catch {
     //not sure
   }
@@ -72,7 +78,8 @@ onBeforeMount(async () => {
     </div>
     <div class="profile-info-box">
       <ul class="requirements-list">
-        <li>Maximum Annual Income: ${{ rules }}</li>
+        <li>Maximum Annual Income: ${{ rules.annualIncome }}</li>
+        <li>Snap Required: {{ rules.snapRequired }}</li>
         <!-- Add more requirements as needed -->
       </ul>
     </div>

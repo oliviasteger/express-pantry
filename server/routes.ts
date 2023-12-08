@@ -272,9 +272,8 @@ class Routes {
   }
 
   @Router.get("/profiles")
-  async getProfiles() {
-    return await Profile.getProfiles();
-    //return await Profile.getProfilesByQuery(JSON.parse(searchQuery));
+  async getProfiles(searchQuery: string) {
+    return await Profile.getProfilesByQuery(JSON.parse(searchQuery));
   }
 
   @Router.patch("/profiles")

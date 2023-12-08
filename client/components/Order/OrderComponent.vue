@@ -36,11 +36,11 @@ const deleteOrder = async () => {
 const clientName = ref("");
 const profileName = ref("");
 
-// const getClientUsername = async () => {
-//   const clientIdCheck = props.order.sender;2
-//   console.log(clientIdCheck);
-//   clientName.value = await fetchy(`/api/users/id/${clientIdCheck}`, "GET");
-// };
+const getClientUsername = async () => {
+  let check = await fetchy(`/api/users/id/${props.order.sender}`, "GET");
+  check = check.username;
+  clientName.value = check;
+};
 
 const getProfile = async () => {
   console.log("HELLO");
@@ -55,6 +55,7 @@ const getProfile = async () => {
 onBeforeMount(async () => {
   try {
     await getProfile();
+    await getClientUsername();
   } catch {
     // User is not logged in
   }
@@ -63,7 +64,7 @@ onBeforeMount(async () => {
 
 <template>
   <v-row>
-    <v-col> <strong>Sender:</strong> {{ props.order.sender }} </v-col>
+    <v-col> <strong>Sender:</strong> {{ clientName }} </v-col>
     <v-col> <strong>Recipient:</strong> {{ profileName }} </v-col>
     <v-col> <strong>Status:</strong> {{ props.order.status }} </v-col>
     <v-col> <strong>pickup Date:</strong> {{ new Date(props.order.pickup).toLocaleString() }} </v-col>

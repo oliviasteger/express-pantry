@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import router from "@/router";
+import { useUserStore } from "@/stores/user";
 import { onMounted, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
-
+const { loginUser, updateSession, updateType } = useUserStore();
 const cities = ref([]);
 const username = ref("");
 const password = ref("");
@@ -39,6 +41,9 @@ async function userRegister() {
       password: password.value,
     },
   });
+  void updateSession();
+  void updateType();
+  await router.push({ name: "Home" });
 }
 </script>
 

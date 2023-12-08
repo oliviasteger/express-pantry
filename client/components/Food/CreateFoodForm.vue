@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { createVuetify } from "vuetify";
 import "vuetify/dist/vuetify.min.css";
 import { fetchy } from "../../utils/fetchy";
-
+const emit = defineEmits(["editItem", "refreshItems"]);
 const barcode = ref("");
 const dropDate = ref("");
 const expirationDate = ref("");
@@ -21,6 +21,7 @@ const addFoodItem = async () => {
         status: status.value,
       },
     });
+    emit("refreshItems");
   } catch (error) {
     console.error("Error adding food item:", error);
   }
