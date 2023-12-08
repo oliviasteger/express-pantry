@@ -30,9 +30,7 @@ const switchToMap = () => {
   void router.push({ name: 'Map'});
 
 };
-const switchToCart = (order:Array<{
-    [key: string]: number;
-  }>) => {
+const switchToCart = (order:Array<string>) => {
     console.log('in switchFromShop');
     void router.push({ name: 'Cart', params: {}, query: { order: JSON.stringify(order) } });
 

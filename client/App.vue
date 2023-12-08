@@ -89,6 +89,7 @@ nav {
   padding: 1em 2em;
   display: flex;
   align-items: center;
+  background-color: white;
 }
 
 h1 {

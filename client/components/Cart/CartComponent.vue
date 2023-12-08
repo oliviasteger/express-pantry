@@ -11,17 +11,28 @@ const loaded = ref(false);
 const { currentUsername } = storeToRefs(useUserStore());
 const props = defineProps(["order"]);
 const emit = defineEmits(["changedOrder"]);
-const order = ref<
-  Array<{
-    [key: string]: number;
-  }>
->([]);
+const order = ref<Array<string>>([]);
+const cartCountMap = ref<Map<string, number>>(new Map());
 
 
 const addToCart = async (barcode: string, number?: number) => {
     //prob emit to ya ya 
     emit("changedOrder", order.value); 
 };
+const getItemCounts = (order: Array<string>): Map<string, number> => {
+  const itemCountMap = new Map<string,number>();
+
+  for (const barcode of order){
+    if (!itemCountMap.has(barcode)){
+      itemCountMap.set(barcode, 0)
+    }
+    const currentAmount = itemCountMap.get(barcode)
+    if (currentAmount !== undefined) itemCountMap.set(barcode, currentAmount + 1)
+  }
+
+  return itemCountMap;
+}
+
 const deleteItem = async (barcode: string) => {
     const index = order.value.findIndex(item => Object.keys(item)[0] === barcode);
 
@@ -40,6 +51,7 @@ const removeFromCart = (barcode: string, number?: number) => {
 onBeforeMount(async () => {
   try{
     order.value = props.order;
+    cartCountMap.value = getItemCounts(order.value);
     loaded.value = true;
   }catch(error){
     console.error("something went wrong with mounting CartComponent ", error);
@@ -53,9 +65,9 @@ onBeforeMount(async () => {
     <v-card>
     <v-card-title>Your Cart</v-card-title>
     <v-list class = "container" v-if="loaded && order.length !== 0">
-      <v-list-item-group v-for="object of Object.entries($props.order)" :key="object[0]">
+      <v-list-item-group v-for="barcode of cartCountMap.keys()" :key="barcode">
         
-        <CartItemComponent :item="object[0]" :quantity="object[1]" @deleteItemFromCart="deleteItem" @addedToCart="addToCart" @removeFromCart="removeFromCart"/>
+        <CartItemComponent :item="barcode" :quantity="cartCountMap.get(barcode)" @deleteItemFromCart="deleteItem" @addedToCart="addToCart" @removeFromCart="removeFromCart"/>
         <v-divider width="90%"></v-divider>
           
       </v-list-item-group>

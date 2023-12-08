@@ -13,9 +13,7 @@ const shop = ref();
 const shopId:Ref<string> = ref("");
 const loaded = ref(false);
 const order = ref<
-  Array<{
-    [key: string]: number;
-  }>
+  Array<string>
 >([]);
 const { currentUsername } = storeToRefs(useUserStore());
 interface Shop {
@@ -55,9 +53,7 @@ const switchToShop = () => {
   
 
 };
-const updateOrder = (newOrder: Array<{
-    [key: string]: number;
-  }>) => {
+const updateOrder = (newOrder: Array<string>) => {
     console.log(newOrder, " edited the order in cart");
     order.value = newOrder; 
 
