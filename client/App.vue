@@ -53,6 +53,9 @@ onBeforeMount(async () => {
             <li>
               <RouterLink :to="{ name: 'Admin Orders' }" :class="{ underline: currentRouteName == 'Admin Orders' }"> Orders </RouterLink>
             </li>
+            <li>
+              <RouterLink :to="{ name: 'Requests' }" :class="{ underline: currentRouteName == 'Requests' }"> Requests </RouterLink>
+            </li>
             <!-- Add more admin-specific links as needed -->
           </ul>
           <ul v-else-if="userStore.userType === 'Client'">
@@ -62,6 +65,9 @@ onBeforeMount(async () => {
             </li>
             <li>
               <RouterLink :to="{ name: 'Client Orders' }" :class="{ underline: currentRouteName == 'Client Orders' }"> Orders </RouterLink>
+            </li>
+            <li>
+              <RouterLink :to="{ name: 'Requests' }" :class="{ underline: currentRouteName == 'Requests' }"> Requests </RouterLink>
             </li>
           </ul>
         </li>

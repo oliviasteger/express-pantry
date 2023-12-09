@@ -69,8 +69,6 @@ onBeforeMount(async () => {
 </script>
 <template>
   <div v-show="loaded">
-    {{ currentCity }}
-    {{ props.selectedCity }}
     <button class="default-disabled info">
       <div class="side">Based on your account information to the right, these are the food pantries within your selected area that you are eligible for</div>
 

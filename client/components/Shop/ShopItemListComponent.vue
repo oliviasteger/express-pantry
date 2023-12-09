@@ -6,6 +6,7 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref, watch } from "vue";
 import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
+import CreateRequestForm from "../Request/CreateRequestForm.vue";
 interface Shop {
   administrator: string;
   location: string;
@@ -111,10 +112,10 @@ onBeforeMount(async () => {
   if (props.shop) {
     await setUpShop(props.shop);
   }
-  if (props.hasOrder){
-    console.log("props has order")
+  if (props.hasOrder) {
+    console.log("props has order");
     order.value = props.order;
-  }else{
+  } else {
     console.log("this in onBefore", order.value);
   }
   console.log(`in onBeforeMount this is order ${order.value}`);
@@ -149,7 +150,7 @@ onBeforeMount(async () => {
           <strong>Cart&nbsp;&nbsp;</strong>
           <template v-slot:append>
             <v-chip size="small" color="white" variant="flat" text-color="black" class="custom-chip">
-              <!-- <strong>5 items</strong> -->
+              <strong> {{ order.length }}</strong>
             </v-chip>
           </template>
         </v-chip>
@@ -165,15 +166,20 @@ onBeforeMount(async () => {
     </v-navigation-drawer>
 
     <v-main class="d-flex align-start justify-center" style="min-height: 300px">
-      <section class="posts" v-if="loaded && orderableBarcodesAndQuantities.length !== 0">
-        <article v-for="object of Object.entries(orderableBarcodesAndQuantities)" :key="object[0]">
-          <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop(props.shop)" @addedToCart="addToCart" @removeFromCart="removeFromCart" />
-          <!-- <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
+      <v-container>
+        <v-row> <CreateRequestForm :requestee="props.shop.administrator"></CreateRequestForm> </v-row>
+        <v-row>
+          <section class="posts" v-if="loaded && orderableBarcodesAndQuantities.length !== 0">
+            <article v-for="object of Object.entries(orderableBarcodesAndQuantities)" :key="object[0]">
+              <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop(props.shop)" @addedToCart="addToCart" @removeFromCart="removeFromCart" />
+              <!-- <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
         <EditPostForm v-else :post="post" @refreshPosts="getPosts" @editPost="updateEditing" /> -->
-        </article>
-      </section>
-      <p v-else-if="loaded">No posts found</p>
-      <p v-else>Loading...</p>
+            </article>
+          </section>
+          <p v-else-if="loaded">No posts found</p>
+          <p v-else>Loading...</p>
+        </v-row>
+      </v-container>
     </v-main>
   </v-app>
   <p v-else>

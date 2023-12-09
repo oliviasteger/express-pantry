@@ -15,6 +15,7 @@ import MapView from "../views/MapView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import OrderConfirmationView from "../views/OrderConfirmationView.vue";
 import ProfileView from "../views/ProfileView.vue";
+import RequestViewVue from "../views/RequestView.vue";
 import SettingView from "../views/SettingView.vue";
 import ShopView from "../views/ShopView.vue";
 
@@ -118,6 +119,12 @@ const router = createRouter({
       path: "/inventory",
       name: "Inventory",
       component: FoodListComponent,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/requests",
+      name: "Requests",
+      component: RequestViewVue,
       meta: { requiresAuth: true },
     },
 

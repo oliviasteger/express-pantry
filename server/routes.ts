@@ -331,16 +331,17 @@ class Routes {
     if (userObject.type == "Administrator") throw new NotAllowedError(`Only pantry clients can create requests.`);
 
     // Check that user is eligible to access the pantry
-    await Profile.assertEligible(requestee, userObject);
+    const requesteeProfile = (await Profile.getProfilesByQuery({ administrator: new ObjectId(requestee) }))[0]._id;
+    await Profile.assertEligible(requesteeProfile, userObject);
 
     // Check that the item is out of stock
     const items = await ExpiringItem.getExpiringItems({ administrator: requestee, barcode, status: "Claimable" });
     if (items.length !== 0) throw new NotAllowedError(`Requests can only be made for items that are out of stock.`);
 
-    return await Request.create(barcode, user, requestee);
+    return await Request.create(barcode, user, new ObjectId(requestee));
   }
 
-  @Router.patch("/requests/:id")
+  @Router.patch("/requests/:_id")
   async updateRequest(session: WebSessionDoc, _id: ObjectId, update: Partial<RequestDoc>) {
     const user = WebSession.getUser(session);
     const userObject = await User.getUserById(user);
@@ -358,7 +359,7 @@ class Routes {
     return await Request.update(_id, update);
   }
 
-  @Router.delete("/requests/:id")
+  @Router.delete("/requests/:_id")
   async deleteRequest(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     const userObject = await User.getUserById(user);
