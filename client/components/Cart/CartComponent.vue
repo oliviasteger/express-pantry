@@ -2,21 +2,19 @@ Set up express pantry
 
 <script setup lang="ts">
 import CartItemComponent from "@/components/Cart/CartItemComponent.vue";
-import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
-import { useUserStore } from "../../stores/user";
 
 const loaded = ref(false);
-const { currentUsername } = storeToRefs(useUserStore());
 const props = defineProps(["order"]);
 const emit = defineEmits(["changedOrder"]);
-const order = ref<Array<string>>([]);
+const cartOrder = ref<Array<string>>([]);
 const cartCountMap = ref<Map<string, number>>(new Map());
 
 const addToCart = async (barcode: string, number?: number) => {
   //prob emit to ya ya
-  emit("changedOrder", order.value);
+  emit("changedOrder", cartOrder.value);
 };
+
 const getItemCounts = (order: Array<string>): Map<string, number> => {
   const itemCountMap = new Map<string, number>();
 
@@ -30,24 +28,28 @@ const getItemCounts = (order: Array<string>): Map<string, number> => {
 
   return itemCountMap;
 };
+const removeFromCart = (barcode: string) => {
+  // Remove item from showing
+  const currentBarcodeValue = cartCountMap.value.get(barcode);
+  const currentNumber: number = currentBarcodeValue !== undefined ? currentBarcodeValue : 0;
+  cartCountMap.value.set(barcode, currentNumber > 0 ? currentNumber - 1 : 0);
 
-const deleteItem = async (barcode: string) => {
-  const index = order.value.findIndex((item) => Object.keys(item)[0] === barcode);
-
-  if (index !== -1) {
-    order.value.splice(index, 1);
+  if (cartCountMap.value.get(barcode) == 0) {
+    cartCountMap.value.delete(barcode);
   }
-  emit("changedOrder", order.value);
-};
-const removeFromCart = (barcode: string, number?: number) => {
-  //prob emit to ya ya
-  emit("changedOrder", order.value);
+
+  // Remove item from order
+  const index = cartOrder.value.indexOf(barcode);
+  if (index != -1) {
+    cartOrder.value.splice(index, 1);
+  }
+  emit("changedOrder", cartOrder.value);
 };
 
 onBeforeMount(async () => {
   try {
-    order.value = props.order;
-    cartCountMap.value = getItemCounts(order.value);
+    cartOrder.value = props.order;
+    cartCountMap.value = getItemCounts(cartOrder.value);
     loaded.value = true;
   } catch (error) {
     console.error("something went wrong with mounting CartComponent ", error);
@@ -60,7 +62,7 @@ onBeforeMount(async () => {
     <v-card-title>Your Cart</v-card-title>
     <v-list class="container" v-if="loaded && order.length !== 0">
       <v-list-item-group v-for="barcode of cartCountMap.keys()" :key="barcode">
-        <CartItemComponent :item="barcode" :quantity="cartCountMap.get(barcode)" @deleteItemFromCart="deleteItem" @addedToCart="addToCart" @removeFromCart="removeFromCart" />
+        <CartItemComponent :item="barcode" :quantity="cartCountMap.get(barcode)" @addedToCart="addToCart" @removeFromCart="removeFromCart" />
         <v-divider width="90%"></v-divider>
       </v-list-item-group>
     </v-list>

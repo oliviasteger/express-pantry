@@ -42,7 +42,7 @@ const getName = async (barcode: string) => {
       name.value = data.product.generic_name_en;
       brand.value = data.product.brands;
       imageURL.value = data.product.image_url;
-      group.value = data.product.food_groups;
+      group.value = data.product.food_groups ? data.product.food_groups.substring(data.product.food_groups.indexOf(":") + 1).replaceAll("-", " ") : data.product.food_groups;
 
       console.log("food name: ", name);
       console.log("food brand: ", brand);

@@ -115,6 +115,9 @@ onBeforeMount(async () => {
   </div>
 </template>
 <style scoped>
+button {
+  margin: 1em;
+}
 .info {
   display: flex;
   justify-content: center;

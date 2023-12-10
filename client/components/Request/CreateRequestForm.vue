@@ -19,22 +19,20 @@ const createRequest = async () => {
 };
 </script>
 <template>
-  <v-app>
-    <v-container>
-      <v-form @submit.prevent="createRequest">
-        <h3>Request a food item</h3>
-        <v-row>
-          <v-col>
-            <v-text-field v-model.trim="barcode" label="Food item barcode" required></v-text-field>
-          </v-col>
-        </v-row>
+  <v-container>
+    <v-form @submit.prevent="createRequest">
+      <h3>Request a food item</h3>
+      <v-row>
+        <v-col>
+          <v-text-field v-model.trim="barcode" label="Food item barcode" required></v-text-field>
+        </v-col>
+      </v-row>
 
-        <v-row>
-          <v-col>
-            <v-btn type="submit" color="primary">Request item</v-btn>
-          </v-col>
-        </v-row>
-      </v-form>
-    </v-container>
-  </v-app>
+      <v-row>
+        <v-col>
+          <v-btn type="submit" color="primary">Request item</v-btn>
+        </v-col>
+      </v-row>
+    </v-form>
+  </v-container>
 </template>

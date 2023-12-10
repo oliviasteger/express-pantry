@@ -39,14 +39,8 @@ onBeforeMount(async () => {
 
 <template>
   <section v-if="isLoggedIn">
-    <h2>Add an Item:</h2>
     <CreateFoodForm @refreshItems="getItems" />
   </section>
-  <!-- <div class="row">
-    <h2 v-if="!searchAuthor">Posts:</h2>
-    <h2 v-else>Posts by {{ searchAuthor }}:</h2>
-    <SearchPostForm @getPostsByAuthor="getPosts" />
-  </div> -->
   <section class="posts" v-if="loaded && items.length !== 0">
     <h2>Inventory</h2>
     <article v-for="item in items" :key="item._id">

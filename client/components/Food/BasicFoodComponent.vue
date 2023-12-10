@@ -41,16 +41,21 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <v-row>
-    <v-col> <strong>Barcode:</strong> {{ props.item.barcode }} </v-col>
-    <v-col> <strong>Status:</strong> {{ props.item.status }} </v-col>
-    <v-col> <strong>Expiration Date:</strong> {{ new Date(props.item.expirationDate).toLocaleString() }} </v-col>
-    <v-col> <strong>Drop Date:</strong> {{ new Date(props.item.dropDate).toLocaleString() }} </v-col>
-    <v-col> <strong>Name:</strong> {{ name }} </v-col>
-    <v-col> <strong>Brand:</strong> {{ brand }} </v-col>
-    <v-col>
-      <img :src="imageURL" alt="Input ImageURL" class="image" width="100" height="100" />
-    </v-col>
-    <v-col> <strong>Food Group:</strong> {{ group }} </v-col>
-  </v-row>
+  <v-container>
+    <v-row align="stretch" class="w-100">
+      <h3>{{ name ? name : "No name available" }} - {{ brand ? brand : "No brand available" }}</h3>
+    </v-row>
+    <v-row align="stretch" class="w-100">
+      <v-col cols="3">
+        <v-img :src="imageURL" alt="Input ImageURL" class="h-100" />
+      </v-col>
+      <v-col cols="9">
+        <strong>Barcode:</strong> {{ props.item.barcode }}<br />
+        <strong>Status:</strong> {{ props.item.status }} <br />
+        <strong>Expiration Date:</strong> {{ new Date(props.item.expirationDate).toLocaleString() }} <br />
+        <strong>Drop Date:</strong> {{ new Date(props.item.dropDate).toLocaleString() }} <br />
+        <strong>Food Group:</strong> {{ group ? group : "No food group available" }}
+      </v-col>
+    </v-row>
+  </v-container>
 </template>

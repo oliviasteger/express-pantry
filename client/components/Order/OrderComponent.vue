@@ -25,9 +25,7 @@ const deleteOrder = async () => {
   deleting.value = true;
 
   try {
-    await fetchy("/api/order", "DELETE", {
-      body: { orderId: props.order._id },
-    });
+    await fetchy(`/api/order/${props.order._id}`, "DELETE");
   } catch (error) {
     console.error("Error deleting item:", error);
   } finally {
@@ -91,12 +89,12 @@ onBeforeMount(async () => {
       <v-btn class="btn-small" @click="emit('editOrder', props.order._id)">Edit</v-btn>
     </v-col>
   </v-row>
-  <v-row v-if="loaded && items.length !== 0">
-    <h3>Order Items</h3>
+  <h3 v-if="loaded && items.length !== 0">Order Items</h3>
+  <v-container v-if="loaded && items.length !== 0">
     <article v-for="item in items" :key="item[0]._id">
       <BasicFoodComponent :item="item[0]" />
     </article>
-  </v-row>
+  </v-container>
 </template>
 
 <style scoped>

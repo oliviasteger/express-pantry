@@ -96,3 +96,9 @@ onBeforeMount(async () => {
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.v-container {
+  height: fit-content;
+}
+</style>

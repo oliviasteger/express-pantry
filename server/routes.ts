@@ -423,7 +423,7 @@ class Routes {
     return await Order.update(new ObjectId(orderId), { status: newStatus });
   }
 
-  @Router.delete("/order")
+  @Router.delete("/order/:orderId")
   async deleteOrder(orderId: string, session: WebSessionDoc) {
     const userId = WebSession.getUser(session);
     const order = await Order.getorderById(new ObjectId(orderId));
