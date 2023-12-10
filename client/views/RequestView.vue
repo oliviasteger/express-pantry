@@ -6,7 +6,7 @@ import EditRequestForm from "../components/Request/EditRequestForm.vue";
 import RequestComponent from "../components/Request/RequestComponent.vue";
 import { fetchy } from "../utils/fetchy";
 const { isLoggedIn } = storeToRefs(useUserStore());
-const requests = ref<{ barcode: string; requester: string; requestee: string; status: "Pending" | "Accepted" | "Rejected" }[]>([]);
+const requests = ref<{ _id: string; barcode: string; requester: string; requestee: string; status: "Pending" | "Accepted" | "Rejected" }[]>([]);
 const loaded = ref(false);
 const editing = ref("");
 const userStore = useUserStore();
