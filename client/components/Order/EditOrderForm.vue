@@ -20,6 +20,7 @@ async function updateStatus() {
     //womp womp
   }
   emit("refreshItems");
+  emit("refreshOrders");
 }
 </script>
 
