@@ -21,6 +21,7 @@ async function updateStatus() {
   }
   emit("refreshItems");
   emit("refreshOrders");
+  emit("editOrder");
 }
 </script>
 
