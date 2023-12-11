@@ -59,6 +59,8 @@ const show = ref(false);
         <v-tooltip
           v-model="show"
           location="bottom"
+          flex="column"
+          flex-direction="start"
         >
           <!-- <template v-slot:activator="{ props }">
             <v-btn
@@ -85,7 +87,7 @@ const show = ref(false);
           </span>
 
           </div>
-          <div v-if="userType === 'Admin'">
+          <div v-if="userType === 'Administrator'">
             <span>
               To <strong>add items to the inventory</strong> or <strong>update existing items</strong>, <strong>navigate to the Inventory tab</strong> and use the <strong>Add Item form</strong>, or scroll down to see existing items and available actions. 
               <br><br>
