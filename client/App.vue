@@ -31,30 +31,30 @@ onBeforeMount(async () => {
     <nav order="0">
       <div class="title">
         <img src="@/assets/images/betterlogo.svg.svg" />
-        <RouterLink :to="{ name: 'Home' }">
+        <RouterLink :to="{ name: 'Home' }" :class="{ color:'var(--darker-header)'}">
           <h2>ExpressPantry</h2>
         </RouterLink>
       </div>
       <ul>
         <li>
-          <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
+          <RouterLink :to="{ name: 'Home' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Home' }"> Home </RouterLink>
         </li>
         <li v-if="isLoggedIn">
           <ul v-if="userStore.userType === 'Administrator'">
             <li>
-              <RouterLink :to="{ name: 'Admin Settings' }" :class="{ underline: currentRouteName == 'Admin Settings' }"> Settings </RouterLink>
+              <RouterLink :to="{ name: 'Admin Settings' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Admin Settings' }"> Settings </RouterLink>
             </li>
             <li>
-              <RouterLink :to="{ name: 'Profile' }" :class="{ underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
+              <RouterLink :to="{ name: 'Profile' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
             </li>
             <li>
-              <RouterLink :to="{ name: 'Inventory' }" :class="{ underline: currentRouteName == 'Inventory' }"> Inventory </RouterLink>
+              <RouterLink :to="{ name: 'Inventory' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Inventory' }"> Inventory </RouterLink>
             </li>
             <li>
-              <RouterLink :to="{ name: 'Admin Orders' }" :class="{ underline: currentRouteName == 'Admin Orders' }"> Orders </RouterLink>
+              <RouterLink :to="{ name: 'Admin Orders' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Admin Orders' }"> Orders </RouterLink>
             </li>
             <li>
-              <RouterLink :to="{ name: 'Requests' }" :class="{ underline: currentRouteName == 'Requests' }"> Requests </RouterLink>
+              <RouterLink :to="{ name: 'Requests' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Requests' }"> Requests </RouterLink>
             </li>
             <!-- Add more admin-specific links as needed -->
           </ul>
@@ -95,7 +95,10 @@ nav {
   padding: 1em 2em;
   display: flex;
   align-items: center;
-  background-color: white;
+  background-color: var(--lightest-header);
+}
+RouterLink {
+  color:var(--darker-header);
 }
 
 h1 {

@@ -59,8 +59,7 @@ const show = ref(false);
         <v-tooltip
           v-model="show"
           location="bottom"
-          flex="column"
-          flex-direction="start"
+          class ="move"
         >
           <!-- <template v-slot:activator="{ props }">
             <v-btn
@@ -119,6 +118,11 @@ const show = ref(false);
 <style scoped>
 h1 {
   text-align: center;
+}
+.move{
+  top:50%;
+  width: 500px;
+  margin:auto;
 }
 .icon-container {
   position: relative;
