@@ -23,7 +23,7 @@ const loaded = ref(false);
 const { currentUsername } = storeToRefs(useUserStore());
 const props = defineProps(["shop", "order", "hasOrder"]);
 const name = ref();
-const emit = defineEmits(["openShop", "leaveShop", "refreshPantryList", "goToCart"]);
+const emit = defineEmits(["openShop", "leaveShop", "refreshPantryList", "goToCart", "goToMap"]);
 const order = ref<Array<string>>([]);
 
 const setUpShop = async (shop: Shop) => {
@@ -55,7 +55,9 @@ const openCart = async () => {
   emit("goToCart", order.value);
   return;
 };
-
+const returnToMap = () => {
+  emit("goToMap");
+};
 const addToCart = async (barcode: string) => {
   //checking if the number is greater than amount of barcode in stock
   // try {
@@ -134,7 +136,7 @@ onBeforeMount(async () => {
   <v-app class="rounded rounded-md bar" v-if="props.shop">
     <v-app-bar class="custom-app-bar" :elevation="3" density="compact">
       <template v-slot:prepend>
-        <v-icon icon="mdi-chevron-left"></v-icon>
+        <v-icon icon="mdi-chevron-left" @="returnToMap"></v-icon>
         <v-app-bar-title absolute="false"
           >Shopping At
           <button class="default-disabled">
@@ -161,7 +163,7 @@ onBeforeMount(async () => {
 
     <v-navigation-drawer class="custom-navigation-drawer">
       <v-list>
-        <v-list-item title="Navigation drawer"></v-list-item>
+        <!-- <v-list-item title="Navigation drawer"></v-list-item> -->
       </v-list>
     </v-navigation-drawer>
 
@@ -207,10 +209,10 @@ onBeforeMount(async () => {
   height: fit-content !important;
   padding: 0.1em !important;
 }
-/* .custom-navigation-drawer {
-  position: sticky !important; 
-  top: auto !important; 
-} */
+.custom-navigation-drawer {
+  /* position: relative !important;  */
+  top: 10% !important; 
+} 
 
 section {
   display: flex;

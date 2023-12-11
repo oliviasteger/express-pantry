@@ -133,18 +133,21 @@ onBeforeMount(async () => {
       <v-btn type="submit" id="change" block class="mt-2" text="Change Username"></v-btn>
     </v-form>
     <br /><br />
+    <v-divider class ="div"></v-divider>
     <v-form validate-on="submit lazy" @submit.prevent="updatePassword">
       <v-text-field v-model="password" label="Password" :rules="rules"></v-text-field>
 
       <v-btn type="submit" id="change" block class="mt-2" text="Change Password"></v-btn>
     </v-form>
     <br /><br />
+    <v-divider class ="div"></v-divider>
     <v-form validate-on="submit lazy" @submit.prevent="updateIncome">
       <v-text-field v-model="information.annualIncome" :placeholder="currentAnnualIncome" label="Current Annual Income" :persistent-placeholder="true" :rules="rules"></v-text-field>
 
       <v-btn type="submit" block id="change" class="mt-2" text="Change Income Amount"></v-btn>
     </v-form>
     <br /><br />
+    <v-divider class ="div"></v-divider>
     <v-form validate-on="submit lazy" @submit.prevent="updateLocation">
       <div class="pure-control-group">
         <label for="aligned-location">Choose the city You Live In: </label>
@@ -157,7 +160,7 @@ onBeforeMount(async () => {
       <v-btn type="submit" id="change" block class="mt-2" text="Change Location"></v-btn>
     </v-form>
     <br /><br />
-
+    <v-divider class ="div"></v-divider>
     <v-form validate-on="submit lazy" @submit.prevent="updateSnap">
       <v-switch
         color="primary"
@@ -174,10 +177,20 @@ onBeforeMount(async () => {
   </div>
 </template>
 <style>
+.div{
+  padding-bottom:1em;
+}
 .form {
-  padding-bottom: 50px;
+  padding-bottom: 0px;
 }
 #change {
   background-color: var(--lighter-header);
+  color:white;
+}
+#change:hover {
+  background-color: white;
+  color:var(--lighter-header);
+  border-color: var(--lighter-header);
+  border-width: 2px;
 }
 </style>

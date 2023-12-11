@@ -20,9 +20,21 @@ async function delete_() {
 
 <template>
   <main class="column">
+    <v-card elevation="3" class="back">
+
+      <div class = "row">
     <h1>Settings for {{ currentUsername }}</h1>
+    
     <button class="pure-button pure-button-primary" @click="logout">Logout</button>
     <button class="button-error pure-button" @click="delete_">Delete User</button>
+  </div>
     <UpdateUserForm />
+  </v-card>
   </main>
 </template>
+<style>
+.back {
+  padding: 1em;
+  border-radius: 0.5em;
+}
+</style>
