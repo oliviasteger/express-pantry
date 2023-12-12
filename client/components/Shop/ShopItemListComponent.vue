@@ -64,10 +64,7 @@ const addToCart = async (barcode: string) => {
   // if (!number) {
   //   number = 1;
   // }
-  console.log(`order ${order.value}`);
   order.value.push(barcode);
-  console.log(barcode);
-  console.log(order.value);
 
   //console.log(orderableArray);
   // const matchingBarcodeIndex = orderableArray.findIndex(entry => entry[barcode] !== undefined);
@@ -115,7 +112,6 @@ onBeforeMount(async () => {
     await setUpShop(props.shop);
   }
   if (props.hasOrder) {
-    console.log("props has order");
     order.value = props.order;
   } else {
     console.log("this in onBefore", order.value);
@@ -211,8 +207,8 @@ onBeforeMount(async () => {
 }
 .custom-navigation-drawer {
   /* position: relative !important;  */
-  top: 10% !important; 
-} 
+  top: 10% !important;
+}
 
 section {
   display: flex;

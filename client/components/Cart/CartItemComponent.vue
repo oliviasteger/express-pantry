@@ -14,7 +14,6 @@ const brand = ref("");
 const group = ref("");
 
 const getName = async (barcode: string) => {
-  console.log("barcode: ", barcode);
   const barcodeNew = barcode;
   fetch("https://world.openfoodfacts.org/api/v2/product/" + barcodeNew + ".json")
     .then((response) => {
@@ -25,10 +24,10 @@ const getName = async (barcode: string) => {
       }
     })
     .then((data) => {
-      name.value = data.product.generic_name_en;
-      brand.value = data.product.brands;
-      imageURL.value = data.product.image_url;
-      group.value = data.product.food_groups;
+      name.value = data.product.generic_name_en ? data.product.generic_name_en : "No name available";
+      brand.value = data.product.brands ? data.product.brands : "No brand available";
+      imageURL.value = data.product.image_url ? data.product.image_url : "https://t3.ftcdn.net/jpg/05/03/24/40/360_F_503244059_fRjgerSXBfOYZqTpei4oqyEpQrhbpOML.jpg";
+      group.value = data.product.food_groups ? data.product.food_groups : "No food groups available";
     })
     .catch((error) => {
       // Handle any errors here
@@ -55,6 +54,7 @@ onBeforeMount(async () => {
     <template v-slot:subtitle>
       <div><strong>Quantity:</strong>{{ props.quantity }}</div>
     </template>
+    <br />
     <v-list-item-action>
       <button class="profile-button" @click="emit('removeFromCart', props.item)">Remove From Cart</button>
     </v-list-item-action>
@@ -62,6 +62,9 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+div {
+  color: black !important;
+}
 .icon-container {
   /*position: relative;*/
   display: inline-block; /* Ensures icons are in the same line */

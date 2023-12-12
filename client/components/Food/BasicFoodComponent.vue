@@ -8,7 +8,6 @@ const brand = ref("");
 const group = ref("");
 
 const getName = async (barcode: string) => {
-  console.log(barcode);
   fetch("https://world.openfoodfacts.org/api/v2/product/" + barcode + ".json")
     .then((response) => {
       if (response.ok) {
@@ -18,11 +17,10 @@ const getName = async (barcode: string) => {
       }
     })
     .then((data) => {
-      console.log(data);
-      name.value = data.product.generic_name_en;
-      brand.value = data.product.brands;
-      imageURL.value = data.product.image_url;
-      group.value = data.product.food_groups;
+      name.value = data.product.generic_name_en ? data.product.generic_name_en : "No name available";
+      brand.value = data.product.brands ? data.product.brands : "No brand available";
+      imageURL.value = data.product.image_url ? data.product.image_url : "https://t3.ftcdn.net/jpg/05/03/24/40/360_F_503244059_fRjgerSXBfOYZqTpei4oqyEpQrhbpOML.jpg";
+      group.value = data.product.food_groups ? data.product.food_groups : "No food groups available";
     })
     .catch((error) => {
       // Handle any errors here
@@ -32,7 +30,6 @@ const getName = async (barcode: string) => {
 
 onBeforeMount(async () => {
   try {
-    console.log("basicfoodbarcode: ", props.item.barcode);
     await getName(props.item.barcode);
   } catch {
     // User is not logged in
@@ -43,7 +40,7 @@ onBeforeMount(async () => {
 <template>
   <v-container>
     <v-row align="stretch" class="w-100">
-      <h3>{{ name ? name : "No name available" }} - {{ brand ? brand : "No brand available" }}</h3>
+      <h3>{{ name }} - {{ brand }}</h3>
     </v-row>
     <v-row align="stretch" class="w-100">
       <v-col cols="3">
@@ -54,7 +51,7 @@ onBeforeMount(async () => {
         <strong>Status:</strong> {{ props.item.status }} <br />
         <strong>Expiration Date:</strong> {{ new Date(props.item.expirationDate).toLocaleString() }} <br />
         <strong>Drop Date:</strong> {{ new Date(props.item.dropDate).toLocaleString() }} <br />
-        <strong>Food Group:</strong> {{ group ? group : "No food group available" }}
+        <strong>Food Group:</strong> {{ group }}
       </v-col>
     </v-row>
   </v-container>

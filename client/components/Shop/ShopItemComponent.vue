@@ -16,20 +16,10 @@ const name = ref("");
 const imageURL = ref("");
 const brand = ref("");
 const group = ref("");
+const allergens = ref("");
+const labels = ref("");
+const show = ref(false);
 
-// const deleteItem = async () => {
-//   if (deleting.value) return; // Prevent multiple delete requests
-//   deleting.value = true;
-
-//   try {
-//     await fetchy(`/api/items/${props.item._id}`, "DELETE");
-//   } catch (error) {
-//     console.error("Error deleting item:", error);
-//   } finally {
-//     deleting.value = false;
-//   }
-//   emit("refreshShopItems");
-// };
 const viewItem = () => {
   if (viewing.value) return; // Prevent multiple view requests
   viewing.value = true;
@@ -37,7 +27,6 @@ const viewItem = () => {
   emit("maximizeItem", props.item);
 };
 const getName = async (barcode: string) => {
-  console.log("barcode: ", barcode);
   const barcodeNew = barcode;
   fetch("https://world.openfoodfacts.org/api/v2/product/" + barcodeNew + ".json")
     .then((response) => {
@@ -49,24 +38,14 @@ const getName = async (barcode: string) => {
     })
     .then((data) => {
       // Process the response data here
-      //   let name = data.product.generic_name;
-      //   let brand = data.product.brand_owner;
-      //   let url = data.product.image_url;
-      //   let group = data.product.food_groups;
-      //   console.log("food name: ", name);
-      //   console.log("food brand: ", brand);
-      //   console.log("food image URL: ", url);
-      //   console.log("food group: ", group);
-
-      name.value = data.product.generic_name_en;
-      brand.value = data.product.brands;
-      imageURL.value = data.product.image_url;
-      group.value = data.product.food_groups;
-
-      console.log("food name: ", name);
-      console.log("food brand: ", brand);
-      console.log("DATA", data);
-      //   emit("refreshShopItems");
+      name.value = data.product.generic_name_en ? data.product.generic_name_en : "No name available";
+      brand.value = data.product.brands ? data.product.brands.toString().replaceAll(",", ", ") : "No brand available";
+      imageURL.value = data.product.image_url ? data.product.image_url : "https://t3.ftcdn.net/jpg/05/03/24/40/360_F_503244059_fRjgerSXBfOYZqTpei4oqyEpQrhbpOML.jpg";
+      group.value = data.product.food_groups ? data.product.food_groups.substring(data.product.food_groups.indexOf(":") + 1).replaceAll("-", " ") : "No food groups available";
+      allergens.value = data.product.allergens ? data.product.allergens.replaceAll("en:", "").replaceAll(",", ", ") : "No allergen information available";
+      labels.value = data.product.ingredients_analysis_tags
+        ? data.product.ingredients_analysis_tags.toString().replaceAll("en:", "").replaceAll(",", ", ").replaceAll("-", " ")
+        : "No additional information available";
     })
     .catch((error) => {
       // Handle any errors here
@@ -85,73 +64,38 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <v-card elevation="3" height="300px">
-    <!-- <v-col> <strong>Barcode:</strong> {{ props.item.barcode }} </v-col>
-    <v-col> <strong>Status:</strong> {{ props.item.status }} </v-col>
-    <v-col> <strong>Expiration Date:</strong> {{ new Date(props.item.expirationDate).toLocaleString() }} </v-col>
-    <v-col> <strong>Drop Date:</strong> {{ new Date(props.item.dropDate).toLocaleString() }} </v-col>
-             -->
+  <v-card elevation="3" max-width="320">
+    <center>
+      <v-img class="rounded-lg ma-3" width="200" height="200" :src="imageURL"></v-img>
+    </center>
 
-    <v-img aspect-ratio="1/1" height="200" width="200" :src="imageURL"></v-img>
-    <v-row>
-      <v-card-title class="text-h6">
-        <v-row justify="space-between">
-          <v-col> {{ name }} </v-col>
-          <v-col>
-            <div position="relative" class="icon-container" @click="emit('addedToCart', props.item)">
-              <v-icon icon="mdi-circle" color="var(--green)" class="base-left-icon"></v-icon>
-              <v-icon icon="mdi-plus" color="white" class="overlay-left-icon"></v-icon>
-            </div>
-          </v-col>
-          <v-col>
-            <div class="icon-container" @click="emit('removeFromCart', props.item)">
-              <v-icon icon="mdi-circle" color="var(--red)" class="base-right-icon"></v-icon>
-              <v-icon icon="mdi-minus" color="white" class="overlay-right-icon"></v-icon>
-            </div>
-          </v-col>
-        </v-row>
-      </v-card-title>
+    <v-card-item>
+      <v-card-title>{{ name }}</v-card-title>
+      <v-card-subtitle> {{ brand }}</v-card-subtitle>
+    </v-card-item>
 
-      <v-col>
-        <!-- <v-btn class="button-error btn-small" @click="deleteItem">Delete</v-btn> -->
-        <v-btn class="default btn-small" @click="viewItem">View</v-btn>
-      </v-col>
-    </v-row>
+    <v-card-actions>
+      <v-btn @click="emit('addedToCart', props.item)" color="var(--green)">Add to cart</v-btn>
+      <v-btn @click="emit('removeFromCart', props.item)" color="var(--red)">Remove from cart</v-btn>
+    </v-card-actions>
+
+    <v-card-actions>
+      <v-btn>More information</v-btn>
+
+      <v-spacer></v-spacer>
+
+      <v-btn :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'" @click="show = !show"></v-btn>
+    </v-card-actions>
+
+    <v-expand-transition>
+      <div v-show="show">
+        <v-divider></v-divider>
+
+        <v-card-text>
+          <div><strong>Allergens:</strong> {{ allergens }} <br /></div>
+          <div><strong>Labels and certifications:</strong> {{ labels }}</div>
+        </v-card-text>
+      </div>
+    </v-expand-transition>
   </v-card>
 </template>
-
-<style scoped>
-.icon-container {
-  /*position: relative;*/
-  display: inline-block; /* Ensures icons are in the same line */
-}
-
-.base-left-icon {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.base-right-icon {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-.overlay-left-icon {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  /* Adjust z-index if needed */
-}
-.overlay-right-icon {
-  position: absolute;
-  top: 0;
-  right: 0;
-
-  /* Adjust z-index if needed */
-}
-
-.overlay-icon {
-  color: red; /* Change the color or styling for the overlay icon */
-}
-</style>
