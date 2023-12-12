@@ -36,7 +36,7 @@ const createOrder = async () => {
   try {
     console.log({ body: { profileId: shopId.value, barcodes: props.order, pickupTime: time.value?.toISOString() } });
     await fetchy("/api/order", "POST", { body: { profileId: shopId.value, barcodes: JSON.stringify(Array.from(getItemCounts(props.order).entries())), pickupTime: time.value?.toISOString() } });
-    await router.push({ name: "Client Orders" });
+    await router.push({ name: "Orders" });
   } catch (e) {
     console.log(e);
   }

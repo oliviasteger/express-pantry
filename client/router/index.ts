@@ -5,14 +5,13 @@ import { useUserStore } from "@/stores/user";
 import FoodListComponent from "../components/Food/FoodListComponent.vue";
 import EditProfileForm from "../components/Profile/EditProfileForm.vue";
 import AccountView from "../views/AccountView.vue";
-import AdminOrdersView from "../views/AdminOrdersView.vue";
 import CartView from "../views/CartView.vue";
-import ClientOrdersView from "../views/ClientOrdersView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import MapView from "../views/MapView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import OrderConfirmationView from "../views/OrderConfirmationView.vue";
+import OrdersView from "../views/OrdersView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import RequestViewVue from "../views/RequestView.vue";
 import SettingView from "../views/SettingView.vue";
@@ -66,16 +65,9 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/adminorders",
-      name: "Admin Orders",
-      component: AdminOrdersView,
-      meta: { requiresAuth: true },
-    },
-
-    {
-      path: "/clientorders",
-      name: "Client Orders",
-      component: ClientOrdersView,
+      path: "/orders",
+      name: "Orders",
+      component: OrdersView,
       meta: { requiresAuth: true },
     },
     {

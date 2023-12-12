@@ -52,7 +52,7 @@ onBeforeMount(async () => {
               <RouterLink :to="{ name: 'Inventory' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Inventory' }"> Inventory </RouterLink>
             </li>
             <li>
-              <RouterLink :to="{ name: 'Admin Orders' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Admin Orders' }"> Orders </RouterLink>
+              <RouterLink :to="{ name: 'Orders' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Orders' }"> Orders </RouterLink>
             </li>
             <li>
               <RouterLink :to="{ name: 'Requests' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Requests' }"> Requests </RouterLink>
@@ -64,7 +64,7 @@ onBeforeMount(async () => {
               <RouterLink :to="{ name: 'Map' }" :class="{ underline: currentRouteName == 'Map' }"> Map </RouterLink>
             </li>
             <li>
-              <RouterLink :to="{ name: 'Client Orders' }" :class="{ underline: currentRouteName == 'Client Orders' }"> Orders </RouterLink>
+              <RouterLink :to="{ name: 'Orders' }" :class="{ underline: currentRouteName == 'Orders' }"> Orders </RouterLink>
             </li>
             <li>
               <RouterLink :to="{ name: 'Requests' }" :class="{ underline: currentRouteName == 'Requests' }"> Requests </RouterLink>

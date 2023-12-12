@@ -6,12 +6,7 @@ import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["order"]);
 const status = ref("");
-const emit = defineEmits(["editOrder", "refreshItems", "refreshOrders"]);
-
-const loaded = ref(false);
-const cancelEditing = () => {
-  emit("editOrder"); // This will switch back to displaying the OrderComponent
-};
+const emit = defineEmits(["editOrder", "refreshItems", "refreshOrders", "cancelEditing"]);
 
 async function updateStatus() {
   try {
@@ -31,5 +26,5 @@ async function updateStatus() {
     <v-select v-model="status" :items="['placed', 'packed', 'picked up']" label="Choose the status of this order" required></v-select>
     <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
   </v-form>
-  <v-btn @click="cancelEditing" block class="mt-2" text="Go Back To All Orders"></v-btn>
+  <v-btn @click="emit('cancelEditing')" block class="mt-2" text="Go Back To All Orders"></v-btn>
 </template>

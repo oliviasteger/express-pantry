@@ -5,17 +5,14 @@
   pickup: Date;-->
 
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
-import { storeToRefs } from "pinia";
 import { defineProps, onBeforeMount, ref } from "vue"; // Import defineProps and defineEmits
 import { fetchy } from "../../utils/fetchy";
-import BasicFoodComponent from "../Food/BasicFoodComponent.vue";
 
-const props = defineProps(["order"]);
-const { currentUsername } = storeToRefs(useUserStore());
-const emit = defineEmits(["editOrder", "refreshItems", "refreshOrders"]);
-const items = ref<{ _id: string; sender: string; recipient: string; items: string[]; status: "placed" | "packed" | "picked up"; pickup: Date }[][]>([]);
+const props = defineProps(["order", "userType"]);
+const emit = defineEmits(["editOrder", "refreshOrders"]);
+const items = ref<{ _id: string; name: string; brand: string; imageURL: string }[]>([]);
 const loaded = ref(false);
+const show = ref(false);
 
 // const emit = defineEmits(); // Use defineEmits without arguments
 const deleting = ref(false); // Track if the order is being deleted
@@ -31,7 +28,6 @@ const deleteOrder = async () => {
   } finally {
     deleting.value = false;
   }
-  emit("refreshItems");
   emit("refreshOrders");
 };
 const clientName = ref("");
@@ -44,61 +40,136 @@ const getClientUsername = async () => {
 };
 
 const getProfile = async () => {
-  console.log("HELLO");
   //const currentId = await fetchy("/api/profiles", "GET");
   let currentId = await fetchy(`/api/profiles/admin/${props.order.recipient}`, "GET");
   //const currentId = await fetchy(`api/profiles?searchQuery=${JSON.stringify({ administrator: props.order.recipient })}`, "GET");
-  console.log("CHECK", currentId);
   currentId = currentId[0].name;
   profileName.value = currentId;
 };
 
 const getOrderItems = async () => {
   const itemIds = props.order.items;
-  const loadedItems = [];
+  let loadedItems = [];
   for (let itemId of itemIds) {
-    const item = await fetchy(`/api/items/${itemId}`, "GET");
-    loadedItems.push(item);
+    try {
+      const item = await fetchy(`/api/items/${itemId}`, "GET");
+      loadedItems.push(item[0]);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-  items.value = loadedItems;
+  const itemValues: { _id: string; name: string; brand: string; imageURL: string }[] = [];
+
+  for (let item of loadedItems) {
+    fetch("https://world.openfoodfacts.org/api/v2/product/" + item.barcode + ".json")
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parse the response data as JSON
+        } else {
+          throw new Error("API request failed");
+        }
+      })
+      .then((data) => {
+        let name = data.product.generic_name_en ? data.product.generic_name_en : "No name available";
+        let brand = data.product.brands ? data.product.brands : "No brand available";
+        let imageURL = data.product.image_url ? data.product.image_url : "https://t3.ftcdn.net/jpg/05/03/24/40/360_F_503244059_fRjgerSXBfOYZqTpei4oqyEpQrhbpOML.jpg";
+
+        itemValues.push({ _id: item._id, name: name, brand: brand, imageURL: imageURL });
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error(error); // Example: Logging the error to the console
+      });
+  }
+
+  items.value = itemValues;
 };
 
 onBeforeMount(async () => {
   try {
-    console.log(props.order);
     await getProfile();
     await getClientUsername();
     await getOrderItems();
     loaded.value = true;
-  } catch {
-    // User is not logged in
+  } catch (e) {
+    console.log(e);
   }
 });
 </script>
 
 <template>
-  <v-row>
-    <v-col> <strong>Sender:</strong> {{ clientName }} </v-col>
-    <v-col> <strong>Recipient:</strong> {{ profileName }} </v-col>
-    <v-col> <strong>Status:</strong> {{ props.order.status }} </v-col>
-    <v-col> <strong>pickup Date:</strong> {{ new Date(props.order.pickup).toLocaleString() }} </v-col>
+  <v-card min-width="600px" v-if="loaded">
+    <v-card-item>
+      <v-card-title>Order from {{ clientName }} at {{ profileName }} </v-card-title>
+      <v-card-subtitle>Scheduled for pickup at {{ new Date(props.order.pickup).toLocaleString() }}</v-card-subtitle>
+    </v-card-item>
 
-    <v-col>
-      <v-btn class="button-error btn-small" @click="deleteOrder">Delete</v-btn>
-      <v-btn class="btn-small" @click="emit('editOrder', props.order._id)">Edit</v-btn>
-    </v-col>
-  </v-row>
-  <h3 v-if="loaded && items.length !== 0">Order Items</h3>
-  <v-container v-if="loaded && items.length !== 0">
-    <article v-for="item in items" :key="item[0]._id">
-      <BasicFoodComponent :item="item[0]" />
-    </article>
-  </v-container>
+    <v-card-item> <strong>Status: </strong> {{ props.order.status }} </v-card-item>
+
+    <v-card-actions>
+      <v-btn @click="deleteOrder">Delete</v-btn>
+      <v-btn
+        v-if="userType == 'Administrator'"
+        @click="
+          emit('editOrder', props.order._id);
+          show = false;
+        "
+        >Edit</v-btn
+      >
+    </v-card-actions>
+
+    <v-card-actions>
+      <v-btn>Order contents</v-btn>
+
+      <v-spacer></v-spacer>
+
+      <v-btn :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'" @click="show = !show"></v-btn>
+    </v-card-actions>
+
+    <v-expand-transition>
+      <div v-show="show">
+        <v-divider></v-divider>
+
+        <v-list v-if="loaded && items.length !== 0" lines="three">
+          <v-list-item v-for="item in items" :key="item._id" :prepend-avatar="item.imageURL" :title="item.name + ' - ' + item.brand" ripple></v-list-item>
+        </v-list>
+        <v-card-text v-else>No items in order</v-card-text>
+      </div>
+    </v-expand-transition>
+  </v-card>
 </template>
 
 <style scoped>
-article {
+/*article {
   margin: 1em;
+}*/
+section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1em;
+}
+section,
+p,
+.row {
+  margin: 0 auto;
+  max-width: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 1em;
+}
+
+article {
+  border-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+.posts {
+  display: flex;
+  flex-wrap: wrap;
 }
 </style>
