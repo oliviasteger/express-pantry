@@ -19,22 +19,17 @@ const { currentUsername } = storeToRefs(useUserStore());
 let currentAnnualIncome = ref("");
 let currentSnapEligible = ref("");
 let currentCity = ref("");
+const show = ref(false);
 
 const getEligibleProfiles = async () => {
   try {
     const city = props.selectedCity ? props.selectedCity : currentCity.value;
-    console.log("in get Profile");
-    console.log(`this is props.selectedd ${props.selectedCity}`);
-    console.log(`this is currentCity ${currentCity.value}`);
     const results = await fetchy(`/api/profiles/location/${city}`, "GET");
     const profiles = [];
     for (let profile of results) {
       const id = profile._id;
-      console.log(`this is id ${id}`);
       try {
         const eligibilityCheck = await fetchy(`api/profiles/eligibility/${id}/${currentUsername.value}`, "GET");
-        console.log(`this is eligibility check ${eligibilityCheck}`);
-        console.log(`this is eligibility check msg ${eligibilityCheck.msg}`);
         if (eligibilityCheck.msg === "User is eligible") {
           profiles.push(profile);
         }
@@ -69,6 +64,45 @@ onBeforeMount(async () => {
 </script>
 <template>
   <div v-show="loaded">
+    <v-card>
+      <v-card-title> Eligibility Information </v-card-title>
+      <v-card-text>Based on your account information, these are the food pantries in the selected area that you are eligible for.</v-card-text>
+      <v-card-actions>
+        <v-btn>View eligibility information</v-btn>
+
+        <v-spacer></v-spacer>
+
+        <v-btn :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'" @click="show = !show"></v-btn>
+      </v-card-actions>
+      <v-expand-transition>
+        <div v-show="show">
+          <v-divider></v-divider>
+
+          <v-card-text>
+            <div><strong>City:</strong> {{ currentCity }} <br /></div>
+            <div><strong>Annual income:</strong> {{ currentAnnualIncome }}</div>
+            <div><strong>SNAP eligibility:</strong> {{ currentSnapEligible }}</div>
+          </v-card-text>
+        </div>
+      </v-expand-transition>
+    </v-card>
+    <br />
+
+    <v-list v-if="eligibleProfiles.length !== 0" lines="three">
+      <v-list-item
+        class="ma-3"
+        v-for="(profile, index) in eligibleProfiles"
+        :key="profile._id"
+        :title="profile.name"
+        :subtitle="'Open Hours: ' + profile.openHour + ' to ' + profile.closeHour"
+        :prepend-avatar="'https://static.thenounproject.com/png/4798768-200.png'"
+        @click="emit('openShop', profile._id)"
+        variant="tonal"
+      ></v-list-item>
+    </v-list>
+  </div>
+
+  <!--<div v-show="loaded">
     <button class="default-disabled info">
       <div class="side">Based on your account information to the right, these are the food pantries within your selected area that you are eligible for</div>
 
@@ -89,18 +123,8 @@ onBeforeMount(async () => {
               <div class="text-overline mb-1">SNAP Eligibile?</div>
               <div class="text-caption">{{ currentSnapEligible }}</div>
             </div>
-
-            <!-- <div class="text-h6 mb-1">
-                Headline
-              </div> -->
           </div>
         </v-card-item>
-
-        <!-- <v-card-actions>
-            <v-btn>
-              Button
-            </v-btn>
-          </v-card-actions> -->
       </v-card>
     </button>
     <div class="list-title">Your Food Pantries</div>
@@ -112,7 +136,7 @@ onBeforeMount(async () => {
     <div class="list-container" v-else>
       <button class="default-disabled">No pantries in {{ props.selectedCity }}</button>
     </div>
-  </div>
+  </div>-->
 </template>
 <style scoped>
 button {
