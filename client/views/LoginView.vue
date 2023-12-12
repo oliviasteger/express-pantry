@@ -23,6 +23,7 @@ async function switchView() {
 </template>
 <style>
 .panel{
+  margin-top: 1em;
   width: 40vw;
   gap:10px;
 }

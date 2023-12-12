@@ -40,6 +40,7 @@ async function delete_() {
 </template>
 <style>
 .panel{
+  margin-top: 1em;
   width: 60vw;
 }
 </style>
