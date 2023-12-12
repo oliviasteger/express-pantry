@@ -60,7 +60,7 @@ async function updateStatus() {
     <v-card-title>Update Item</v-card-title>
     <v-card-item>
       <v-form validate-on="submit lazy" @submit.prevent="updateBarcode">
-        <v-text-field v-model="barcode" label="food item barcode" :persistent-placeholder="true"></v-text-field>
+        <v-text-field v-model="barcode" label="Food item barcode" :persistent-placeholder="true"></v-text-field>
         <v-btn type="submit" block class="mt-2" text="change barcode"></v-btn>
       </v-form>
     </v-card-item>
@@ -80,7 +80,7 @@ async function updateStatus() {
     </v-card-item>
     <v-card-item>
       <v-form validate-on="submit lazy" @submit.prevent="updateStatus">
-        <v-select v-model="status" :items="['Unreleased', 'Claimable', 'Ordered', 'Used', 'Expired']" label="Item status" required />
+        <v-select v-model="status" :items="['Unreleased', 'Claimable', 'Ordered', 'Used', 'Expired']" label="Food item status" required />
         <v-btn type="submit" block class="mt-2" text="Change status"></v-btn>
       </v-form>
     </v-card-item>
