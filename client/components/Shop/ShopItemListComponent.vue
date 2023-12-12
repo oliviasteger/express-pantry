@@ -132,7 +132,7 @@ onBeforeMount(async () => {
   <v-app class="rounded rounded-md bar" v-if="props.shop">
     <v-app-bar class="custom-app-bar" :elevation="3" density="compact">
       <template v-slot:prepend>
-        <v-icon icon="mdi-chevron-left" @="returnToMap"></v-icon>
+        <v-icon icon="mdi-chevron-left" @click="returnToMap"></v-icon>
         <v-app-bar-title absolute="false"
           >Shopping At
           <button class="default-disabled">
