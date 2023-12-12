@@ -125,7 +125,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <h2>Update User Profile</h2>
+  <strong>UPDATE USER PROFILE</strong>
   <div class="form" id="back">
     <v-form validate-on="submit lazy" @submit.prevent="updateUsername">
       <v-text-field v-model="username" :placeholder="currentUsername" :persistent-placeholder="true" :rules="rules" label="Username"></v-text-field>

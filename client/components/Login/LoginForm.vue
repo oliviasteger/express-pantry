@@ -26,6 +26,7 @@ async function login() {
       rounded="lg"
       @submit.prevent="login"
     >
+    <form @submit.prevent="login">
     <h2>Login</h2>
       <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
@@ -82,6 +83,7 @@ async function login() {
           Register now <v-icon icon="mdi-chevron-right"></v-icon>
         </a>
       </v-card-text>
+    </form>
     </v-card>
   <!-- <form class="pure-form pure-form-aligned column" @submit.prevent="login">
     <h3>Login</h3>
