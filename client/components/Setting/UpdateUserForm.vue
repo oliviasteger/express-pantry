@@ -39,7 +39,7 @@ const updateField = async (type: "annualIncome" | "snapEligible" | "city") => {
   await getInformation();
   emptyForm();
 };
-
+const cityModel = ref<any>(null);
 const emptyForm = () => {
   information.value = {
     annualIncome: "",
@@ -61,11 +61,19 @@ const rules = [
 const currentAnnualIncome = ref("");
 const currentCity = ref("");
 const currentSnapEligible = ref(false);
+const validationErrors = ref<Array<string>>([]);
 
 const isUpdateCityDisabled = computed(() => {
   // You can set your own validation logic here.
   return !information.value.city;
 });
+function validate() {
+      validationErrors.value = [];
+      if (!cityModel) {
+        validationErrors.value.push('Please select a city');
+      }
+      // Other validation rules as needed
+    }
 
 async function updateUsername() {
   await updateUser({ username: username.value });
@@ -79,6 +87,8 @@ async function updatePassword() {
   password.value = "";
 }
 async function updateIncome() {
+  information.value.city = currentCity.value;
+  information.value.snapEligible = currentSnapEligible.value;
   await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
   const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
   currentAnnualIncome.value = user.information.annualIncome;
@@ -87,6 +97,8 @@ async function updateIncome() {
 }
 
 async function updateSnap() {
+  information.value.city = currentCity.value;
+  information.value.annualIncome = currentAnnualIncome.value;
   await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
   console.log(await fetchy(`/api/users/${currentUsername.value}`, "GET"));
   const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
@@ -96,12 +108,21 @@ async function updateSnap() {
 }
 
 async function updateLocation() {
-  await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
-  console.log(await fetchy(`/api/users/${currentUsername.value}`, "GET"));
-  const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
-  currentAnnualIncome.value = user.information.annualIncome;
-  currentCity.value = user.information.city;
-  currentSnapEligible.value = user.information.snapEligible;
+  console.log('this is currentCity', currentCity, ' and this is new location ', cityModel)
+  validate();
+      if (validationErrors.value.length === 0) {
+        information.value.city = cityModel.value;
+        information.value.snapEligible = currentSnapEligible.value;
+        information.value.annualIncome = currentAnnualIncome.value;
+        await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
+        console.log(await fetchy(`/api/users/${currentUsername.value}`, "GET"));
+        const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
+        currentAnnualIncome.value = user.information.annualIncome;
+        currentCity.value = user.information.city;
+        currentSnapEligible.value = user.information.snapEligible;
+      }
+    
+  
 }
 
 async function getInformation() {
@@ -120,47 +141,56 @@ async function getInformation() {
 onBeforeMount(async () => {
   await getInformation();
   await getCities();
+  console.log('this is cities', cities, 'and value', cities.value);
   loaded.value = true;
 });
 </script>
 
 <template>
-  <strong>UPDATE USER PROFILE</strong>
-  <div class="form" id="back">
+  <strong style="margin:16px;">UPDATE USER PROFILE</strong>
+  <div class="d-flex flex-column" id="back">
     <v-form validate-on="submit lazy" @submit.prevent="updateUsername">
-      <v-text-field v-model="username" :placeholder="currentUsername" :persistent-placeholder="true" :rules="rules" label="Username"></v-text-field>
+      <v-text-field hide-details v-model="username" :placeholder="currentUsername" :persistent-placeholder="true" :rules="rules" label="Username"></v-text-field>
 
       <v-btn type="submit" id="change" block class="mt-2" text="Change Username"></v-btn>
     </v-form>
-    <br /><br />
+    <br />
     <v-divider class ="div"></v-divider>
     <v-form validate-on="submit lazy" @submit.prevent="updatePassword">
-      <v-text-field v-model="password" label="Password" :rules="rules"></v-text-field>
+      <v-text-field hide-details v-model="password" label="Password" :rules="rules"></v-text-field>
 
       <v-btn type="submit" id="change" block class="mt-2" text="Change Password"></v-btn>
     </v-form>
-    <br /><br />
+    <br />
     <v-divider class ="div"></v-divider>
+    <br />
     <v-form validate-on="submit lazy" @submit.prevent="updateIncome">
-      <v-text-field v-model="information.annualIncome" :placeholder="currentAnnualIncome" label="Current Annual Income" :persistent-placeholder="true" :rules="rules"></v-text-field>
+      <v-text-field hide-details v-model="information.annualIncome" :placeholder="currentAnnualIncome" label="Current Annual Income" :persistent-placeholder="true" :rules="rules"></v-text-field>
 
       <v-btn type="submit" block id="change" class="mt-2" text="Change Income Amount"></v-btn>
     </v-form>
-    <br /><br />
+    <br />
     <v-divider class ="div"></v-divider>
+    <br />
     <v-form validate-on="submit lazy" @submit.prevent="updateLocation">
-      <div class="pure-control-group">
+      
+      <v-select v-model="cityModel" :hint="`Your currently located in ${currentCity}`" :items="cities" :error-messages="validationErrors" chips label="City"></v-select>
+      
+      
+    
+      <!-- <div class="pure-control-group">
         <label for="aligned-location">Choose the city You Live In: </label>
         <select v-model="information.city" id="aligned-location" required>
           <option value="Current location" disabled>{{ currentCity }}</option>
           <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
         </select>
-      </div>
+      </div> -->
       <!-- <v-select v-model="information.city" label="Select City" :placeholder="undefined" :persistent-placeholder="true" :items="cities" return-object></v-select> -->
-      <v-btn type="submit" id="change" block class="mt-2" text="Change Location"></v-btn>
+      <v-btn hide-details type="submit" id="change" block class="mt-2" text="Change Location"></v-btn>
     </v-form>
-    <br /><br />
+    <br />
     <v-divider class ="div"></v-divider>
+    <br />
     <v-form validate-on="submit lazy" @submit.prevent="updateSnap">
       <v-switch
         color="primary"
@@ -173,15 +203,17 @@ onBeforeMount(async () => {
       ></v-switch>
       <v-btn type="submit" id="change" block class="mt-2" text="Change"></v-btn>
     </v-form>
-    <br /><br />
+    <br />
   </div>
 </template>
 <style>
-.div{
-  padding-bottom:1em;
-}
+
 .form {
   padding-bottom: 0px;
+}
+#back{
+  border: 1px black;
+  padding:1em;
 }
 #change {
   background-color: var(--lighter-header);

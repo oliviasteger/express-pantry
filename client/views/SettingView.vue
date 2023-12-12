@@ -21,7 +21,7 @@ async function delete_() {
 <template>
   <main class="column">
     <v-card elevation="3" class="panel">
-    <v-card-title>Settings for {{ currentUsername }}</v-card-title>
+    <v-card-title><strong>Settings for {{ currentUsername }}</strong></v-card-title>
     <v-card-actions>
     <v-row class="m-0">
       <v-col class="d-flex justify-end">
@@ -40,6 +40,6 @@ async function delete_() {
 </template>
 <style>
 .panel{
-  width: 40vw;
+  width: 60vw;
 }
 </style>
