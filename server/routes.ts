@@ -15,8 +15,6 @@ import { WebSessionDoc } from "./concepts/websession";
 async function getAvailableTimes(profileId: string | ObjectId) {
   const profile = await Profile.getProfileById(new ObjectId(profileId));
   const availableTimes = new Map<string, number>();
-  console.log(profile.openHour);
-  console.log(profile.closeHour);
 
   for (let day = 0; day < 7; day++) {
     for (let hour = profile.openHour; hour < profile.closeHour; hour += 1) {
@@ -25,8 +23,6 @@ async function getAvailableTimes(profileId: string | ObjectId) {
         date.setDate(date.getDate() + day);
         date.setUTCHours(hour, minute, 0, 0);
         availableTimes.set(date.toISOString(), 0);
-        console.log(date);
-        console.log(hour);
       }
     }
   }
@@ -74,7 +70,6 @@ async function organizePantryItems(pantryAdminId: string | ObjectId) {
         const targetOrder = applicableOrders[0];
         const claimableItems = await ExpiringItem.getExpiringItems({ administrator: new ObjectId(pantryAdminId), barcode: item.barcode, status: "Claimable" });
         if (claimableItems.length > 0) {
-          console.log("Other items are claimable");
           claimableItems.sort((i1, i2) => new Date(i1.expirationDate).getTime() - new Date(i2.expirationDate).getTime());
           const chosenItem = claimableItems[0];
 
@@ -83,7 +78,6 @@ async function organizePantryItems(pantryAdminId: string | ObjectId) {
 
           await Promise.all([ExpiringItem.update(chosenItem._id, { status: "Ordered" }), Order.update(targetOrder._id, { items: orderItems })]);
         } else {
-          console.log("No MOre claimable");
           await Order.update(targetOrder._id, { items: targetOrder.items.filter((itemId) => !new ObjectId(item._id).equals(itemId)) });
         }
       }
@@ -117,8 +111,6 @@ class Routes {
   async createUser(session: WebSessionDoc, username: string, password: string, type: UserType, information?: string) {
     WebSession.isLoggedOut(session);
     let parsedInfo;
-    console.log("DID it get here");
-    console.log("TYPE", type);
     if (information) parsedInfo = JSON.parse(information);
     return await User.create(username, password, type, parsedInfo);
   }
@@ -156,7 +148,6 @@ class Routes {
   @Router.get("/users/:id/items")
   async getOrderableBarcodesAndQuantities(id: string) {
     // View all orderable items for a given pantry
-    console.log(`id is ${id}`);
     const administrator = await User.getUserById(new ObjectId(id));
     await User.isAdministrator(administrator._id);
     await organizePantryItems(administrator._id);
@@ -206,7 +197,6 @@ class Routes {
     await User.isAdministrator(user);
     await ExpiringItem.isAdministrator(user, id);
     const item = await ExpiringItem.update(id, update);
-    console.log("Past the first part");
     // Organizes the orders and handles expirey information
     await organizePantryItems(user);
     return item;
@@ -222,14 +212,12 @@ class Routes {
     const itemPromise = ExpiringItem.getExpiringItems({ _id: id });
     // @ts-expect-error Though items is an array, if we query it for an individual item mongo processes it as asking if that id is in items.
     const applicableOrders = await Order.getordersByQuery({ recipient: user, items: new ObjectId(id) });
-    console.log(applicableOrders);
     assert(applicableOrders.length <= 1, "There should not be more than 1 order taking this item");
     if (applicableOrders.length == 1) {
       const targetOrder = applicableOrders[0];
       const item = (await itemPromise)[0];
       const claimableItems = await ExpiringItem.getExpiringItems({ administrator: user, barcode: item.barcode, status: "Claimable" });
       if (claimableItems.length > 0) {
-        console.log("Other items are claimable");
         claimableItems.sort((i1, i2) => i1.expirationDate.getTime() - i2.expirationDate.getTime());
         const chosenItem = claimableItems[0];
 
@@ -239,7 +227,6 @@ class Routes {
 
         void Order.update(targetOrder._id, { items: orderItems });
       } else {
-        console.log("No MOre claimable");
         void Order.update(targetOrder._id, { items: targetOrder.items.filter((itemId) => !new ObjectId(id).equals(itemId)) });
       }
     }
@@ -273,7 +260,6 @@ class Routes {
 
   @Router.get("/profiles/admin/:administrator")
   async getProfilesByAdmin(administrator: string) {
-    console.log("WHY");
     return await Profile.getProfilesByQuery({ administrator: new ObjectId(administrator) });
   }
 
@@ -444,7 +430,6 @@ class Routes {
     const availableTimesPromise = getAvailableTimes(profileId);
     await Profile.assertEligible(new ObjectId(profileId), await user);
     const availableTimes = await availableTimesPromise;
-    console.log(availableTimes);
     assert(availableTimes.includes(pickupTime), "Pickup time not available");
 
     const orderedItems: ExpiringItemDoc[] = [];
@@ -474,86 +459,6 @@ class Routes {
     await organizePantryItems(adminId);
     return { msg: "Pantry organized" };
   }
-
-  // @Router.get("/posts")
-  // async getPosts(author?: string) {
-  //   let posts;
-  //   if (author) {
-  //     const id = (await User.getUserByUsername(author))._id;
-  //     posts = await Post.getByAuthor(id);
-  //   } else {
-  //     posts = await Post.getPosts({});
-  //   }
-  //   return Responses.posts(posts);
-  // }
-
-  // @Router.post("/posts")
-  // async createPost(session: WebSessionDoc, content: string, options?: PostOptions) {
-  //   const user = WebSession.getUser(session);
-  //   const created = await Post.create(user, content, options);
-  //   return { msg: created.msg, post: await Responses.post(created.post) };
-  // }
-
-  // @Router.patch("/posts/:_id")
-  // async updatePost(session: WebSessionDoc, _id: ObjectId, update: Partial<PostDoc>) {
-  //   const user = WebSession.getUser(session);
-  //   await Post.isAuthor(user, _id);
-  //   return await Post.update(_id, update);
-  // }
-
-  // @Router.delete("/posts/:_id")
-  // async deletePost(session: WebSessionDoc, _id: ObjectId) {
-  //   const user = WebSession.getUser(session);
-  //   await Post.isAuthor(user, _id);
-  //   return Post.delete(_id);
-  // }
-
-  // @Router.get("/friends")
-  // async getFriends(session: WebSessionDoc) {
-  //   const user = WebSession.getUser(session);
-  //   return await User.idsToUsernames(await Friend.getFriends(user));
-  // }
-
-  // @Router.delete("/friends/:friend")
-  // async removeFriend(session: WebSessionDoc, friend: string) {
-  //   const user = WebSession.getUser(session);
-  //   const friendId = (await User.getUserByUsername(friend))._id;
-  //   return await Friend.removeFriend(user, friendId);
-  // }
-
-  // @Router.get("/friend/requests")
-  // async getRequests(session: WebSessionDoc) {
-  //   const user = WebSession.getUser(session);
-  //   return await Responses.friendRequests(await Friend.getRequests(user));
-  // }
-
-  // @Router.post("/friend/requests/:to")
-  // async sendFriendRequest(session: WebSessionDoc, to: string) {
-  //   const user = WebSession.getUser(session);
-  //   const toId = (await User.getUserByUsername(to))._id;
-  //   return await Friend.sendRequest(user, toId);
-  // }
-
-  // @Router.delete("/friend/requests/:to")
-  // async removeFriendRequest(session: WebSessionDoc, to: string) {
-  //   const user = WebSession.getUser(session);
-  //   const toId = (await User.getUserByUsername(to))._id;
-  //   return await Friend.removeRequest(user, toId);
-  // }
-
-  // @Router.put("/friend/accept/:from")
-  // async acceptFriendRequest(session: WebSessionDoc, from: string) {
-  //   const user = WebSession.getUser(session);
-  //   const fromId = (await User.getUserByUsername(from))._id;
-  //   return await Friend.acceptRequest(fromId, user);
-  // }
-
-  // @Router.put("/friend/reject/:from")
-  // async rejectFriendRequest(session: WebSessionDoc, from: string) {
-  //   const user = WebSession.getUser(session);
-  //   const fromId = (await User.getUserByUsername(from))._id;
-  //   return await Friend.rejectRequest(fromId, user);
-  // }
 }
 
 export default getExpressRouter(new Routes());
