@@ -20,7 +20,7 @@ async function login() {
 
 <template>
     <v-card
-      class="mx-auto pa-12 pb-8 "
+      class="mx-auto pa-12 pb-8 panel"
       elevation="8"
       max-width="600"
       rounded="lg"
@@ -112,6 +112,11 @@ h3,
 h6 {
   display: flex;
   justify-content: center;
+}
+.panel{
+  margin-top: 1em;
+  width: 40vw;
+  gap:10px;
 }
 .small {
   font-size: small;
