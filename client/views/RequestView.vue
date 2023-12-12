@@ -34,12 +34,12 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <main v-if="isLoggedIn && loaded">
+  <v-container v-if="isLoggedIn && loaded">
     <h1>Requests</h1>
 
     <article v-for="request in requests" v-bind:key="request.barcode">
       <RequestComponent v-if="editing !== request._id" :request="request" :userType="userStore.userType" @refreshRequests="getRequests" @editRequest="updateEditing"></RequestComponent>
       <EditRequestForm v-else :request="request" :userType="userStore.userType" @refreshRequests="getRequests" @editRequest="updateEditing" @cancelEdit="cancelEditing"></EditRequestForm>
     </article>
-  </main>
+  </v-container>
 </template>

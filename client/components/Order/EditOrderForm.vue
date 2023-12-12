@@ -21,10 +21,16 @@ async function updateStatus() {
 </script>
 
 <template>
-  <h2>Update Order</h2>
-  <v-form validate-on="submit lazy" @submit.prevent="updateStatus">
-    <v-select v-model="status" :items="['placed', 'packed', 'picked up']" label="Choose the status of this order" required></v-select>
-    <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
-  </v-form>
-  <v-btn @click="emit('cancelEditing')" block class="mt-2" text="Go Back To All Orders"></v-btn>
+  <v-card>
+    <v-card-title>Update Order</v-card-title>
+    <v-card-item>
+      <v-form validate-on="submit lazy" @submit.prevent="updateStatus">
+        <v-select v-model="status" :items="['placed', 'packed', 'picked up']" label="Choose the status of this order" required></v-select>
+        <v-btn type="submit" block class="mt-2" text="Change"></v-btn>
+      </v-form>
+    </v-card-item>
+    <v-card-actions>
+      <v-btn @click="emit('cancelEditing')" block class="mt-2" text="Go Back To All Orders"></v-btn>
+    </v-card-actions>
+  </v-card>
 </template>

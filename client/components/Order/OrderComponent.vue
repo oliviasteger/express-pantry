@@ -10,7 +10,7 @@ import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["order", "userType"]);
 const emit = defineEmits(["editOrder", "refreshOrders"]);
-const items = ref<{ _id: string; name: string; brand: string; imageURL: string }[]>([]);
+const items = ref<{ _id: string; barcode: string; name: string; brand: string; imageURL: string; expirationDate: Date }[]>([]);
 const loaded = ref(false);
 const show = ref(false);
 
@@ -59,7 +59,7 @@ const getOrderItems = async () => {
     }
   }
 
-  const itemValues: { _id: string; name: string; brand: string; imageURL: string }[] = [];
+  const itemValues: { _id: string; barcode: string; name: string; brand: string; imageURL: string; expirationDate: Date }[] = [];
 
   for (let item of loadedItems) {
     fetch("https://world.openfoodfacts.org/api/v2/product/" + item.barcode + ".json")
@@ -72,10 +72,10 @@ const getOrderItems = async () => {
       })
       .then((data) => {
         let name = data.product.generic_name_en ? data.product.generic_name_en : "No name available";
-        let brand = data.product.brands ? data.product.brands : "No brand available";
+        let brand = data.product.brands ? data.product.brands.toString().replaceAll(",", ", ") : "No brand available";
         let imageURL = data.product.image_url ? data.product.image_url : "https://t3.ftcdn.net/jpg/05/03/24/40/360_F_503244059_fRjgerSXBfOYZqTpei4oqyEpQrhbpOML.jpg";
 
-        itemValues.push({ _id: item._id, name: name, brand: brand, imageURL: imageURL });
+        itemValues.push({ _id: item._id, barcode: item.barcode, name: name, brand: brand, imageURL: imageURL, expirationDate: item.expirationDate });
       })
       .catch((error) => {
         // Handle any errors here
@@ -103,21 +103,12 @@ onBeforeMount(async () => {
     <v-card-item>
       <v-card-title>Order from {{ clientName }} at {{ profileName }} </v-card-title>
       <v-card-subtitle>Scheduled for pickup at {{ new Date(props.order.pickup).toLocaleString() }}</v-card-subtitle>
+      <v-chip class="mt-2" tonal :color="$props.order.status == 'picked up' ? 'var(--green)' : $props.order.status == 'packed' ? 'var(--muted-blue)' : 'var(--light-red)'"
+        >Order {{ props.order.status }}</v-chip
+      >
     </v-card-item>
 
-    <v-card-item> <strong>Status: </strong> {{ props.order.status }} </v-card-item>
-
-    <v-card-actions>
-      <v-btn @click="deleteOrder">Delete</v-btn>
-      <v-btn
-        v-if="userType == 'Administrator'"
-        @click="
-          emit('editOrder', props.order._id);
-          show = false;
-        "
-        >Edit</v-btn
-      >
-    </v-card-actions>
+    <v-divider></v-divider>
 
     <v-card-actions>
       <v-btn>Order contents</v-btn>
@@ -132,11 +123,29 @@ onBeforeMount(async () => {
         <v-divider></v-divider>
 
         <v-list v-if="loaded && items.length !== 0" lines="three">
-          <v-list-item v-for="item in items" :key="item._id" :prepend-avatar="item.imageURL" :title="item.name + ' - ' + item.brand" ripple></v-list-item>
+          <v-list-item v-for="item in items" :key="item._id" :prepend-avatar="item.imageURL" :title="item.name + ' - ' + item.brand" ripple>
+            <v-list-item-subtitle
+              >Barcode: {{ item.barcode }} <br />
+              Expiration date: {{ item.expirationDate.toLocaleString() }}</v-list-item-subtitle
+            >
+          </v-list-item>
         </v-list>
         <v-card-text v-else>No items in order</v-card-text>
       </div>
     </v-expand-transition>
+    <v-divider></v-divider>
+
+    <v-card-actions>
+      <v-btn color="var(--red)" @click="deleteOrder">Delete</v-btn>
+      <v-btn
+        v-if="userType == 'Administrator'"
+        @click="
+          emit('editOrder', props.order._id);
+          show = false;
+        "
+        >Edit</v-btn
+      >
+    </v-card-actions>
   </v-card>
 </template>
 

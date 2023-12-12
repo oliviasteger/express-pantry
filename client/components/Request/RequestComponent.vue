@@ -40,10 +40,10 @@ const getItemInfo = async (barcode: string) => {
       }
     })
     .then((data) => {
-      name.value = data.product.generic_name_en;
-      brand.value = data.product.brands;
-      imageURL.value = data.product.image_url;
-      group.value = data.product.food_groups;
+      name.value = data.product.generic_name_en ? data.product.generic_name_en : "No name available";
+      brand.value = data.product.brands ? data.product.brands.toString().replaceAll(",", ", ") : "No brand available";
+      imageURL.value = data.product.image_url ? data.product.image_url : "https://t3.ftcdn.net/jpg/05/03/24/40/360_F_503244059_fRjgerSXBfOYZqTpei4oqyEpQrhbpOML.jpg";
+      group.value = data.product.food_groups ? data.product.food_groups.substring(data.product.food_groups.indexOf(":") + 1).replaceAll("-", " ") : data.product.food_groups;
 
       emit("refreshRequests");
     })
@@ -54,18 +54,15 @@ const getItemInfo = async (barcode: string) => {
 };
 
 const getRelatedAccounts = async (request: { requestee: string; requester: string }, userType: "Client" | "Administrator") => {
-  if (userType == "Client") {
-    try {
-      requestee.value = (await fetchy(`/api/users/id/${request.requestee}`, "GET")).username;
-    } catch (e) {
-      console.log("Error fetching requestee profile: ", e);
-    }
-  } else {
-    try {
-      requester.value = (await fetchy(`/api/users/id/${request.requester}`, "GET")).username;
-    } catch (e) {
-      console.log("Error fetching requester profile: ", e);
-    }
+  try {
+    requestee.value = (await fetchy(`/api/profiles/admin/${request.requestee}`, "GET"))[0].name;
+  } catch (e) {
+    console.log("Error fetching requestee profile: ", e);
+  }
+  try {
+    requester.value = (await fetchy(`/api/users/id/${request.requester}`, "GET")).username;
+  } catch (e) {
+    console.log("Error fetching requester profile: ", e);
   }
 };
 
@@ -76,25 +73,24 @@ onBeforeMount(async () => {
 });
 </script>
 <template>
-  <v-container v-if="loaded">
-    <v-row>
-      <v-col> <strong>Barcode:</strong> {{ props.request.barcode }} </v-col>
-      <v-col v-if="userType === 'Administrator'"><strong>Requester:</strong> {{ requester }} </v-col>
-      <v-col v-if="userType === 'Client'"><strong>Pantry:</strong> {{ requestee }} </v-col>
-      <v-col> <strong>Status:</strong> {{ props.request.status }} </v-col>
-      <v-col> <strong>Name:</strong> {{ name }} </v-col>
-      <v-col> <strong>Brand:</strong> {{ brand }} </v-col>
-      <v-col>
-        <img :src="imageURL" alt="Input ImageURL" class="image" width="100" height="100" />
-      </v-col>
-      <v-col> <strong>Food Group:</strong> {{ group }} </v-col>
-
-      <v-col>
-        <v-btn v-if="userType === 'Client'" class="button-error btn-small" @click="deleteRequest">Delete</v-btn>
-        <v-btn class="btn-small" @click="emit('editRequest', props.request._id)">Edit</v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-card v-if="loaded">
+    <v-img></v-img>
+    <v-card-item>
+      <v-card-title>Request from {{ requester }} to {{ requestee }}</v-card-title>
+      <v-chip class="mt-2" tonal :color="$props.request.status == 'Accepted' ? 'var(--green)' : $props.request.status == 'Pending' ? 'var(--muted-blue)' : 'var(--light-red)'"
+        >Request {{ props.request.status.toLowerCase() }}</v-chip
+      >
+    </v-card-item>
+    <v-card-item>
+      <v-list>
+        <v-list-item :prepend-avatar="imageURL" :title="name + ' - ' + brand" :subtitle="'Barcode: ' + props.request.barcode"></v-list-item>
+      </v-list>
+    </v-card-item>
+    <v-card-actions>
+      <v-btn v-if="userType === 'Client'" color="var(--red)" @click="deleteRequest">Delete</v-btn>
+      <v-btn @click="emit('editRequest', props.request._id)">Edit</v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <style scoped>
