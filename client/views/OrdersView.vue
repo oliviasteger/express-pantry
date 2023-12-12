@@ -7,12 +7,12 @@ const userStore = useUserStore();
 </script>
 
 <template>
-  <main v-if="isLoggedIn">
+  <v-container v-if="isLoggedIn">
     <h1>
       <div></div>
       Your Orders
     </h1>
 
     <OrderListComponent :userType="userStore.userType" />
-  </main>
+  </v-container>
 </template>
