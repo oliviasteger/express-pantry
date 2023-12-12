@@ -47,8 +47,8 @@ export const vuetify = createVuetify({
       light: {
         dark: false,
         colors: {
-          primary: "#2f01d1ff", // #E53935
-          secondary: "#28b7caff", // #FFCDD2
+          primary: "#3066be", // #E53935
+          secondary: "#666666", // #FFCDD2
         },
       },
     },

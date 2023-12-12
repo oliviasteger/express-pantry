@@ -2,9 +2,8 @@
 import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import UpdateUserForm from "../components/Setting/UpdateUserForm.vue";
 
-const { currentUsername } = storeToRefs(useUserStore());
+const { currentUsername, userType } = storeToRefs(useUserStore());
 const { logoutUser, deleteUser } = useUserStore();
 
 async function logout() {
@@ -20,21 +19,26 @@ async function delete_() {
 
 <template>
   <main class="column">
-    <v-card elevation="3" class="back">
-
-      <div class = "row">
-    <h1>Settings for {{ currentUsername }}</h1>
+    <v-card elevation="3" class="panel">
+    <v-card-title>Settings for {{ currentUsername }}</v-card-title>
+    <v-card-actions>
+    <v-row class="m-0">
+      <v-col class="d-flex justify-end">
+        <v-btn class="button-error btn-small" @click="delete_">Delete Account</v-btn>
+        <v-btn class="btn-small" variant="flat" color="primary" @click="logout">Logout</v-btn>
+      </v-col>
+    </v-row>
     
-    <button class="pure-button pure-button-primary" @click="logout">Logout</button>
-    <button class="button-error pure-button" @click="delete_">Delete User</button>
-  </div>
-    <UpdateUserForm />
-  </v-card>
+    </v-card-actions>
+    <div v-if="userType === 'Client'">
+      <UpdateUserForm />
+    </div>
+    
+    </v-card>
   </main>
 </template>
 <style>
-.back {
-  padding: 1em;
-  border-radius: 0.5em;
+.panel{
+  width: 40vw;
 }
 </style>

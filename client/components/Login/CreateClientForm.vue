@@ -83,9 +83,16 @@ async function userRegister() {
       </div>
 
       <br />
-      <div class="pure-controls">
-        <button type="submit" class="pure-button pure-button-primary">Register</button>
-      </div>
+      <v-btn
+        block
+        class="mb-8"
+        color="primary"
+        size="large"
+        variant="tonal"
+        type="submit"
+      >
+        Register
+      </v-btn>
     </fieldset>
   </form>
 </template>

@@ -22,7 +22,37 @@ async function register() {
 </script>
 
 <template>
-  <h3>Register User</h3>
+  <v-card
+      class="mx-auto pa-12 pb-8 "
+      elevation="8"
+      max-width="600"
+      rounded="lg"
+      
+    >
+    
+  <div class="d-flex flex-column align-center" id="Flair" style="gap:.5em;" >
+    <strong justify-center >USER TYPE </strong>
+    
+      <v-btn-toggle v-model="toggle_user_type" shaped block outlined mandatory class="buttons" id="Flair">
+        <v-btn id="btn" variant="outlined" @click="selectUserType('Client')">Food Pantry Client</v-btn>
+        <v-btn id="btn" variant="outlined" @click="selectUserType('Administrator')">Food Pantry Admin</v-btn>
+      </v-btn-toggle>
+    
+  </div>
+  <div v-show="hasSelected && userType == 'Client'">
+    <v-card elevation ="5" hover style="padding:1em;margin-top: 1em;">
+      <CreateClientForm></CreateClientForm>
+    </v-card>
+    
+  </div>
+  <div v-show="hasSelected && userType == 'Administrator'">
+    <v-card elevation ="5" hover style="padding:1em;margin-top: 1em;">
+      <PantryRegistration></PantryRegistration>
+    </v-card>
+    
+  </div>
+    </v-card>
+  <!-- <h3>Register User</h3>
   <div class="d-flex flex-column" id="Flair">
     <v-col cols="12" class="py-2">
       <v-btn-toggle v-model="toggle_user_type" shaped outlined mandatory class="buttons" id="Flair">
@@ -36,7 +66,7 @@ async function register() {
   </div>
   <div v-show="hasSelected && userType == 'Administrator'">
     <PantryRegistration></PantryRegistration>
-  </div>
+  </div> -->
   <!-- <button type="submit" class="button default">Register</button> -->
 
   <!-- <fieldset>

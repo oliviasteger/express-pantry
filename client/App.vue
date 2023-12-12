@@ -40,10 +40,11 @@ onBeforeMount(async () => {
           <RouterLink :to="{ name: 'Home' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Home' }"> Home </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <ul v-if="userStore.userType === 'Administrator'">
-            <li>
-              <RouterLink :to="{ name: 'Admin Settings' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Admin Settings' }"> Settings </RouterLink>
+          <li>
+              <RouterLink :to="{ name: 'Settings' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
             </li>
+          <ul v-if="userStore.userType === 'Administrator'">
+           
             <li>
               <RouterLink :to="{ name: 'Profile' }" :class="{ color:'var(--darker-header)', underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
             </li>
@@ -59,7 +60,6 @@ onBeforeMount(async () => {
             <!-- Add more admin-specific links as needed -->
           </ul>
           <ul v-else-if="userStore.userType === 'Client'">
-            <li><RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink></li>
             <li>
               <RouterLink :to="{ name: 'Map' }" :class="{ underline: currentRouteName == 'Map' }"> Map </RouterLink>
             </li>
