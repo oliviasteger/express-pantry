@@ -19,20 +19,16 @@ const createRequest = async () => {
 };
 </script>
 <template>
-  <v-container>
-    <v-form @submit.prevent="createRequest">
-      <h3>Request a food item</h3>
-      <v-row>
-        <v-col>
-          <v-text-field v-model.trim="barcode" label="Food item barcode" required></v-text-field>
-        </v-col>
-      </v-row>
-
-      <v-row>
-        <v-col>
-          <v-btn type="submit" color="primary">Request item</v-btn>
-        </v-col>
-      </v-row>
-    </v-form>
-  </v-container>
+  <v-card min-width="600px">
+    <v-card-title>Request an item</v-card-title>
+    <v-card-subtitle
+      >To request an item, submit the item's barcode below. You can find the barcode using the <a href="https://world.openfoodfacts.org" target="blank">Open Food Facts website</a>.</v-card-subtitle
+    >
+    <v-container>
+      <v-form @submit.prevent="createRequest">
+        <v-text-field v-model.trim="barcode" label="Food item barcode" required></v-text-field>
+        <v-btn type="submit" color="primary">Request item</v-btn>
+      </v-form>
+    </v-container>
+  </v-card>
 </template>

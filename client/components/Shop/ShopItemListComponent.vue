@@ -157,21 +157,19 @@ onBeforeMount(async () => {
       </template>
     </v-app-bar>
 
-    <v-navigation-drawer class="custom-navigation-drawer">
+    <!--<v-navigation-drawer class="custom-navigation-drawer">
       <v-list>
-        <!-- <v-list-item title="Navigation drawer"></v-list-item> -->
+        <v-list-item title="Navigation drawer"></v-list-item>
       </v-list>
-    </v-navigation-drawer>
+    </v-navigation-drawer>-->
 
     <v-main class="d-flex align-start justify-center" style="min-height: 300px">
       <v-container>
-        <v-row> <CreateRequestForm :requestee="props.shop.administrator"></CreateRequestForm> </v-row>
+        <v-row align="center" justify="center" class="mb-8"> <CreateRequestForm :requestee="props.shop.administrator"></CreateRequestForm> </v-row>
         <v-row>
           <section class="posts" v-if="loaded && orderableBarcodesAndQuantities.length !== 0">
             <article v-for="object of Object.entries(orderableBarcodesAndQuantities)" :key="object[0]">
               <ShopItemComponent :item="object[0]" @refreshShopItems="setUpShop(props.shop)" @addedToCart="addToCart" @removeFromCart="removeFromCart" />
-              <!-- <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
-        <EditPostForm v-else :post="post" @refreshPosts="getPosts" @editPost="updateEditing" /> -->
             </article>
           </section>
           <p v-else-if="loaded">No posts found</p>

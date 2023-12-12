@@ -16,14 +16,14 @@ async function getOrders() {
     if (type.value == "Client") {
       const clientId = await fetchy("/api/session", "GET");
       const orders = await fetchy(`/api/order/user/${clientId._id}`, "GET");
-      unfulfilled.value = orders.filter((order) => order.status != "picked up");
-      fulfilled.value = orders.filter((order) => order.status == "picked up");
+      unfulfilled.value = orders.filter((order: { status: "placed" | "packed" | "picked up" }) => order.status != "picked up");
+      fulfilled.value = orders.filter((order: { status: "placed" | "packed" | "picked up" }) => order.status == "picked up");
       loaded.value = true;
     } else {
       const adminId = await fetchy("/api/session", "GET");
       const orders = await fetchy(`/api/order/admin/${adminId._id}`, "GET");
-      unfulfilled.value = orders.filter((order) => order.status != "picked up");
-      fulfilled.value = orders.filter((order) => order.status == "picked up");
+      unfulfilled.value = orders.filter((order: { status: "placed" | "packed" | "picked up" }) => order.status != "picked up");
+      fulfilled.value = orders.filter((order: { status: "placed" | "packed" | "picked up" }) => order.status == "picked up");
       loaded.value = true;
     }
   } catch (e) {
