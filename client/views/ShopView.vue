@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import ShopItemListComponent from "@/components/Shop/ShopItemListComponent.vue";
-import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { useRoute } from "vue-router";
 import router from "../router";
-import { useUserStore } from "../stores/user";
 import { fetchy } from "../utils/fetchy";
 const props = defineProps(["order"]);
 const hasOrder = ref(false);
@@ -12,13 +10,11 @@ const shop = ref();
 const shopId = ref();
 const order = ref<Array<string>>([]);
 const loading = ref(false);
-const { currentUsername } = storeToRefs(useUserStore());
 
 async function getProfileById(_id: any) {
   let profile;
   try {
     profile = await fetchy(`/api/profiles/id/${_id}`, "GET");
-    console.log(profile, "in get ProfileById");
   } catch (_) {
     console.log("failed");
     return;
@@ -26,18 +22,15 @@ async function getProfileById(_id: any) {
   shop.value = profile;
 }
 const switchToMap = () => {
-  console.log("in goToMap");
   shop.value = null;
   void router.push({ name: "Map" });
 };
 const switchToCart = (order: Array<string>) => {
-  console.log("in switchFromShop");
   void router.push({ name: "Cart", params: { shopId: shopId.value }, query: { order: JSON.stringify(order) } });
 };
 
 onBeforeMount(async () => {
   const route = useRoute();
-  console.log(route.params.shopId, "this is shopId");
   shopId.value = route.params.shopId;
   // Access route parameter 'id'
   if (route.params.shopId) {
@@ -46,7 +39,6 @@ onBeforeMount(async () => {
     console.log("route parameter wasn't passed correctly");
   }
   if (props.order.value) {
-    console.log(order.value);
     hasOrder.value = true;
     order.value = props.order.value;
   }

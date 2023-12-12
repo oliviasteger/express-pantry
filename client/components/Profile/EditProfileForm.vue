@@ -27,7 +27,6 @@ async function getCities() {
 async function updateLocation() {
   try {
     const profile = await fetchy("api/profiles/currentUser", "GET");
-    console.log(profile);
     const profileId = profile._id;
 
     await fetchy("api/profiles/", "PATCH", { body: { update: { location: city.value }, _id: profileId } });
@@ -40,7 +39,6 @@ async function updateLocation() {
 async function updateName() {
   try {
     const profile = await fetchy("api/profiles/currentUser", "GET");
-    console.log(profile);
     const profileId = profile._id;
 
     await fetchy("api/profiles/", "PATCH", { body: { update: { name: name.value }, _id: profileId } });
@@ -53,7 +51,6 @@ async function updateName() {
 async function updateOpenHour() {
   try {
     const profile = await fetchy("api/profiles/currentUser", "GET");
-    console.log(profile);
     const profileId = profile._id;
     await fetchy("api/profiles/", "PATCH", { body: { update: { openHour: openHours.value }, _id: profileId } });
     await router.push({ name: "Profile" });
@@ -77,7 +74,6 @@ async function updateRules() {
   try {
     const profile = await fetchy("api/profiles/currentUser", "GET");
     const profileId = profile._id;
-    console.log("RULES EDITED", rules.value);
     await fetchy("api/profiles/", "PATCH", { body: { update: { rules: rules.value }, _id: profileId } });
     await router.push({ name: "Profile" });
   } catch {

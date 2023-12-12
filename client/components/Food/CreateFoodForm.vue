@@ -29,43 +29,33 @@ const addFoodItem = async () => {
 </script>
 
 <template>
-  <v-card min-width="60%" class="ma-5">
+  <v-card min-width="600px" class="ma-5">
     <v-card-title>Add inventory item</v-card-title>
     <v-card-item>
       <v-form @submit.prevent="addFoodItem">
-        <v-row>
-          <v-col>
-            <v-text-field v-model.trim="barcode" label="Input the barcode of the food item" required></v-text-field>
-          </v-col>
-        </v-row>
+        <v-container>
+          <v-text-field v-model.trim="barcode" label="Food item barcode" required></v-text-field>
+        </v-container>
 
-        <v-row>
-          <v-col>
-            <!-- Use native date input for expiration date -->
-            <label for="expirationDate">Expiration Date:</label>
-            <input v-model.trim="expirationDate" type="date" id="expirationDate" required />
-          </v-col>
-        </v-row>
+        <!-- Use native date input for expiration date -->
+        <v-container>
+          <label for="expirationDate">Expiration Date: &nbsp;</label>
+          <input v-model.trim="expirationDate" type="date" id="expirationDate" required />
+        </v-container>
 
-        <v-row>
-          <v-col>
-            <!-- Use native date input for expiration date -->
-            <label for="dropDate">Drop Date For Item:</label>
-            <input v-model.trim="dropDate" type="date" id="dropDate" required />
-          </v-col>
-        </v-row>
+        <!-- Use native date input for expiration date -->
+        <v-container>
+          <label for="dropDate">Drop/Release Date: &nbsp;</label>
+          <input v-model.trim="dropDate" type="date" id="dropDate" required />
+        </v-container>
 
-        <v-row>
-          <v-col>
-            <v-select v-model="status" :items="['Unreleased', 'Claimable', 'Ordered', 'Used', 'Expired']" label="Choose the status of this food item" required></v-select>
-          </v-col>
-        </v-row>
+        <v-container>
+          <v-select v-model="status" :items="['Unreleased', 'Claimable', 'Ordered', 'Used', 'Expired']" label="Food item status" required></v-select>
+        </v-container>
 
-        <v-row>
-          <v-col>
-            <v-btn type="submit" color="primary">Add Item</v-btn>
-          </v-col>
-        </v-row>
+        <div class="d-flex flex-column">
+          <v-btn type="submit" color="primary">Add Item</v-btn>
+        </div>
       </v-form>
     </v-card-item>
   </v-card>
