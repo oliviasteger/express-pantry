@@ -5,9 +5,9 @@ import ProfileComponent from "@/components/Profile/ProfileComponent.vue";
 </script>
 
 <template>
-  <main>
+  <v-container>
     <ProfileComponent />
-  </main>
+  </v-container>
 </template>
 <!-- <style>
 #center {
