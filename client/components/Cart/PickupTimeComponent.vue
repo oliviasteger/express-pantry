@@ -28,11 +28,12 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <v-form @submit.prevent="emit('addTime', selectedTime)">
-    <v-select :items="times" v-model="selectedTime"></v-select>
-    <div>
-      <p>Selected time: {{ selectedTime }}</p>
-    </div>
-    <v-btn type="submit" block class="mt-0 mb-0" text="Select time"></v-btn>
-  </v-form>
+  <v-card min-width="600px">
+    <v-card-title> Select a pickup time </v-card-title>
+    <v-card-subtitle>Please double-check your order contents before submitting your order. You will not be able to change your order once it is submitted.</v-card-subtitle>
+    <v-form class="ma-3" @submit.prevent="emit('addTime', selectedTime)">
+      <v-select :items="times" v-model="selectedTime"></v-select>
+      <v-btn type="submit" block class="mt-0 mb-0" text="Submit order"></v-btn>
+    </v-form>
+  </v-card>
 </template>

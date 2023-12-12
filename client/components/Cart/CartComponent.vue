@@ -58,13 +58,19 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <v-card>
+  <v-card min-width="600px">
     <v-card-title>Your Cart</v-card-title>
-    <v-list class="container" v-if="loaded && order.length !== 0">
-      <v-list-item-group v-for="barcode of cartCountMap.keys()" :key="barcode">
-        <CartItemComponent :item="barcode" :quantity="cartCountMap.get(barcode)" @addedToCart="addToCart" @removeFromCart="removeFromCart" />
-        <v-divider width="90%"></v-divider>
-      </v-list-item-group>
+    <v-list v-if="loaded && order.length !== 0" lines="three">
+      <CartItemComponent
+        class="ma-3"
+        v-for="barcode of cartCountMap.keys()"
+        :key="barcode"
+        variant="tonal"
+        :item="barcode"
+        :quantity="cartCountMap.get(barcode)"
+        @addedToCart="addToCart"
+        @removeFromCart="removeFromCart"
+      />
     </v-list>
     <v-card-text v-else>No items in cart</v-card-text>
   </v-card>
@@ -86,13 +92,5 @@ onBeforeMount(async () => {
 .profile-button:hover {
   background-color: #007bff;
   color: #fff;
-}
-.container {
-  width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: var(--light-grey);
 }
 </style>
