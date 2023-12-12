@@ -10,20 +10,22 @@ async function switchView() {
 
 <template>
   <main>
-    <div class="column" id="center">
-      <div class="column" v-show="!needRegistry">
-        <h1>Please login</h1>
+    <div>
+      <v-sheet v-show="!needRegistry">
         <LoginForm @register="switchView" />
-      </div>
+      </v-sheet>
 
-      <div v-show="needRegistry">
-        <h1>Create your ExpressPantry Account</h1>
+      <v-sheet v-show="needRegistry">
         <RegisterForm @submit="switchView" />
-      </div>
+      </v-sheet>
     </div>
   </main>
 </template>
 <style>
+.panel{
+  width: 40vw;
+  gap:10px;
+}
 #center {
   display: flex;
   align-self: center;

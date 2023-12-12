@@ -6,7 +6,6 @@ import FoodListComponent from "../components/Food/FoodListComponent.vue";
 import EditProfileForm from "../components/Profile/EditProfileForm.vue";
 import AccountView from "../views/AccountView.vue";
 import AdminOrdersView from "../views/AdminOrdersView.vue";
-import AdminSettingView from "../views/AdminSettingView.vue";
 import CartView from "../views/CartView.vue";
 import ClientOrdersView from "../views/ClientOrdersView.vue";
 import HomeView from "../views/HomeView.vue";
@@ -83,12 +82,6 @@ const router = createRouter({
       path: "/setting",
       name: "Settings",
       component: SettingView,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/adminsetting",
-      name: "Admin Settings",
-      component: AdminSettingView,
       meta: { requiresAuth: true },
     },
     {
