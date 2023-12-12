@@ -45,15 +45,8 @@ onBeforeMount(async () => {
       <hr width="100%" size=".1" id="color" noshade />
       <div class="row">
         <PantryListComponent :selectedCity="selectedCity" @openShop="switchToShop"></PantryListComponent>
-        <!--<MapComponent>
-          <MyMarker />
-        </MapComponent>-->
       </div>
     </div>
-    <!-- <div v-if="inShop">
-      <ShopView :shop="shop" @leaveShop="switchFromShop"></ShopView>
-      
-    </div> -->
   </main>
 </template>
 <style>

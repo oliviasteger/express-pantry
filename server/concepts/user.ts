@@ -107,9 +107,7 @@ export default class UserConcept {
 
   async isAdministrator(_id: ObjectId) {
     const maybeUser = await this.users.readOne({ _id });
-    console.log("User requested");
     if (maybeUser === null) {
-      console.log("No user");
       throw new NotFoundError(`User not found!`);
     } else if (maybeUser.type === "Client") {
       throw new NotAllowedError(`User is not an administrator!`);

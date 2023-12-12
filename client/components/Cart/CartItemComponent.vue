@@ -27,7 +27,7 @@ const getName = async (barcode: string) => {
       name.value = data.product.generic_name_en ? data.product.generic_name_en : "No name available";
       brand.value = data.product.brands ? data.product.brands : "No brand available";
       imageURL.value = data.product.image_url ? data.product.image_url : "https://t3.ftcdn.net/jpg/05/03/24/40/360_F_503244059_fRjgerSXBfOYZqTpei4oqyEpQrhbpOML.jpg";
-      group.value = data.product.food_groups ? data.product.food_groups : "No food groups available";
+      group.value = data.product.food_groups ? data.product.food_groups.substring(data.product.food_groups.indexOf(":") + 1).replaceAll("-", " ") : "No food groups available";
     })
     .catch((error) => {
       // Handle any errors here
@@ -46,14 +46,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <v-list-item :prepend-avatar="imageURL" ripple>
-    <template v-slot:title>
-      <div v-html="name"></div>
-    </template>
-
-    <template v-slot:subtitle>
-      <div><strong>Quantity:</strong>{{ props.quantity }}</div>
-    </template>
+  <v-list-item :prepend-avatar="imageURL" :title="name + ' - ' + brand" :subtitle="'Quantity: ' + props.quantity" ripple>
     <br />
     <v-list-item-action>
       <button class="profile-button" @click="emit('removeFromCart', props.item)">Remove From Cart</button>

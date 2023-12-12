@@ -34,9 +34,9 @@ const getItemCounts = (order: Array<string>): Map<string, number> => {
 
 const createOrder = async () => {
   try {
-  console.log({ body: { profileId: shopId.value, barcodes: props.order, pickupTime: time.value?.toISOString() } });
-  await fetchy("/api/order", "POST", { body: { profileId: shopId.value, barcodes: JSON.stringify(Array.from(getItemCounts(props.order).entries())), pickupTime: time.value?.toISOString() } });
-  await router.push({ name: "Client Orders" });
+    console.log({ body: { profileId: shopId.value, barcodes: props.order, pickupTime: time.value?.toISOString() } });
+    await fetchy("/api/order", "POST", { body: { profileId: shopId.value, barcodes: JSON.stringify(Array.from(getItemCounts(props.order).entries())), pickupTime: time.value?.toISOString() } });
+    await router.push({ name: "Client Orders" });
   } catch (e) {
     console.log(e);
   }
@@ -78,7 +78,6 @@ onBeforeMount(async () => {
 </script>
 
 <template>
- 
   <v-app class="rounded rounded-md bar" v-if="shop" @submit.prevent="createOrder">
     <v-app-bar class="custom-app-bar" :elevation="3" density="compact">
       <template v-slot:prepend>
@@ -90,19 +89,13 @@ onBeforeMount(async () => {
           </button></v-app-bar-title
         >
       </template>
-
-      <template v-slot:append>
-        <v-chip type="submit" variant="elevated">
-          <strong>Place Order</strong>
-        </v-chip>
-      </template>
     </v-app-bar>
 
     <v-main class="d-flex align-start justify-center" style="min-height: 300px">
-      <section class="posts" v-if="loaded && hasOrder">
-        <CartComponent :order="props.order" />
-        <PickupTimeComponent :administrator="shopId" @addTime="updateTime" required />
-      </section>
+      <v-container v-if="loaded && hasOrder">
+        <PickupTimeComponent :administrator="shopId" @addTime="updateTime" required /><br />
+        <CartComponent :order="props.order" /><br />
+      </v-container>
       <p v-else-if="loaded">No items in cart yet!</p>
       <p v-else>Loading...</p>
     </v-main>

@@ -30,15 +30,12 @@ const rules = ref({
 
 const getProfile = async () => {
   try {
-    console.log("HEREEEE");
     const profile = await fetchy("api/profiles/currentUser", "GET");
     city.value = profile.location;
     name.value = profile.name;
     openHours.value = profile.openHour;
     closeHours.value = profile.closeHour;
     rules.value = profile.rules;
-    console.log(profile.rules);
-    console.log("RULES", rules.value);
   } catch {
     //not sure
   }

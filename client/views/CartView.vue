@@ -15,18 +15,13 @@ async function getProfileById(_id: any) {
   let profile;
   try {
     profile = await fetchy(`/api/profiles/id/${_id}`, "GET");
-    console.log(profile, "in get ProfileById");
   } catch (_) {
     console.log("failed");
     return;
   }
   shop.value = profile;
 }
-// watch(() => props.order, async (newOrder: any, oldOrder: any) => {
-//       if (newOrder) {
-//         await setUpShop(newShop);
-//       }
-//     });
+
 const switchToShop = () => {
   console.log(shopId, " switching from cart to shop");
   console.log(`this is the order ${order.value}`);
@@ -35,12 +30,6 @@ const switchToShop = () => {
   }
   console.log(`this is the order after the check ${order.value}`);
   void router.push({ name: "Shop", params: { shopId: shopId.value }, query: { order: JSON.stringify(order.value) } });
-  // void router.push({ name: "Shop", params: { shopId: shopId.value } });
-  // if(order){
-
-  // }else{
-  //     void router.push({ name: 'Shop', params:{shopId:shopId.value}});
-  // }
 };
 const updateOrder = (newOrder: Array<string>) => {
   console.log(newOrder, " edited the order in cart");
@@ -54,12 +43,6 @@ const checkout = () => {
   }
   console.log(`this is the order after the check ${order.value}`);
   void router.push({ name: "OrderConfirmation", params: { shopId: shopId.value }, query: { order: JSON.stringify(order.value) } });
-  // void router.push({ name: "Shop", params: { shopId: shopId.value } });
-  // if(order){
-
-  // }else{
-  //     void router.push({ name: 'Shop', params:{shopId:shopId.value}});
-  // }
 };
 onBeforeMount(async () => {
   const route = useRoute();
@@ -127,16 +110,13 @@ onBeforeMount(async () => {
   background: black;
   color: white;
 }
+
 .custom-app-bar {
   position: relative !important;
   top: auto !important;
   height: fit-content !important;
   padding: 0.1em !important;
 }
-/* .custom-navigation-drawer {
-  position: sticky !important; 
-  top: auto !important; 
-} */
 
 section {
   display: flex;
@@ -210,11 +190,4 @@ article {
   padding: 1em;
   flex-wrap: wrap;
 }
-/* .row {
-  display: flex;
-  justify-content: space-between;
-  margin: 0 auto;
-  max-width: 60em;
-} */
-/* Add more styling as needed */
 </style>

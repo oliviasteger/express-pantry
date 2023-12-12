@@ -41,8 +41,8 @@ onBeforeMount(async () => {
   <section v-if="isLoggedIn">
     <CreateFoodForm @refreshItems="getItems" />
   </section>
+  <h2 style="text-align: center">Inventory</h2>
   <section class="posts" v-if="loaded && items.length !== 0">
-    <h2>Inventory</h2>
     <article v-for="item in items" :key="item._id">
       <FoodComponent v-if="editing !== item._id" :item="item" @refreshItems="getItems" @editItem="updateEditing" />
       <EditFoodForm v-else :item="item" @refreshItems="getItems" @editItem="updateEditing" @cancelEdit="cancelEditing" />
@@ -55,34 +55,32 @@ onBeforeMount(async () => {
 <style scoped>
 section {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1em;
+}
+section,
+p {
+  margin: 0 auto;
+  max-width: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
   gap: 1em;
 }
 
-section,
-p,
-.row {
-  margin: 0 auto;
-  max-width: 60em;
-}
-
 article {
-  background-color: var(--base-bg);
+  background-color: #ffffff;
   border-radius: 1em;
   display: flex;
   flex-direction: column;
   gap: 0.5em;
   padding: 1em;
 }
-
 .posts {
-  padding: 1em;
-}
-
-.row {
   display: flex;
-  justify-content: space-between;
-  margin: 0 auto;
-  max-width: 60em;
+  padding: 1em;
+  flex-wrap: wrap;
 }
 </style>
