@@ -9,7 +9,7 @@ let password = ref("");
 const loaded = ref(false);
 const information = ref({
   annualIncome: "",
-  snapEligible: false,
+  isSnapEligible: false,
   city: "",
 });
 const cities = ref([]);
@@ -26,7 +26,7 @@ const emit = defineEmits(["refreshPage"]);
 const updateField = async (type: "annualIncome" | "snapEligible" | "city") => {
   const fieldParsed = () => {
     if (type == "annualIncome") return { annualIncome: information.value.annualIncome };
-    else if (type == "snapEligible") return { snapEligible: information.value.snapEligible };
+    else if (type == "snapEligible") return { isSnapEligible: information.value.isSnapEligible };
     else if (type == "city") return { city: information.value.city };
     else return {};
   };
@@ -43,7 +43,7 @@ const cityModel = ref<any>(null);
 const emptyForm = () => {
   information.value = {
     annualIncome: "",
-    snapEligible: false,
+    isSnapEligible: false,
     city: "",
   };
   username.value = "";
@@ -60,7 +60,7 @@ const rules = [
 ];
 const currentAnnualIncome = ref("");
 const currentCity = ref("");
-const currentSnapEligible = ref(false);
+const currentSnapEligible = ref("");
 const validationErrors = ref<Array<string>>([]);
 
 const isUpdateCityDisabled = computed(() => {
@@ -77,7 +77,7 @@ function validate() {
 
 async function updateIncome() {
   information.value.city = currentCity.value;
-  information.value.snapEligible = currentSnapEligible.value;
+  information.value.isSnapEligible = currentSnapEligible.value === "Yes";
   await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
   const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
   currentAnnualIncome.value = user.information.annualIncome;
@@ -88,12 +88,13 @@ async function updateIncome() {
 async function updateSnap() {
   information.value.city = currentCity.value;
   information.value.annualIncome = currentAnnualIncome.value;
+  information.value.isSnapEligible = currentSnapEligible.value === "Yes";
   await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
   console.log(await fetchy(`/api/users/${currentUsername.value}`, "GET"));
   const user = await fetchy(`/api/users/${currentUsername.value}`, "GET");
   currentAnnualIncome.value = user.information.annualIncome;
   currentCity.value = user.information.city;
-  currentSnapEligible.value = user.information.snapEligible;
+  //currentSnapEligible.value = user.information.snapEligible ? "Yes" : "No";
 }
 
 async function updateLocation() {
@@ -101,7 +102,7 @@ async function updateLocation() {
   validate();
   if (validationErrors.value.length === 0) {
     information.value.city = cityModel.value;
-    information.value.snapEligible = currentSnapEligible.value;
+    information.value.isSnapEligible = currentSnapEligible.value === "Yes";
     information.value.annualIncome = currentAnnualIncome.value;
     await fetchy("/api/users", "PATCH", { body: { update: { information: JSON.stringify(information.value) } } });
     console.log(await fetchy(`/api/users/${currentUsername.value}`, "GET"));
@@ -122,7 +123,7 @@ async function getInformation() {
   }
   currentAnnualIncome.value = user.information.annualIncome;
   currentCity.value = user.information.city;
-  currentSnapEligible.value = user.information.snapEligible;
+  currentSnapEligible.value = user.information.isSnapEligible ? "Yes" : "No";
 }
 
 onBeforeMount(async () => {
@@ -149,7 +150,7 @@ onBeforeMount(async () => {
   </v-card-item>
   <v-card-item>
     <v-form validate-on="submit lazy" @submit.prevent="updateSnap">
-      <v-switch color="primary" inset true-value="Yes" false-value="No" v-model="information.snapEligible" hide-details :label="`Do you recieve SNAP benefits/federal food assistance?`"></v-switch>
+      <v-switch color="primary" inset true-value="Yes" false-value="No" v-model="currentSnapEligible" hide-details :label="`Do you recieve SNAP benefits/federal food assistance?`"></v-switch>
       <v-btn type="submit" id="change" block class="mt-2" text="Change"></v-btn>
     </v-form>
   </v-card-item>

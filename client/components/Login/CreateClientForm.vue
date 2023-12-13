@@ -9,9 +9,10 @@ const username = ref("");
 const password = ref("");
 const information = ref({
   annualIncome: "",
-  snapEligible: false,
+  isSnapEligible: false,
   city: "",
 });
+const snapEligible = ref("");
 async function getCities() {
   const response = await fetch("https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/us-cities-demographics/records?group_by=city&limit=3000");
   const data = await response.json();
@@ -26,6 +27,7 @@ onMounted(async () => {
 });
 
 async function userRegister() {
+  information.value.isSnapEligible = snapEligible.value === "true";
   await fetchy("/api/users", "POST", {
     body: {
       username: username.value,
@@ -75,24 +77,15 @@ async function userRegister() {
 
       <div class="pure-control-group">
         <label for="aligned-snapEligible">Do you have snap benefits?</label>
-        <select v-model="information.snapEligible" id="aligned-snapEligible" required>
+        <select v-model="snapEligible" id="aligned-snapEligible" required>
           <option value="" disabled>Select</option>
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
         </select>
       </div>
 
       <br />
-      <v-btn
-        block
-        class="mb-8"
-        color="primary"
-        size="large"
-        variant="tonal"
-        type="submit"
-      >
-        Register
-      </v-btn>
+      <v-btn block class="mb-8" color="primary" size="large" variant="tonal" type="submit"> Register </v-btn>
     </fieldset>
   </form>
 </template>
